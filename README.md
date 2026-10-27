@@ -28,7 +28,6 @@ npm run tauri build   # gera o instalador em src-tauri/target/release/bundle
 ## Publicar uma nova versão
 
 1. Atualize a versão em `package.json`, `src-tauri/tauri.conf.json` e `src-tauri/Cargo.toml`.
-2. Crie e envie uma tag: `git tag v0.2.0 && git push origin v0.2.0`.
-3. O GitHub Actions compila e publica o instalador em **Releases** (leva uns 10 a 15 minutos).
-
-O build também pode ser disparado manualmente em **Actions → Build e Release (Windows) → Run workflow**.
+2. Envie as mudanças para a branch `main`.
+3. Dispare o build em **Actions → Build e Release (Windows) → Run workflow** (ou envie uma tag `v*`).
+4. O GitHub Actions compila, cria a tag `v<versão>` e publica o instalador em **Releases**.

@@ -1,0 +1,47 @@
+# Gera o instalador do Windows (.exe) e publica na aba "Releases" do GitHub.
+# Dispara quando uma tag "v*" é enviada (ex.: v0.1.0) ou manualmente pela aba Actions.
+name: Build e Release (Windows)
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache do Rust
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Instalar dependências
+        run: npm ci
+
+      - name: Compilar e publicar instalador
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: v__VERSION__
+          releaseName: "AION2 Task Manager v__VERSION__"
+          releaseBody: "Baixe o arquivo **_x64-setup.exe** abaixo e execute para instalar."
+          releaseDraft: false
+          prerelease: false

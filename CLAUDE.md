@@ -117,6 +117,7 @@ src/
     AppHeader.tsx               Cabeçalho com logo, abas e contagem do reset
     icons.tsx                   Ícones SVG próprios
   screens/ComponentShowcase.tsx Tela de amostra da Etapa 3 (temporária)
+  updater/                      Atualização pelo app (hook + faixa de aviso + rodapé de versão)
 src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do instalador
 ```
 
@@ -137,6 +138,17 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
 
+## Atualização pelo próprio app (desde a v0.3.0)
+
+- Plugins Tauri **updater** + **process**. Código em `src/updater/` (`useUpdater.ts`, `UpdateBanner.tsx`).
+- Ao abrir, o app verifica em silêncio `https://github.com/FounderHA/AION2TaskManager/releases/latest/download/latest.json`. Se houver versão nova, mostra uma faixa dourada com **"Atualizar agora"**; baixa, instala (modo `passive`) e reinicia.
+- Rodapé mostra a versão instalada e o link **"Verificar atualizações"**.
+- **O repositório precisa ser público**: o atualizador não baixa de Releases privados.
+- As atualizações são **assinadas**. A chave pública está em `tauri.conf.json` (`plugins.updater.pubkey`). A chave privada fica **só** no segredo `TAURI_SIGNING_PRIVATE_KEY` do repositório (sem senha) e numa cópia de segurança com o usuário. **Nunca commitar a chave privada.** Se ela for perdida, os apps já instalados não aceitam mais atualizações (seria preciso reinstalar manualmente uma versão com chave nova).
+- `bundle.createUpdaterArtifacts: true` faz o build gerar a assinatura; o `tauri-action` publica o `latest.json` na Release.
+- Sem o segredo configurado, o build **falha** (não consegue assinar).
+- Versões anteriores à 0.3.0 não têm atualizador: precisam ser trocadas manualmente uma vez.
+
 ## Plano de etapas
 
 | # | Etapa | Status |
@@ -144,6 +156,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 | 1 | Mockup visual do Painel Semanal | ✅ Aprovado |
 | 2 | Base do projeto + GitHub Actions (v0.1.0) | ✅ Instalador testado e funcionando |
 | 3 | Sistema visual (componentes reutilizáveis + tela de amostra) | ✅ Entregue na v0.2.0, aguardando validação |
+| 3.1 | Atualização pelo próprio app (v0.3.0) | ✅ Implementado; depende do repositório público e do segredo de assinatura |
 | 4 | Catálogo de tarefas (dados com escopo, ciclo, regra main/alt) | ⏳ Próxima |
 | 5 | Lógica de tempo (semana qua 04:00 → ter 03:59, dia vira às 04:00) | |
 | 6 | Personagens (cadastro, main/alt, membership) | |

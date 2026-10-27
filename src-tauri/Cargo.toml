@@ -1,6 +1,6 @@
 [package]
 name = "aion2taskmanager"
-version = "0.2.0"
+version = "0.3.0"
 description = "Controle de tarefas diárias e semanais do Aion 2"
 authors = ["FounderHA"]
 edition = "2024"
@@ -19,6 +19,7 @@ tauri-build = { version = "2", features = [] }
 
 [dependencies]
 tauri = { version = "2", features = [] }
+tauri-plugin-process = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 
@@ -30,3 +31,6 @@ lto = true
 opt-level = 3
 panic = "abort"
 strip = true
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-plugin-updater = "2"

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { AppHeader, Panel, SectionTitle, type TabItem } from "./components/ui";
 import { ComponentShowcase } from "./screens/ComponentShowcase";
+import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
+import { useUpdater } from "./updater/useUpdater";
 
 type TabId = "semana" | "hoje" | "conta" | "historico" | "componentes";
 
@@ -22,10 +24,12 @@ const COMING: Record<Exclude<TabId, "componentes">, string> = {
 
 function App() {
   const [tab, setTab] = useState<TabId>("componentes");
+  const updater = useUpdater();
 
   return (
     <div className="app-bg">
       <AppHeader tabs={TABS} active={tab} onTabChange={setTab} resetLabel="Próximo reset" resetValue="--h --m" resetHint="qua 04:00" />
+      <UpdateBanner state={updater.state} dismissed={updater.dismissed} onInstall={updater.install} onDismiss={updater.dismiss} />
       {tab === "componentes" ? (
         <ComponentShowcase />
       ) : (
@@ -36,6 +40,7 @@ function App() {
           </Panel>
         </div>
       )}
+      <VersionFooter version={updater.currentVersion} state={updater.state} onCheck={updater.checkNow} />
     </div>
   );
 }

@@ -130,8 +130,8 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 ## Build e release
 
 - O instalador é gerado pelo workflow **"Build e Release (Windows)"** (`.github/workflows/release.yml`).
-- Dispara por **push de tag `v*`** ou manualmente (**workflow_dispatch**).
-- **Em sessões do Claude, push de tag é bloqueado (HTTP 403).** Use: `gh workflow run release.yml -R FounderHA/aion2taskmanager --ref main`. O `tauri-action` cria sozinho a tag `v<versão>` e a Release a partir da versão do `tauri.conf.json`.
+- Dispara por **push de tag `v*`** ou manualmente (**workflow_dispatch**), com o campo opcional `notas` (texto que aparece na faixa de atualização do app).
+- **Em sessões do Claude, push de tag é bloqueado (HTTP 403).** Use: `gh workflow run release.yml -R FounderHA/aion2taskmanager --ref main -f notas="Novidades em português"`. O `tauri-action` cria sozinho a tag `v<versão>` e a Release a partir da versão do `tauri.conf.json`.
 - Antes de cada release, atualizar a versão em **3 lugares**: `package.json`, `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`. A mesma versão não pode ser publicada duas vezes.
 - Em sessões do Claude, o GraphQL do GitHub é bloqueado: use `gh api repos/FounderHA/aion2taskmanager/...` (REST) em vez de `gh release view`.
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.

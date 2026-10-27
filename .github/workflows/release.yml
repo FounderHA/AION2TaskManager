@@ -7,6 +7,11 @@ on:
     tags:
       - "v*"
   workflow_dispatch:
+    inputs:
+      notas:
+        description: "Novidades desta versão (aparecem na faixa de atualização do app)"
+        required: false
+        default: "Melhorias e correções."
 
 permissions:
   contents: write
@@ -45,6 +50,7 @@ jobs:
         with:
           tagName: v__VERSION__
           releaseName: "AION2 Task Manager v__VERSION__"
-          releaseBody: "Baixe o arquivo **_x64-setup.exe** abaixo e execute para instalar."
+          # Texto exibido na faixa "Nova versão disponível" dentro do app
+          releaseBody: ${{ inputs.notas || 'Melhorias e correções.' }}
           releaseDraft: false
           prerelease: false

@@ -15,6 +15,8 @@ interface StoreValue {
   updateCharacter: (id: string, patch: Partial<Omit<Character, "id" | "createdAt" | "role">>) => void;
   setMain: (id: string) => void;
   deleteCharacter: (id: string) => void;
+  /** Liga/desliga uma marcação (chave de data/checks.ts). */
+  toggleCheck: (key: string) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -86,15 +88,26 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   const deleteCharacter = useCallback((id: string) => {
     setData((d) => {
       const rest = d.characters.filter((c) => c.id !== id);
+      // Remove as marcações do personagem excluído (as de servidor ficam)
+      const checks = Object.fromEntries(Object.entries(d.checks).filter(([k]) => !k.startsWith(`${id}|`)));
       // Se o main foi excluído, ensureSingleMain promove o alt mais antigo
-      return { ...d, characters: ensureSingleMain(rest) };
+      return { ...d, characters: ensureSingleMain(rest), checks };
+    });
+  }, []);
+
+  const toggleCheck = useCallback((key: string) => {
+    setData((d) => {
+      const checks = { ...d.checks };
+      if (checks[key]) delete checks[key];
+      else checks[key] = new Date().toISOString();
+      return { ...d, checks };
     });
   }, []);
 
   const value = useMemo<StoreValue>(() => {
     const characters = sortCharacters(data.characters);
-    return { data, characters, main: characters.find((c) => c.role === "MAIN"), saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter };
-  }, [data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter]);
+    return { data, characters, main: characters.find((c) => c.role === "MAIN"), saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck };
+  }, [data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

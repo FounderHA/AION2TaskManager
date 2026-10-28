@@ -138,7 +138,9 @@ src/
   time/gameTime.ts              Dia/semana do jogo, próximos resets, textos (funções puras, testadas)
   time/gameTime.test.ts         Testes (vitest) da lógica de tempo
   time/useGameClock.ts          Hook que atualiza o relógio a cada 15 s
-  screens/WeekPreviewScreen.tsx Aba Semana (provisória): faixa qua→ter com hoje destacado e resets
+  screens/WeeklyScreen.tsx      Aba Semana: Painel Semanal (cards, grade de diárias, semanais, progresso, alertas)
+  data/checks.ts                Chaves das marcações, estado das células e progresso da semana (testado)
+  data/checks.test.ts           Testes das marcações e do progresso
 src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do instalador
 ```
 
@@ -158,6 +160,17 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Marcações e Painel Semanal (desde a v0.7.0)
+
+- Marcações ficam em `AppData.checks` (objeto chave → data/hora ISO em que foi marcada). Desmarcar apaga a chave.
+- Formato da chave: `<dono>|<idTarefa>|d:<YYYY-MM-DD>` para diárias/ritmo/dias fixos (dia do jogo) e `<dono>|<idTarefa>|w:<YYYY-MM-DD>` para semanais (quarta da semana).
+- `<dono>` = id do personagem, ou **`SERVER`** para tarefas de servidor. Assim, trocar o main não perde o que já foi feito no servidor.
+- Excluir um personagem apaga as marcações dele (as de `SERVER` ficam).
+- Estados da célula: `done` (dourado), `today` (ciano), `missed` (tracejado, ainda clicável), `future` (desativado, não marca), `none` (evento de dias fixos fora do dia).
+- Progresso (`weekProgress`) conta só os dias **até hoje** + as semanais; dias futuros não pesam.
+- Tarefas ligadas: por enquanto `enabledByDefault` do catálogo (`isEnabled` em `WeeklyScreen.tsx`); na Etapa 12 vira configuração do usuário.
+- O selo "EXPIRA HOJE" aparece nas semanais pendentes só no último dia (terça).
 
 ## Lógica de tempo (desde a v0.6.0)
 
@@ -199,9 +212,9 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 | 4 | Catálogo de tarefas (dados com escopo, ciclo, regra main/alt) | ✅ Aprovado; código na v0.4.0 (aba Catálogo) |
 | 5 | Lógica de tempo (semana qua 04:00 → ter 03:59, dia vira às 04:00) | ✅ v0.6.0 (contagem no cabeçalho + prévia na aba Semana) |
 | 6 | Personagens (cadastro, main/alt, membership) | ✅ Adiantada a pedido do usuário; v0.5.0 (aba Personagens) |
-| 7 | Painel Semanal (grade qua→ter, check por dia) | ⏳ Próxima |
-| 8 | Visão do Dia | |
-| 9 | Salvamento local automático | 🟡 Base pronta na v0.5.0 (dados.json); falta incluir as marcações quando existirem |
+| 7 | Painel Semanal (grade qua→ter, check por dia) | ✅ v0.7.0 |
+| 8 | Visão do Dia | ⏳ Próxima |
+| 9 | Salvamento local automático | ✅ Personagens (v0.5.0) e marcações (v0.7.0) |
 | 10 | Backup (exportar/importar `.json`) | |
 | 11 | Histórico de semanas | |
 | 12 | Configurações (horário de reset, editor de tarefas, tema) | |

@@ -5,13 +5,15 @@ import { CheckIcon, CrossIcon } from "./icons";
    done:   dourado (concluída)
    today:  ciano (pendente hoje)
    missed: tracejado (dia passado não feito; ainda pode marcar)
-   future: neutro (dia que ainda não chegou) */
-export type CellState = "done" | "today" | "missed" | "future";
+   future: neutro e desativado (dia que ainda não chegou)
+   none:   sem quadrado (evento que não acontece nesse dia) */
+export type CellState = "done" | "today" | "missed" | "future" | "none";
 
 export function CheckCell({ state, label, onToggle }: { state: CellState; label: string; onToggle: () => void }) {
+  if (state === "none") return <span className="check-cell check-cell--none" aria-hidden="true" />;
   const status = state === "done" ? "concluída" : state === "missed" ? "perdida" : state === "today" ? "pendente" : "ainda não chegou";
   return (
-    <button className={`check-cell check-cell--${state}`} aria-pressed={state === "done"} aria-label={`${label}, ${status}`} onClick={onToggle}>
+    <button className={`check-cell check-cell--${state}`} aria-pressed={state === "done"} aria-label={`${label}, ${status}`} disabled={state === "future"} onClick={onToggle}>
       {state === "done" && <CheckIcon />}
       {state === "missed" && <CrossIcon />}
     </button>

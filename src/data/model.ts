@@ -22,13 +22,15 @@ export interface AppData {
   /** Versão do formato do arquivo; aumentar quando a estrutura mudar. */
   schemaVersion: 1;
   characters: Character[];
+  /** Marcações: chave (ver data/checks.ts) → data/hora em que foi marcada (ISO). */
+  checks: Record<string, string>;
 }
 
 export const SCHEMA_VERSION = 1 as const;
 export const NAME_MAX = 24;
 
 export function emptyData(): AppData {
-  return { schemaVersion: SCHEMA_VERSION, characters: [] };
+  return { schemaVersion: SCHEMA_VERSION, characters: [], checks: {} };
 }
 
 /** Lê o JSON salvo com tolerância: campos estranhos são ignorados, faltantes recebem padrão. */
@@ -48,7 +50,13 @@ export function parseData(raw: string | null | undefined): AppData {
         member: c.member === true,
         createdAt: typeof c.createdAt === "string" ? c.createdAt : new Date().toISOString(),
       }));
-    return { schemaVersion: SCHEMA_VERSION, characters: ensureSingleMain(characters) };
+    const checks: Record<string, string> = {};
+    if (obj?.checks && typeof obj.checks === "object") {
+      for (const [k, v] of Object.entries(obj.checks as Record<string, unknown>)) {
+        if (typeof v === "string" && k.includes("|")) checks[k] = v;
+      }
+    }
+    return { schemaVersion: SCHEMA_VERSION, characters: ensureSingleMain(characters), checks };
   } catch {
     return emptyData();
   }

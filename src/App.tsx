@@ -3,7 +3,7 @@ import { AppHeader, Panel, SectionTitle, type TabItem } from "./components/ui";
 import { CatalogScreen } from "./screens/CatalogScreen";
 import { CharactersScreen } from "./screens/CharactersScreen";
 import { ComponentShowcase } from "./screens/ComponentShowcase";
-import { WeekPreviewScreen } from "./screens/WeekPreviewScreen";
+import { WeeklyScreen } from "./screens/WeeklyScreen";
 import { formatCountdown, localResetLabel } from "./time/gameTime";
 import { useGameClock } from "./time/useGameClock";
 import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
@@ -45,7 +45,7 @@ function App() {
       ) : tab === "catalogo" ? (
         <CatalogScreen />
       ) : tab === "semana" ? (
-        <WeekPreviewScreen clock={clock} />
+        <WeeklyScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
       ) : tab === "personagens" ? (
         <CharactersScreen />
       ) : (

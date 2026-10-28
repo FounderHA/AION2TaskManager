@@ -31,14 +31,19 @@ interface WeekViewProps {
   onToggle?: (key: string) => void;
   /** Selo "EXPIRA HOJE" nas semanais pendentes. */
   weeklyExpiring?: boolean;
+  /** Personagem escolhido controlado de fora (opcional). */
+  selectedId?: string | null;
+  onSelect?: (id: string) => void;
   /** Conteúdo extra na coluna lateral (alertas). */
   sideExtra?: ReactNode;
 }
 
-export function WeekView({ characters, main, checks, days, weekKey, todayIndex, readOnly, onToggle, weeklyExpiring, sideExtra }: WeekViewProps) {
+export function WeekView({ characters, main, checks, days, weekKey, todayIndex, readOnly, onToggle, weeklyExpiring, sideExtra, selectedId: controlledId, onSelect }: WeekViewProps) {
   const { catalog, data } = useStore();
   const membership = data.settings.membership;
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [localId, setLocalId] = useState<string | null>(null);
+  const selectedId = controlledId !== undefined ? controlledId : localId;
+  const setSelectedId = onSelect ?? setLocalId;
   const selected = characters.find((c) => c.id === selectedId) ?? characters.find((c) => c.id === main?.id) ?? characters[0];
   const progress = useMemo(() => progressFor(catalog, characters, checks, days, todayIndex, weekKey), [catalog, characters, checks, days, todayIndex, weekKey]);
   const toggle = onToggle ?? (() => {});

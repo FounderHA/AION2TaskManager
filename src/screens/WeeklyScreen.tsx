@@ -1,11 +1,11 @@
-// Aba Semana: Painel Semanal da semana atual (editável).
+// Aba Personagem: controle completo de um personagem por vez (semana atual, editável).
 import { Alert, Button, Panel, SectionTitle } from "../components/ui";
 import { WeekView } from "../components/WeekView";
 import { useStore } from "../data/store";
 import { formatCountdown, localResetLabel } from "../time/gameTime";
 import type { GameClock } from "../time/useGameClock";
 
-export function WeeklyScreen({ clock, onGoToCharacters }: { clock: GameClock; onGoToCharacters: () => void }) {
+export function WeeklyScreen({ clock, onGoToCharacters, selectedId, onSelect }: { clock: GameClock; onGoToCharacters: () => void; selectedId: string | null; onSelect: (id: string) => void }) {
   const { characters, main, data, toggleCheck } = useStore();
   const toWeekly = clock.nextWeekly.getTime() - clock.now.getTime();
 
@@ -16,7 +16,7 @@ export function WeeklyScreen({ clock, onGoToCharacters }: { clock: GameClock; on
           <div className="empty-state">
             <span style={{ fontSize: 16, color: "var(--text)" }}>Cadastre seus personagens para ver as tarefas da semana.</span>
             <Button variant="primary" onClick={onGoToCharacters}>
-              Ir para Personagens
+              Ir para Cadastro
             </Button>
           </div>
         </Panel>
@@ -35,6 +35,8 @@ export function WeeklyScreen({ clock, onGoToCharacters }: { clock: GameClock; on
         todayIndex={clock.todayIndex}
         onToggle={toggleCheck}
         weeklyExpiring={clock.todayIndex === 6}
+        selectedId={selectedId}
+        onSelect={onSelect}
         sideExtra={
           <Panel label="Atenção">
             <SectionTitle>Atenção</SectionTitle>

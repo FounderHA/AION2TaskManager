@@ -4,7 +4,7 @@ import { CharactersScreen } from "./screens/CharactersScreen";
 import { HistoryScreen } from "./screens/HistoryScreen";
 import { OdyleScreen } from "./screens/OdyleScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
-import { TodayScreen } from "./screens/TodayScreen";
+import { ProgressScreen } from "./screens/ProgressScreen";
 import { WeeklyScreen } from "./screens/WeeklyScreen";
 import { formatCountdown, localResetLabel } from "./time/gameTime";
 import { useGameClock } from "./time/useGameClock";
@@ -13,23 +13,24 @@ import { currentOdyle, rulesFor } from "./data/odyle";
 import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
 import { useUpdater } from "./updater/useUpdater";
 
-type TabId = "semana" | "hoje" | "odyle" | "personagens" | "historico" | "configuracoes";
+type TabId = "personagem" | "progresso" | "odyle" | "personagens" | "historico" | "configuracoes";
 
 const BASE_TABS: TabItem<TabId>[] = [
-  { id: "hoje", label: "Hoje" },
-  { id: "semana", label: "Semana" },
+  { id: "progresso", label: "Progresso" },
+  { id: "personagem", label: "Personagem" },
   { id: "odyle", label: "Odyle" },
-  { id: "personagens", label: "Personagens" },
+  { id: "personagens", label: "Cadastro" },
   { id: "historico", label: "Histórico" },
   { id: "configuracoes", label: "Configurações" },
 ];
 
 function App() {
-  const [tab, setTab] = useState<TabId>("hoje");
+  const [tab, setTab] = useState<TabId>("progresso");
+  const [selectedChar, setSelectedChar] = useState<string | null>(null);
   const updater = useUpdater();
   const { reset, saveStatus, characters, data } = useStore();
 
-  // Ao abrir: sem personagens cadastrados, começa na aba Personagens
+  // Ao abrir: sem personagens cadastrados, começa na aba Cadastro
   const decidedStart = useRef(false);
   useEffect(() => {
     if (decidedStart.current || saveStatus === "carregando") return;
@@ -59,10 +60,17 @@ function App() {
       )}
       {tab === "configuracoes" ? (
         <SettingsScreen appVersion={updater.currentVersion} />
-      ) : tab === "semana" ? (
-        <WeeklyScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
-      ) : tab === "hoje" ? (
-        <TodayScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
+      ) : tab === "personagem" ? (
+        <WeeklyScreen clock={clock} onGoToCharacters={() => setTab("personagens")} selectedId={selectedChar} onSelect={setSelectedChar} />
+      ) : tab === "progresso" ? (
+        <ProgressScreen
+          clock={clock}
+          onGoToCharacters={() => setTab("personagens")}
+          onOpenCharacter={(id) => {
+            setSelectedChar(id);
+            setTab("personagem");
+          }}
+        />
       ) : tab === "odyle" ? (
         <OdyleScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
       ) : tab === "personagens" ? (

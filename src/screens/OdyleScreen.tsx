@@ -200,7 +200,7 @@ export function OdyleScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
           <div className="empty-state">
             <span style={{ fontSize: 16, color: "var(--text)" }}>Cadastre seus personagens para controlar a Odyle Energy.</span>
             <Button variant="primary" onClick={onGoToCharacters}>
-              Ir para Personagens
+              Ir para Cadastro
             </Button>
           </div>
         </Panel>

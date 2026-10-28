@@ -18,10 +18,10 @@ O app se atualiza sozinho: ao abrir, se houver versão nova, aparece uma faixa d
 
 | Aba | Para que serve |
 |---|---|
-| **Hoje** | O que falta hoje, de todos os personagens numa tela. É a aba para usar enquanto joga. |
-| **Semana** | A semana inteira (quarta a terça) de um personagem por vez: diárias dia a dia, semanais e progresso. |
+| **Progresso** | Visão geral de todos os personagens, só para conferir: o que falta hoje (diárias) e o que falta na semana (semanais e compras). Clique num personagem para abrir a aba dele. |
+| **Personagem** | Controle completo de um personagem por vez: diárias dia a dia (quarta a terça), semanais, compras e progresso. É onde você marca as tarefas. |
 | **Odyle** | Odyle Energy de cada personagem: Basic (recarrega sozinha a cada 3h, às 01h, 04h, 07h… de Brasília) e Charged (dos itens, até 2000). Botões −40/−80 para gastar, +40/+10 para Charged, aviso quando passa de 800 e horário em que enche. |
-| **Personagens** | Cadastro do main e dos alts: nome, classe, facção, foto, GS/CP e Odyle Energy inicial. |
+| **Cadastro** | Cadastro do main e dos alts: nome, classe, facção, foto, GS/CP e Odyle Energy inicial. |
 | **Histórico** | Semanas encerradas, só para consulta: o que foi feito e o que ficou para trás. |
 | **Configurações** | Membership da conta (vale para todos os personagens), backup, ligar/desligar tarefas, criar tarefas próprias e horário do reset. |
 

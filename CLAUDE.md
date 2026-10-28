@@ -172,6 +172,12 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
 
+## Foto do personagem (v1.3.1)
+- `Character.photo`: data URL (JPEG 160×160, cortado em quadrado no centro) ou null; dados antigos viram null; acima de `PHOTO_MAX` (250 KB) é descartada ao ler.
+- Escolhida no formulário de Personagens ("Escolher foto"/"Trocar foto"/"Remover"); fica só no dados.json do PC (e vai no backup).
+- `CharPortrait` (moldura dourada com silhueta quando não há foto) aparece no card do personagem (Personagens, Semana, Histórico), no Hoje e na aba Odyle.
+- `components/pickImage.ts` é o seletor de imagem compartilhado (fit `contain` para ícones de GS/CP, `cover` para a foto).
+
 ## Odyle Energy e Membership por conta (v1.3.0)
 - **Membership é da conta**: `settings.membership` (boolean). `Character.member` foi removido; ao abrir dados antigos, se qualquer personagem tinha `member: true`, a conta vira membership (migração em `parseData`). `describe(task, membership)` usa o da conta.
 - **Regras** (`settings.odyle`, editáveis em Configurações → Conta): com membership limite 840 e +15; sem, 560 e +10. Recarga a cada 3h às 01, 04, 07, 10, 13, 16, 19, 22 de Brasília (= horas UTC ≡ 1 mod 3), confirmado pelo usuário. Charged Energy (itens) até 2000, não recarrega.
@@ -270,7 +276,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 
 ## Personagens e salvamento (desde a v0.5.0)
 
-- Campos: nome (até 24 caracteres, sem repetir), classe (nomes do cliente em inglês: Gladiator, Templar, Assassin, Ranger, Sorcerer, Spiritmaster, Cleric, Chanter), facção (Elyos/Asmodian), papel (MAIN/ALT), GS/CP e Odyle inicial (membership saiu do personagem na v1.3.0).
+- Campos: nome (até 24 caracteres, sem repetir), classe (nomes do cliente em inglês: Gladiator, Templar, Assassin, Ranger, Sorcerer, Spiritmaster, Cleric, Chanter), facção (Elyos/Asmodian), papel (MAIN/ALT), foto, GS/CP e Odyle inicial (membership saiu do personagem na v1.3.0).
 - **Regra do main:** sempre exatamente um main quando há personagens. O primeiro cadastrado é main; promover outro rebaixa o atual; excluir o main promove o alt mais antigo (`ensureSingleMain`).
 - Exclusão pede confirmação em dois cliques (sem diálogos nativos).
 - Dados em `%APPDATA%\com.founderha.aion2taskmanager\dados.json`, escritos pelos comandos Rust `load_data`, `save_data`, `data_location` (`src-tauri/src/lib.rs`). A gravação é segura: escreve `.tmp`, guarda a versão anterior em `dados.json.bak` e troca.

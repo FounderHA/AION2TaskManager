@@ -1,7 +1,7 @@
 // Etapa 8: aba Hoje — o que fazer hoje, de todos os personagens numa tela só.
 // Usa as mesmas marcações da aba Semana.
 import { useState } from "react";
-import { Alert, Badge, Button, Panel, SectionTitle, TaskToggleRow } from "../components/ui";
+import { Alert, Badge, Button, CharPortrait, Panel, SectionTitle, TaskToggleRow } from "../components/ui";
 import { isEnabled } from "../components/WeekView";
 import { describe, isPurchase, occursOn } from "../data/catalog";
 import { activeTasks, dayCheckKey, isWeekly, weekCheckKey } from "../data/checks";
@@ -123,6 +123,7 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
           return (
             <Panel key={char.id} label={char.name}>
               <div className="today-char__head">
+                <CharPortrait photo={char.photo} name={char.name} size={40} />
                 <span className="today-char__name">{char.name}</span>
                 <Badge kind={char.role === "MAIN" ? "main" : "alt"} />
                 <span className="today-char__meta">

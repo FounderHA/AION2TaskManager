@@ -96,6 +96,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         className: input.className,
         faction: input.faction,
         odyle: input.odyle ?? null,
+        photo: input.photo,
         gs: input.gs,
         cp: input.cp,
         role: isFirst || input.makeMain ? "MAIN" : "ALT",

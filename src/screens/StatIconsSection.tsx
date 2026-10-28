@@ -4,42 +4,7 @@ import { useState } from "react";
 import { Alert, Button, Panel, SectionTitle } from "../components/ui";
 import { StatIcon } from "../components/CharStats";
 import { useStore } from "../data/store";
-
-const SIZE = 64;
-
-/** Lê a imagem escolhida e devolve um PNG 64×64 (proporção mantida) em data URL. */
-function pickImage(): Promise<string | null> {
-  return new Promise((resolve, reject) => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = "image/png,image/jpeg,image/webp,image/gif";
-    input.onchange = () => {
-      const file = input.files?.[0];
-      if (!file) return resolve(null);
-      const reader = new FileReader();
-      reader.onerror = () => reject(new Error("Não foi possível ler a imagem."));
-      reader.onload = () => {
-        const img = new Image();
-        img.onerror = () => reject(new Error("Arquivo de imagem inválido."));
-        img.onload = () => {
-          const scale = Math.min(SIZE / img.width, SIZE / img.height, 1);
-          const w = Math.max(1, Math.round(img.width * scale));
-          const h = Math.max(1, Math.round(img.height * scale));
-          const canvas = document.createElement("canvas");
-          canvas.width = SIZE;
-          canvas.height = SIZE;
-          const ctx = canvas.getContext("2d");
-          if (!ctx) return reject(new Error("Não foi possível processar a imagem."));
-          ctx.drawImage(img, (SIZE - w) / 2, (SIZE - h) / 2, w, h);
-          resolve(canvas.toDataURL("image/png"));
-        };
-        img.src = String(reader.result);
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  });
-}
+import { pickImage } from "../components/pickImage";
 
 export function StatIconsSection() {
   const { data, setStatIcon } = useStore();
@@ -48,7 +13,7 @@ export function StatIconsSection() {
   const choose = async (which: "gs" | "cp") => {
     setError("");
     try {
-      const url = await pickImage();
+      const url = await pickImage({ size: 64, fit: "contain" });
       if (url) setStatIcon(which, url);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

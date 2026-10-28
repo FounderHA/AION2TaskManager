@@ -1,6 +1,6 @@
 // Aba Odyle: Odyle Energy de cada personagem (Basic com recarga automática + Charged dos itens).
 import { useState } from "react";
-import { Alert, Badge, Button, Panel, SectionTitle } from "../components/ui";
+import { Alert, Badge, Button, CharPortrait, Panel, SectionTitle } from "../components/ui";
 import type { Character, OdyleSnapshot } from "../data/model";
 import { CHARGED_ADD_OPTIONS, CHARGED_CAP, currentOdyle, rulesFor, SPEND_OPTIONS, type OdyleNow, type OdyleRules } from "../data/odyle";
 import { useStore } from "../data/store";
@@ -89,6 +89,7 @@ function OdyleCard({ char, rules, now }: { char: Character; rules: OdyleRules; n
     <Panel label={char.name}>
       <div className={`odyle-card ${cur ? `odyle-card--${cur.level}` : ""}`}>
         <div className="odyle-card__head">
+          <CharPortrait photo={char.photo} name={char.name} size={40} />
           <span className="today-char__name">{char.name}</span>
           <Badge kind={char.role === "MAIN" ? "main" : "alt"} />
           <span className="today-char__meta">{char.className}</span>

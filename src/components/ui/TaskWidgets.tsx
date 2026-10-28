@@ -47,12 +47,30 @@ export function WeeklyCard({ name, note, done, server, expiring, onToggle, readO
   );
 }
 
+/* ---------- Foto do personagem (moldura) ---------- */
+export function CharPortrait({ photo, name, size = 56 }: { photo: string | null; name: string; size?: number }) {
+  return (
+    <span className="portrait" style={{ width: size, height: size }}>
+      {photo ? (
+        <img src={photo} alt={`Foto de ${name}`} />
+      ) : (
+        <svg viewBox="0 0 48 48" width={size * 0.62} height={size * 0.62} aria-hidden="true">
+          <circle cx="24" cy="17" r="8.5" fill="none" stroke="currentColor" strokeWidth="2" />
+          <path d="M9 42c1.8-8.4 8-13 15-13s13.2 4.6 15 13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+      )}
+    </span>
+  );
+}
+
 /* ---------- Card de personagem ---------- */
 export type CharacterCardData = {
   name: string;
   className: string;
   faction: "Elyos" | "Asmodian";
   role: "MAIN" | "ALT";
+  /** Foto (data URL); null/omitida = moldura vazia. */
+  photo?: string | null;
   /** Progresso da semana em %; se omitido, a barra não aparece. */
   progress?: number;
 };
@@ -60,14 +78,19 @@ export type CharacterCardData = {
 export function CharacterCard({ data, selected, onSelect, footer, stats }: { data: CharacterCardData; selected: boolean; onSelect: () => void; footer?: string; stats?: ReactNode }) {
   return (
     <button className={`char-card ${selected ? "char-card--selected" : ""}`} aria-pressed={selected} onClick={onSelect}>
-      <div className="char-card__top">
-        <span className="char-card__name">{data.name}</span>
-        <Badge kind={data.role === "MAIN" ? "main" : "alt"} />
-      </div>
-      <div className="char-card__meta">
-        <span>{data.className}</span>
-        <span className="char-card__dot">·</span>
-        <span>{data.faction}</span>
+      <div className="char-card__head">
+        <CharPortrait photo={data.photo ?? null} name={data.name} />
+        <div className="char-card__id">
+          <div className="char-card__top">
+            <span className="char-card__name">{data.name}</span>
+            <Badge kind={data.role === "MAIN" ? "main" : "alt"} />
+          </div>
+          <div className="char-card__meta">
+            <span>{data.className}</span>
+            <span className="char-card__dot">·</span>
+            <span>{data.faction}</span>
+          </div>
+        </div>
       </div>
       {stats}
       {data.progress !== undefined && <ProgressBar value={data.progress} />}

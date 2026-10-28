@@ -2,6 +2,9 @@
 import type { CharacterRole } from "./types";
 import { defaultSettings, parseSettings, type Settings } from "./settings";
 
+/** Tamanho máximo do texto da foto (data URL). */
+export const PHOTO_MAX = 250_000;
+
 export type Faction = "Elyos" | "Asmodian";
 
 /** Classes como aparecem no cliente em inglês. */
@@ -21,6 +24,8 @@ export interface Character {
   cp: number | null;
   /** Última "foto" da Odyle Energy (ver data/odyle.ts); null = não informada. */
   odyle: OdyleSnapshot | null;
+  /** Foto do personagem (data URL quadrado, ~160px); null = sem foto. */
+  photo: string | null;
 }
 
 /** Valores informados num momento; o valor atual é calculado somando as recargas desde então. */
@@ -91,6 +96,7 @@ export function parseData(raw: string | null | undefined): AppData {
         gs: statOrNull(c.gs),
         cp: statOrNull(c.cp),
         odyle: parseOdyle(c.odyle),
+        photo: typeof c.photo === "string" && c.photo.startsWith("data:image/") && c.photo.length < PHOTO_MAX ? c.photo : null,
       }));
     // Versões antigas guardavam membership por personagem: se algum tinha, a conta passa a ter
     const legacyMember = list.some((c) => !!c && typeof c === "object" && (c as { member?: unknown }).member === true);

@@ -1369,3 +1369,48 @@
   gap: 12px;
   color: var(--text-soft);
 }
+
+/* ---------- Foto do personagem ---------- */
+.portrait {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  overflow: hidden;
+  color: #4a5c78;
+  background: radial-gradient(circle at 50% 35%, rgba(60, 84, 118, 0.55), rgba(10, 16, 28, 0.9));
+  border: 1px solid rgba(224, 180, 82, 0.55);
+  box-shadow: inset 0 0 0 1px rgba(7, 11, 20, 0.8), 0 0 10px rgba(0, 0, 0, 0.35);
+}
+.portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.char-card--selected .portrait {
+  border-color: var(--gold-light);
+}
+.char-card__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.char-card__id {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.photo-field {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.photo-field__side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}

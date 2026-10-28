@@ -1,9 +1,10 @@
 // Cadastro de personagens: nome, classe, facção, Main/Alt, GS/CP e Odyle Energy inicial.
 // Membership é da conta: fica em Configurações.
 import { useEffect, useState } from "react";
-import { AddCharacterCard, Alert, Badge, Button, CharacterCard, Panel, SectionTitle } from "../components/ui";
+import { AddCharacterCard, Alert, Badge, Button, CharacterCard, CharPortrait, Panel, SectionTitle } from "../components/ui";
 import { CharStats, StatIcon } from "../components/CharStats";
-import { CLASSES, NAME_MAX, type Character, type CharacterClass, type Faction } from "../data/model";
+import { pickImage } from "../components/pickImage";
+import { CLASSES, NAME_MAX, PHOTO_MAX, type Character, type CharacterClass, type Faction } from "../data/model";
 import { useStore } from "../data/store";
 import { CHARGED_CAP, currentOdyle, rulesFor, snapshotFromInput, type OdyleRules } from "../data/odyle";
 
@@ -20,16 +21,17 @@ interface FormState {
   /** Odyle Energy atual (vazio = não controlar). */
   basic: string;
   charged: string;
+  photo: string | null;
 }
 
 const onlyDigits = (v: string) => v.replace(/\D/g, "").slice(0, 9);
 const toStat = (v: string): number | null => (v ? Number(v) : null);
 const onlyDigits4 = (v: string) => v.replace(/\D/g, "").slice(0, 4);
 
-const blankForm = (faction: Faction = "Elyos"): FormState => ({ name: "", className: "Gladiator", faction, makeMain: false, gs: "", cp: "", basic: "", charged: "" });
+const blankForm = (faction: Faction = "Elyos"): FormState => ({ name: "", className: "Gladiator", faction, makeMain: false, gs: "", cp: "", basic: "", charged: "", photo: null });
 const fromChar = (c: Character, rules: OdyleRules): FormState => {
   const cur = c.odyle ? currentOdyle(c.odyle, rules, new Date()) : null;
-  return { name: c.name, className: c.className, faction: c.faction, makeMain: c.role === "MAIN", gs: c.gs === null ? "" : String(c.gs), cp: c.cp === null ? "" : String(c.cp), basic: cur ? String(cur.basic) : "", charged: cur ? String(cur.charged) : "" };
+  return { name: c.name, className: c.className, faction: c.faction, makeMain: c.role === "MAIN", gs: c.gs === null ? "" : String(c.gs), cp: c.cp === null ? "" : String(c.cp), basic: cur ? String(cur.basic) : "", charged: cur ? String(cur.charged) : "", photo: c.photo };
 };
 
 const STATUS_TEXT = { carregando: "Carregando…", salvando: "Salvando…", salvo: "Salvo automaticamente", erro: "Erro ao salvar! Seus dados podem não ter sido gravados." } as const;
@@ -83,10 +85,10 @@ export function CharactersScreen() {
     setTouched(true);
     if (nameError) return;
     if (mode.kind === "new") {
-      addCharacter({ name: nameTrim, className: form.className, faction: form.faction, makeMain: form.makeMain, gs: toStat(form.gs), cp: toStat(form.cp), odyle: odyleFromForm() });
+      addCharacter({ name: nameTrim, className: form.className, faction: form.faction, makeMain: form.makeMain, gs: toStat(form.gs), cp: toStat(form.cp), odyle: odyleFromForm(), photo: form.photo });
       close();
     } else if (editing) {
-      updateCharacter(editing.id, { name: nameTrim, className: form.className, faction: form.faction, gs: toStat(form.gs), cp: toStat(form.cp), ...(odyleChanged ? { odyle: odyleFromForm() } : {}) });
+      updateCharacter(editing.id, { name: nameTrim, className: form.className, faction: form.faction, gs: toStat(form.gs), cp: toStat(form.cp), photo: form.photo, ...(odyleChanged ? { odyle: odyleFromForm() } : {}) });
       if (form.makeMain && editing.role !== "MAIN") setMain(editing.id);
       close();
     }
@@ -102,6 +104,18 @@ export function CharactersScreen() {
     close();
   };
 
+  const [photoError, setPhotoError] = useState("");
+  const choosePhoto = async () => {
+    setPhotoError("");
+    try {
+      const url = await pickImage({ size: 160, fit: "cover", type: "image/jpeg" });
+      if (!url) return;
+      if (url.length >= PHOTO_MAX) setPhotoError("Imagem grande demais, tente outra.");
+      else set("photo", url);
+    } catch (e) {
+      setPhotoError(e instanceof Error ? e.message : String(e));
+    }
+  };
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((f) => ({ ...f, [key]: value }));
   const showForm = mode.kind !== "none";
 
@@ -137,6 +151,24 @@ export function CharactersScreen() {
               save();
             }}
           >
+            <div className="photo-field">
+              <CharPortrait photo={form.photo} name={form.name || "personagem"} size={88} />
+              <div className="photo-field__side">
+                <span className="field__label">Foto do personagem</span>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                  <Button type="button" variant="secondary" onClick={choosePhoto}>
+                    {form.photo ? "Trocar foto" : "Escolher foto"}
+                  </Button>
+                  {form.photo && (
+                    <Button type="button" variant="ghost" onClick={() => set("photo", null)}>
+                      Remover
+                    </Button>
+                  )}
+                </div>
+                {photoError ? <span className="field__error">{photoError}</span> : <span className="field__hint">Um print do personagem, por exemplo. A imagem é cortada em quadrado e fica salva só no seu PC.</span>}
+              </div>
+            </div>
+
             <div className="field">
               <label className="field__label" htmlFor="char-name">
                 Nome

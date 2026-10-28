@@ -4,8 +4,8 @@ import { activeTasks, cellState, dayCheckKey, earliestCheckDay, existedInWeek, S
 import { formatCp, formatGs, parseData, type Character } from "./model";
 import { weekDayKeys } from "../time/gameTime";
 
-const main: Character = { id: "m1", name: "Kaelith", className: "Sorcerer", faction: "Elyos", role: "MAIN", createdAt: "2026-10-01T00:00:00Z", gs: null, cp: null, odyle: null };
-const alt: Character = { id: "a1", name: "Varos", className: "Gladiator", faction: "Elyos", role: "ALT", createdAt: "2026-10-02T00:00:00Z", gs: null, cp: null, odyle: null };
+const main: Character = { id: "m1", name: "Kaelith", className: "Sorcerer", faction: "Elyos", role: "MAIN", createdAt: "2026-10-01T00:00:00Z", gs: null, cp: null, odyle: null, photo: null };
+const alt: Character = { id: "a1", name: "Varos", className: "Gladiator", faction: "Elyos", role: "ALT", createdAt: "2026-10-02T00:00:00Z", gs: null, cp: null, odyle: null, photo: null };
 const task = (id: string) => DEFAULT_CATALOG.find((t) => t.id === id)!;
 const WEEK = "2026-10-28"; // quarta
 const days = weekDayKeys(WEEK);
@@ -111,7 +111,7 @@ describe("GS e CP", () => {
   });
   it("dados antigos sem GS/CP continuam válidos", () => {
     const d = parseData(JSON.stringify({ characters: [{ id: "x", name: "A", role: "MAIN" }] }));
-    expect(d.characters[0]).toMatchObject({ gs: null, cp: null, odyle: null });
+    expect(d.characters[0]).toMatchObject({ gs: null, cp: null, odyle: null, photo: null });
     const d2 = parseData(JSON.stringify({ characters: [{ id: "x", name: "A", role: "MAIN", gs: 2673, cp: -5 }] }));
     expect(d2.characters[0]).toMatchObject({ gs: 2673, cp: null });
   });

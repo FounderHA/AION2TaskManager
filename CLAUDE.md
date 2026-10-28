@@ -22,6 +22,8 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 ### Mudanças ainda não lançadas
 - Wind Breeze Merchants (Special): Odyle Energy passou de 20/personagem para **4 por personagem** (mesmo id `wind-breeze-odyle-energy`, marcações mantidas) + nova **Odyle Energy (servidor) 16 por servidor** (id `wind-breeze-odyle-energy-server`, só no main). Pedido do usuário em 28/10/2026.
 - Tarefa diária **Odyle Energy desligada por padrão** (a aba Odyle cuida disso; quem quiser religa em Configurações → Tarefas; marcações antigas ficam guardadas). Alerta fixo de Odyle saiu da lateral da aba Personagem. As compras de Odyle Energy nas lojas continuam.
+- **Fundo animado** inspirado no estilo do God of War 4 (pedido do usuário, arte 100% original): `components/RuneBackdrop.tsx` montado no App, atrás de tudo (`.backdrop`, fixo, sem cliques). Névoa fria azul-esverdeada que se move, anel grande de runas Elder Futhark (traços SVG desenhados no código) girando em 120 s, anel dourado interno girando ao contrário (80 s), anel menor no canto inferior esquerdo (100 s), brasas subindo e vinheta. Respeita `prefers-reduced-motion`. Painéis ficaram um pouco mais transparentes (`--panel-top/bottom`). Evitar `filter` em elementos que giram (custa a cada quadro).
+- Texto do rodapé da aba Odyle atualizado (não fala mais da tarefa diária).
 - Foto maior no card do personagem: moldura de 96 px à esquerda, com nome, classe, GS/CP e progresso ao lado (`char-card__body`).
 
 ## Decisões de produto (já tomadas)

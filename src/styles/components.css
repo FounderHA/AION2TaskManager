@@ -1581,3 +1581,146 @@
   font-size: 11px;
   color: var(--text-muted);
 }
+
+/* ---------- Fundo animado (névoa + anéis de runas + brasas) ---------- */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 55% at 72% 38%, rgba(64, 120, 132, 0.22), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 18% 85%, rgba(44, 86, 104, 0.18), transparent 70%),
+    linear-gradient(180deg, #0c1a22 0%, #08121a 45%, #050a10 100%);
+}
+.app-bg {
+  position: relative;
+  background: transparent;
+  box-shadow: none;
+}
+.app-bg > :not(.backdrop) {
+  position: relative;
+  z-index: 1;
+}
+.backdrop__fog {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.55;
+}
+.backdrop__fog--a {
+  width: 900px;
+  height: 520px;
+  left: 45%;
+  top: 8%;
+  background: radial-gradient(circle, rgba(120, 180, 190, 0.22), transparent 70%);
+  animation: fog-drift-a 70s ease-in-out infinite alternate;
+}
+.backdrop__fog--b {
+  width: 1000px;
+  height: 600px;
+  left: -10%;
+  top: 55%;
+  background: radial-gradient(circle, rgba(90, 140, 170, 0.18), transparent 70%);
+  animation: fog-drift-b 90s ease-in-out infinite alternate;
+}
+.backdrop__ring {
+  position: absolute;
+  color: rgba(150, 214, 226, 0.13);
+  transform: translate(-50%, -50%);
+}
+.backdrop__ring--main {
+  left: 74%;
+  top: 46%;
+  color: rgba(160, 222, 234, 0.15);
+  animation: ring-breathe 9s ease-in-out infinite;
+}
+.backdrop__ring--inner {
+  left: 74%;
+  top: 46%;
+  color: rgba(224, 196, 120, 0.12);
+}
+.backdrop__ring--small {
+  left: 6%;
+  top: 92%;
+  color: rgba(150, 214, 226, 0.09);
+}
+.backdrop__spin {
+  will-change: transform;
+}
+.backdrop__spin svg {
+  display: block;
+}
+.backdrop__spin--slow {
+  animation: spin 120s linear infinite;
+}
+.backdrop__spin--reverse {
+  animation: spin 80s linear infinite reverse;
+}
+.backdrop__spin--mid {
+  animation: spin 100s linear infinite reverse;
+}
+.backdrop__embers span {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  background: #ffd9a0;
+  box-shadow: 0 0 6px 2px rgba(255, 190, 110, 0.55);
+  opacity: 0;
+  animation-name: ember-rise;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+.backdrop__vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 260px rgba(0, 0, 0, 0.9);
+  background: radial-gradient(ellipse 85% 75% at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.55) 100%);
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ring-breathe {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes fog-drift-a {
+  to {
+    transform: translate(-180px, 80px) scale(1.15);
+  }
+}
+@keyframes fog-drift-b {
+  to {
+    transform: translate(220px, -90px) scale(1.1);
+  }
+}
+@keyframes ember-rise {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(var(--drift, 0px), -105vh);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .backdrop *,
+  .backdrop__ring--main {
+    animation: none !important;
+  }
+}

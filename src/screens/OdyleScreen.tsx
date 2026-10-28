@@ -256,7 +256,7 @@ export function OdyleScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
           <OdyleCard key={c.id} char={c} rules={rules} now={now} />
         ))}
       </div>
-      <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>Membership e limites ficam em Configurações → Conta. A tarefa diária "Odyle Energy" continua em Hoje/Semana para marcar que você já gastou o que queria no dia.</p>
+      <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>Membership e limites ficam em Configurações → Conta.</p>
     </div>
   );
 }

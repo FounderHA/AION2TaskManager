@@ -3,6 +3,7 @@ import { Alert, AppHeader, type TabItem } from "./components/ui";
 import { CharactersScreen } from "./screens/CharactersScreen";
 import { HistoryScreen } from "./screens/HistoryScreen";
 import { OdyleScreen } from "./screens/OdyleScreen";
+import { RuneBackdrop } from "./components/RuneBackdrop";
 import { SettingsScreen } from "./screens/SettingsScreen";
 import { ProgressScreen } from "./screens/ProgressScreen";
 import { WeeklyScreen } from "./screens/WeeklyScreen";
@@ -51,6 +52,7 @@ function App() {
 
   return (
     <div className="app-bg">
+      <RuneBackdrop />
       <AppHeader tabs={tabs} active={tab} onTabChange={setTab} resets={resets} />
       <UpdateBanner state={updater.state} dismissed={updater.dismissed} onInstall={updater.install} onDismiss={updater.dismiss} />
       {saveStatus === "erro" && (

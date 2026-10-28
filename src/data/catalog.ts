@@ -12,7 +12,7 @@ export const DEFAULT_CATALOG: TaskDef[] = [
   { id: "dimensional-invasion", name: "Dimensional Invasion", description: "Usar a chave do dia", scope: "servidor", cadence: "diaria", category: "eventos", enabledByDefault: true },
   { id: "nightmare", name: "Nightmare", description: "2 tentativas (só gasta se vencer)", scope: "personagem", cadence: "diaria", category: "dungeons", enabledByDefault: true },
   { id: "odyle-energy", name: "Odyle Energy", description: "Gastar em cubos de Conquest/Transcendence antes de encher (máx. 560)", descriptionMember: "Gastar em cubos de Conquest/Transcendence antes de encher (máx. 840)", scope: "personagem", cadence: "diaria", category: "dungeons", enabledByDefault: false }, // desligada: a aba Odyle cuida disso (28/10/2026)
-  { id: "supply-requests-urgent", name: "Supply Requests (urgente)", description: "Entregas do dia por Abyss Points", scope: "personagem", cadence: "diaria", category: "missoes", enabledByDefault: false },
+  { id: "supply-requests-urgent", name: "Abyss Supply Request: Emergency", description: "Entregas do dia: conferir e entregar o que der", scope: "personagem", cadence: "diaria", category: "missoes", enabledByDefault: true },
   { id: "abandoned-balaur-fortress", name: "Abandoned Balaur Fortress", description: "1 entrada por dia (acumula até 7)", scope: "personagem", cadence: "diaria", category: "dungeons", enabledByDefault: false },
   { id: "fafnium-laboratory", name: "Fafnium Laboratory", description: "1 entrada por dia (acumula até 7)", scope: "personagem", cadence: "diaria", category: "dungeons", enabledByDefault: false },
 
@@ -27,7 +27,7 @@ export const DEFAULT_CATALOG: TaskDef[] = [
   { id: "daeva-pass", name: "Daeva Pass", description: "Bater o limite semanal de EXP", scope: "personagem", cadence: "semanal", category: "missoes", enabledByDefault: true },
   { id: "arena-battlefield", name: "Arena / Battlefield", description: "Recompensas semanais de vitória e participação", scope: "personagem", cadence: "semanal", category: "abismo-pvp", enabledByDefault: false },
   { id: "abyss-corridor", name: "Abyss Corridor", description: "Usar as entradas antes do próximo Artifact Siege", scope: "personagem", cadence: "semanal", category: "abismo-pvp", enabledByDefault: false },
-  { id: "supply-requests-weekly", name: "Supply Requests (semanal)", description: "Entregas da semana", scope: "personagem", cadence: "semanal", category: "missoes", enabledByDefault: false },
+  { id: "supply-requests-weekly", name: "Abyss Supply Request: Weekly", description: "Entregas da semana: conferir e entregar o que der", scope: "personagem", cadence: "semanal", category: "missoes", enabledByDefault: true },
 
   // ---------- Compras da semana (agrupadas por loja) ----------
   // Os ids "command-scrolls-pve", "odyle-morph-character" e "odyle-morph-server" vêm de versões

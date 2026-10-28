@@ -20,7 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- **Abyss Supply Request** ligado por padrão, por personagem: "Abyss Supply Request: Emergency" (diária, id `supply-requests-urgent`) e "Abyss Supply Request: Weekly" (semanal, id `supply-requests-weekly`). Ids antigos mantidos (antes eram "Supply Requests (urgente/semanal)", desligados). Um check só: "já olhei e entreguei o que dava".
 
 ## Decisões de produto (já tomadas)
 

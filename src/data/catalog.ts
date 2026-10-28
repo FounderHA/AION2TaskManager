@@ -39,7 +39,8 @@ export const DEFAULT_CATALOG: TaskDef[] = [
   { id: "latesran-root-command-veteran", name: "Latesran Eastern Root Command: Veteran", description: "5 por servidor", shop: "Command Shop (Abyss)", scope: "servidor", cadence: "semanal", category: "compras", enabledByDefault: true },
   { id: "latesran-root-command-elite", name: "Latesran Eastern Root Command: Elite", description: "5 por servidor", shop: "Command Shop (Abyss)", scope: "servidor", cadence: "semanal", category: "compras", enabledByDefault: true },
   { id: "latesran-root-command-special", name: "Latesran Eastern Root Command: Special", description: "5 por servidor", shop: "Command Shop (Abyss)", scope: "servidor", cadence: "semanal", category: "compras", enabledByDefault: true },
-  { id: "wind-breeze-odyle-energy", name: "Odyle Energy", description: "20 por personagem", shop: "Wind Breeze Merchants (Special)", scope: "personagem", cadence: "semanal", category: "compras", enabledByDefault: true },
+  { id: "wind-breeze-odyle-energy", name: "Odyle Energy", description: "4 por personagem", shop: "Wind Breeze Merchants (Special)", scope: "personagem", cadence: "semanal", category: "compras", enabledByDefault: true },
+  { id: "wind-breeze-odyle-energy-server", name: "Odyle Energy (servidor)", description: "16 por servidor", shop: "Wind Breeze Merchants (Special)", scope: "servidor", cadence: "semanal", category: "compras", enabledByDefault: true },
   { id: "wind-breeze-lower-rift-stone", name: "Lower Abyss Rift Stone", description: "7 por personagem", shop: "Wind Breeze Merchants (Special)", scope: "personagem", cadence: "semanal", category: "compras", enabledByDefault: true },
 
   // ---------- Eventos em dias fixos ----------

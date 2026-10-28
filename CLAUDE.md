@@ -20,6 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
+- Wind Breeze Merchants (Special): Odyle Energy passou de 20/personagem para **4 por personagem** (mesmo id `wind-breeze-odyle-energy`, marcações mantidas) + nova **Odyle Energy (servidor) 16 por servidor** (id `wind-breeze-odyle-energy-server`, só no main). Pedido do usuário em 28/10/2026.
 - Foto maior no card do personagem: moldura de 96 px à esquerda, com nome, classe, GS/CP e progresso ao lado (`char-card__body`).
 
 ## Decisões de produto (já tomadas)
@@ -205,7 +206,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
   - Command Shop: Command: Altgard (12, servidor) — reaproveita o id `command-scrolls-pve`.
   - Substance Morph: Odyle Energy 4 (personagem, id `odyle-morph-character`) e 16 (servidor, id `odyle-morph-server`).
   - Command Shop (Abyss): Latesran Eastern Root Command, …: Veteran, …: Elite, …: Special (5 cada, servidor).
-  - Wind Breeze Merchants (Special): Odyle Energy 20 e Lower Abyss Rift Stone 7 (personagem).
+  - Wind Breeze Merchants (Special): Odyle Energy 4 (personagem) + 16 (servidor, desde 28/10/2026; antes era 20 por personagem) e Lower Abyss Rift Stone 7 (personagem).
   - Removidos: Command Scrolls PvP, Lojas: compras do personagem/servidor.
 - `WeekProgress` ganhou `purchaseDone/purchaseTotal`; compras contam no % mas ficam fora de `weeklyDone/weeklyTotal`. Semana, Hoje, Histórico e o editor de tarefas mostram a seção. Tarefas próprias podem ser "Compra semanal" com nome de loja.
 - **GS e CP** no personagem (`gs`, `cp`: número ou null; dados antigos viram null). Formulário aceita só dígitos; card mostra no formato do jogo (`formatGs` → 2,673; `formatCp` → 152.7K / 1.2M). Componentes `CharStats` e `StatIcon` em `components/CharStats.tsx`.

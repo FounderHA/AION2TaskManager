@@ -21,6 +21,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 
 ### Mudanças ainda não lançadas
 - Wind Breeze Merchants (Special): Odyle Energy passou de 20/personagem para **4 por personagem** (mesmo id `wind-breeze-odyle-energy`, marcações mantidas) + nova **Odyle Energy (servidor) 16 por servidor** (id `wind-breeze-odyle-energy-server`, só no main). Pedido do usuário em 28/10/2026.
+- Tarefa diária **Odyle Energy desligada por padrão** (a aba Odyle cuida disso; quem quiser religa em Configurações → Tarefas; marcações antigas ficam guardadas). Alerta fixo de Odyle saiu da lateral da aba Personagem. As compras de Odyle Energy nas lojas continuam.
 - Foto maior no card do personagem: moldura de 96 px à esquerda, com nome, classe, GS/CP e progresso ao lado (`char-card__body`).
 
 ## Decisões de produto (já tomadas)
@@ -197,7 +198,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Gasto só por botão (−40 / −80), sem campo livre — pedido do usuário. "Desfazer" restaura a foto anterior (por card, só da última ação).
 - Aviso a partir de limite − 40 (800 com membership): selo QUASE CHEIA, barra laranja, ponto na aba Odyle; cheia = barra vermelha, selo CHEIA.
 - No cadastro do personagem há campos opcionais Basic/Charged; ao editar, só regrava a foto se o usuário mudou esses números.
-- A tarefa diária "Odyle Energy" continua no catálogo: serve para marcar "já gastei o que queria hoje".
+- A tarefa diária "Odyle Energy" continua no catálogo, mas desde 28/10/2026 vem **desligada por padrão** (pedido do usuário: a aba Odyle já cuida disso).
 
 ## Ajustes da v1.2.0
 

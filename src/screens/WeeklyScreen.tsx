@@ -50,7 +50,6 @@ export function WeeklyScreen({ clock, onGoToCharacters, selectedId, onSelect }: 
                   Reset semanal em {formatCountdown(toWeekly)} ({localResetLabel(clock.nextWeekly)}).
                 </Alert>
               )}
-              <Alert kind="warning">Odyle Energy: não deixe a barra encher, ela para de regenerar.</Alert>
               <Alert kind="info">Sempre pegue o cubo ao limpar Conquest ou Transcendence: sair sem ele também gasta a cota do servidor.</Alert>
             </div>
           </Panel>

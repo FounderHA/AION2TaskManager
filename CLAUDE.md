@@ -17,6 +17,10 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - Trabalhar **por etapas, uma de cada vez**. Planejar antes, mostrar o resultado e só seguir após aprovação. Não fazer várias etapas de uma vez.
 - O usuário prefere ver algo visual para aprovar antes de código grande.
 - Ele não compila localmente: a validação é feita instalando o `.exe` gerado pelo GitHub Actions.
+- **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
+
+### Mudanças ainda não lançadas
+- (nenhuma)
 
 ## Decisões de produto (já tomadas)
 

@@ -20,11 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- **Daily Dungeon virou semanal** ("14 entradas por semana", cadência `semanal`, mesmo id). Marcações antigas por dia ficam guardadas mas não aparecem mais.
-- **Modo compacto** (`screens/CompactView.tsx` + `components/windowMode.ts`): botão "Compacto" no cabeçalho. A janela vai para 380×720, sempre no topo (alfinete liga/desliga). Mostra anéis de % de Hoje e da Semana, e por personagem: barra do dia, diárias que faltam com check, "▸ Semana" que abre semanais + compras com check, selo de Odyle perto do limite. "Mostrar concluídas" opcional. Lembra o modo e o alfinete no localStorage. Permissões novas em `capabilities/default.json`: `core:window:allow-set-size`, `allow-set-min-size`, `allow-set-always-on-top`, `allow-unmaximize`. No navegador só troca a tela.
-- **Efeito "Dia completo"** (`components/DayCompleteFx.tsx`): asas de luz + anel de runas dourado + texto, quando um personagem fecha todas as diárias de hoje (versão maior quando todos fecham). Só dispara por marcação feita agora (ignora carregar/importar dados, mudança de catálogo e virada do dia). Funciona também no modo compacto. `data/today.ts` (`charDays`, `completeToday`) é compartilhado com o modo compacto.
-- **Tema por facção**: `settings.theme` = `auto` (facção do main) | `elyos` | `asmodian`, em Configurações → Aparência. Aplica `data-faction` no `<html>`; o tema Asmodian (carmesim + roxo) redefine os tokens em `theme.css` (`--cyan*`, `--accent-rgb`, `--accent2-rgb`, fundo animado `--bd-*`, `--rune*`, `--ember*`). O dourado continua sendo "concluído". Cores de destaque e do fundo agora vêm desses tokens (não usar mais rgba fixo de ciano).
-- Cuidado: `.app-bg > :not(.backdrop):not(.fx-day)` recebe `position: relative`; elementos fixos novos dentro do `.app-bg` precisam entrar nessa exceção.
+- (nenhuma)
 
 ## Decisões de produto (já tomadas)
 
@@ -179,6 +175,13 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Ajustes da v1.7.0
+- **Daily Dungeon virou semanal** ("14 entradas por semana", cadência `semanal`, mesmo id). Marcações antigas por dia ficam guardadas mas não aparecem mais.
+- **Modo compacto** (`screens/CompactView.tsx` + `components/windowMode.ts`): botão "Compacto" no cabeçalho. A janela vai para 380×720, sempre no topo (alfinete liga/desliga). Mostra anéis de % de Hoje e da Semana, e por personagem: barra do dia, diárias que faltam com check, "▸ Semana" que abre semanais + compras com check, selo de Odyle perto do limite. "Mostrar concluídas" opcional. Lembra o modo e o alfinete no localStorage. Permissões novas em `capabilities/default.json`: `core:window:allow-set-size`, `allow-set-min-size`, `allow-set-always-on-top`, `allow-unmaximize`. No navegador só troca a tela.
+- **Efeito "Dia completo"** (`components/DayCompleteFx.tsx`): asas de luz + anel de runas dourado + texto, quando um personagem fecha todas as diárias de hoje (versão maior quando todos fecham). Só dispara por marcação feita agora (ignora carregar/importar dados, mudança de catálogo e virada do dia). Funciona também no modo compacto. `data/today.ts` (`charDays`, `completeToday`) é compartilhado com o modo compacto.
+- **Tema por facção**: `settings.theme` = `auto` (facção do main) | `elyos` | `asmodian`, em Configurações → Aparência. Aplica `data-faction` no `<html>`; o tema Asmodian (carmesim + roxo) redefine os tokens em `theme.css` (`--cyan*`, `--accent-rgb`, `--accent2-rgb`, fundo animado `--bd-*`, `--rune*`, `--ember*`). O dourado continua sendo "concluído". Cores de destaque e do fundo agora vêm desses tokens (não usar mais rgba fixo de ciano).
+- Cuidado: `.app-bg > :not(.backdrop):not(.fx-day)` recebe `position: relative`; elementos fixos novos dentro do `.app-bg` precisam entrar nessa exceção.
 
 ## Ajustes da v1.6.0
 - **Season Mission: Weekly** (nova, id `season-mission-weekly`, semanal, por personagem, ligada): um check de "conferi as missões da semana e peguei as recompensas". A aba Season (reset de temporada) ficou de fora.

@@ -11,8 +11,15 @@ export interface TaskOverride {
   description?: string;
 }
 
+/** Imagens escolhidas pelo usuário para os ícones de GS e CP (data URL, só no PC dele). */
+export interface StatIcons {
+  gs?: string;
+  cp?: string;
+}
+
 export interface Settings {
   reset: ResetConfig;
+  icons: StatIcons;
   tasks: Record<string, TaskOverride>;
   customTasks: TaskDef[];
 }
@@ -25,12 +32,12 @@ export const TASK_NAME_MAX = 40;
 export const TASK_DESC_MAX = 120;
 
 export function defaultSettings(): Settings {
-  return { reset: { ...DEFAULT_RESET }, tasks: {}, customTasks: [] };
+  return { reset: { ...DEFAULT_RESET }, icons: {}, tasks: {}, customTasks: [] };
 }
 
 const SCOPES: TaskScope[] = ["personagem", "servidor"];
 const CADENCES: TaskCadence[] = ["diaria", "ritmo", "semanal", "dias-fixos"];
-const CATEGORIES: TaskCategory[] = ["missoes", "dungeons", "raids", "abismo-pvp", "lojas", "eventos"];
+const CATEGORIES: TaskCategory[] = ["missoes", "dungeons", "raids", "abismo-pvp", "lojas", "eventos", "compras"];
 
 /** Lê as configurações salvas com tolerância (valores inválidos voltam ao padrão). */
 export function parseSettings(raw: unknown): Settings {
@@ -41,6 +48,12 @@ export function parseSettings(raw: unknown): Settings {
   const r = o.reset as Record<string, unknown> | undefined;
   if (r && Number.isInteger(r.utcHour) && (r.utcHour as number) >= 0 && (r.utcHour as number) <= 23) s.reset.utcHour = r.utcHour as number;
   if (r && Number.isInteger(r.weeklyWeekday) && (r.weeklyWeekday as number) >= 0 && (r.weeklyWeekday as number) <= 6) s.reset.weeklyWeekday = r.weeklyWeekday as Weekday;
+
+  const icons = o.icons as Record<string, unknown> | undefined;
+  for (const k of ["gs", "cp"] as const) {
+    const v = icons?.[k];
+    if (typeof v === "string" && v.startsWith("data:image/") && v.length < 300_000) s.icons[k] = v;
+  }
 
   if (o.tasks && typeof o.tasks === "object") {
     for (const [id, v] of Object.entries(o.tasks as Record<string, unknown>)) {
@@ -68,6 +81,7 @@ export function parseSettings(raw: unknown): Settings {
         cadence: cadence === "dias-fixos" && !days?.length ? "diaria" : cadence,
         category: CATEGORIES.includes(t.category as TaskCategory) ? (t.category as TaskCategory) : "eventos",
         days: cadence === "dias-fixos" ? days : undefined,
+        shop: typeof t.shop === "string" && t.shop.trim() ? t.shop.slice(0, TASK_NAME_MAX) : undefined,
         time: typeof t.time === "string" ? t.time.slice(0, 40) : undefined,
         enabledByDefault: true,
       });

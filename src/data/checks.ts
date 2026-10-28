@@ -5,7 +5,7 @@
 //   semanal:                      "<dono>|<tarefa>|w:<YYYY-MM-DD>"   (quarta que abre a semana)
 // O <dono> é o id do personagem, ou "SERVER" para tarefas de servidor —
 // assim o que o main fez continua valendo mesmo se o main for trocado.
-import { occursOn, tasksForRole } from "./catalog";
+import { isPurchase, occursOn, tasksForRole } from "./catalog";
 import type { Character } from "./model";
 import type { TaskDef } from "./types";
 import { gameWeekday } from "../time/gameTime";
@@ -55,6 +55,9 @@ export interface WeekProgress {
   /** Diárias (até hoje) feitas e devidas. */
   dailyDone: number;
   dailyTotal: number;
+  /** Itens da seção "Compras da semana" (fora de weeklyDone/weeklyTotal). */
+  purchaseDone: number;
+  purchaseTotal: number;
 }
 
 export function weekProgress(checks: Checks, tasks: TaskDef[], char: Character, days: string[], todayIndex: number, weekKey: string): WeekProgress {
@@ -65,14 +68,20 @@ export function weekProgress(checks: Checks, tasks: TaskDef[], char: Character, 
   let missed = 0;
   let weeklyDone = 0;
   let weeklyTotal = 0;
+  let purchaseDone = 0;
+  let purchaseTotal = 0;
 
   for (const t of tasks) {
     if (isWeekly(t)) {
-      weeklyTotal++;
+      const ok = !!checks[weekCheckKey(t, char, weekKey)];
       due++;
-      if (checks[weekCheckKey(t, char, weekKey)]) {
-        weeklyDone++;
-        done++;
+      if (ok) done++;
+      if (isPurchase(t)) {
+        purchaseTotal++;
+        if (ok) purchaseDone++;
+      } else {
+        weeklyTotal++;
+        if (ok) weeklyDone++;
       }
       continue;
     }
@@ -88,7 +97,7 @@ export function weekProgress(checks: Checks, tasks: TaskDef[], char: Character, 
       }
     }
   }
-  return { percent: due ? Math.round((done / due) * 100) : 0, doneToday, totalToday, missed, weeklyDone, weeklyTotal, dailyDone: done - weeklyDone, dailyTotal: due - weeklyTotal };
+  return { percent: due ? Math.round((done / due) * 100) : 0, doneToday, totalToday, missed, weeklyDone, weeklyTotal, dailyDone: done - weeklyDone - purchaseDone, dailyTotal: due - weeklyTotal - purchaseTotal, purchaseDone, purchaseTotal };
 }
 
 

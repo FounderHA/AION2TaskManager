@@ -1,8 +1,9 @@
 // Grade de uma semana do jogo para um personagem por vez.
 // Usada pela aba Semana (editável) e pela aba Histórico (somente leitura).
 import { useMemo, useState, type ReactNode } from "react";
+import { CharStats } from "./CharStats";
 import { Alert, Badge, CharacterCard, CheckCell, Panel, ProgressRing, SectionTitle, WeeklyCard } from "./ui";
-import { describe } from "../data/catalog";
+import { describe, groupByShop, isPurchase } from "../data/catalog";
 import { activeTasks, cellState, dayCheckKey, isWeekly, weekCheckKey, weekProgress, type Checks, type WeekProgress } from "../data/checks";
 import type { Character } from "../data/model";
 import type { ResolvedTask } from "../data/settings";
@@ -45,7 +46,8 @@ export function WeekView({ characters, main, checks, days, weekKey, todayIndex, 
 
   const tasks = activeTasks(catalog, selected, isEnabled);
   const dailyTasks = tasks.filter((t) => !isWeekly(t));
-  const weeklyTasks = tasks.filter(isWeekly);
+  const weeklyTasks = tasks.filter((t) => isWeekly(t) && !isPurchase(t));
+  const purchaseGroups = groupByShop(tasks.filter(isPurchase));
   const prog = progress[selected.id];
   const closed = todayIndex >= 7;
 
@@ -53,7 +55,7 @@ export function WeekView({ characters, main, checks, days, weekKey, todayIndex, 
     <>
       <section aria-label="Personagens" style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
         {characters.map((c) => (
-          <CharacterCard key={c.id} data={{ ...c, progress: progress[c.id]?.percent ?? 0 }} selected={c.id === selected.id} onSelect={() => setSelectedId(c.id)} />
+          <CharacterCard key={c.id} data={{ ...c, progress: progress[c.id]?.percent ?? 0 }} stats={<CharStats gs={c.gs} cp={c.cp} />} selected={c.id === selected.id} onSelect={() => setSelectedId(c.id)} />
         ))}
       </section>
 
@@ -118,6 +120,27 @@ export function WeekView({ characters, main, checks, days, weekKey, todayIndex, 
               </div>
             )}
           </Panel>
+
+          {purchaseGroups.length > 0 && (
+            <Panel label="Compras da semana">
+              <SectionTitle aside={`${prog.purchaseDone} de ${prog.purchaseTotal} compradas`}>Compras da semana de {selected.name}</SectionTitle>
+              <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                {purchaseGroups.map((g) => (
+                  <div key={g.shop}>
+                    <div className="today-char__sub" style={{ marginTop: 0 }}>
+                      <span>{g.shop}</span>
+                    </div>
+                    <div className="weekly-grid">
+                      {g.items.map((t) => {
+                        const key = weekCheckKey(t, selected, weekKey);
+                        return <WeeklyCard key={t.id} name={t.name} note={describe(t, selected.member)} done={!!checks[key]} server={t.scope === "servidor"} expiring={weeklyExpiring} readOnly={readOnly} onToggle={() => toggle(key)} />;
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </Panel>
+          )}
         </div>
 
         <aside aria-label="Resumo" style={{ flex: "1 1 300px", display: "flex", flexDirection: "column", gap: 20 }}>
@@ -142,6 +165,8 @@ export function WeekView({ characters, main, checks, days, weekKey, todayIndex, 
                 <dd style={{ color: prog.missed ? "#e7a0aa" : undefined }}>{prog.missed}</dd>
                 <dt>{closed ? "Semanais não feitas" : "Semanais pendentes"}</dt>
                 <dd style={{ color: prog.weeklyTotal - prog.weeklyDone ? "#f0c86a" : undefined }}>{prog.weeklyTotal - prog.weeklyDone}</dd>
+                <dt>{closed ? "Compras não feitas" : "Compras pendentes"}</dt>
+                <dd style={{ color: prog.purchaseTotal - prog.purchaseDone ? "#f0c86a" : undefined }}>{prog.purchaseTotal - prog.purchaseDone}</dd>
               </dl>
               {!closed && <span style={{ fontSize: 12, color: "var(--text-muted)", textAlign: "center" }}>O progresso conta só os dias até hoje e as semanais.</span>}
             </div>

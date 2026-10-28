@@ -8,6 +8,7 @@ import { dataLocation } from "../data/storage";
 import { useStore } from "../data/store";
 import { dayLabel } from "../time/gameTime";
 import { ResetSection } from "./ResetSection";
+import { StatIconsSection } from "./StatIconsSection";
 import { TaskEditorSection } from "./TaskEditorSection";
 
 type Message = { kind: "info" | "warning" | "danger"; text: string } | null;
@@ -156,6 +157,8 @@ export function SettingsScreen({ appVersion }: { appVersion: string }) {
       </Panel>
 
       <TaskEditorSection />
+
+      <StatIconsSection />
 
       <ResetSection />
 

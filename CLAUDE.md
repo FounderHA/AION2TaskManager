@@ -169,13 +169,25 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
 
+## Ajustes da v1.2.0
+
+- **Exploration removida** do catálogo (o usuário não quer controlar). O selo **"EXPIRA HOJE" voltou** (foi mal-entendido na 1.1.0: o pedido era tirar a Exploration).
+- **Compras da semana**: nova seção separada das semanais, agrupada por loja (`category: "compras"`, campo `shop`; `isPurchase`, `groupByShop` em `catalog.ts`). Itens definidos pelo usuário:
+  - Command Shop: Command: Altgard (12, servidor) — reaproveita o id `command-scrolls-pve`.
+  - Substance Morph: Odyle Energy 4 (personagem, id `odyle-morph-character`) e 16 (servidor, id `odyle-morph-server`).
+  - Command Shop (Abyss): Latesran Eastern Root Command, …: Veteran, …: Elite, …: Special (5 cada, servidor).
+  - Wind Breeze Merchants (Special): Odyle Energy 20 e Lower Abyss Rift Stone 7 (personagem).
+  - Removidos: Command Scrolls PvP, Lojas: compras do personagem/servidor.
+- `WeekProgress` ganhou `purchaseDone/purchaseTotal`; compras contam no % mas ficam fora de `weeklyDone/weeklyTotal`. Semana, Hoje, Histórico e o editor de tarefas mostram a seção. Tarefas próprias podem ser "Compra semanal" com nome de loja.
+- **GS e CP** no personagem (`gs`, `cp`: número ou null; dados antigos viram null). Formulário aceita só dígitos; card mostra no formato do jogo (`formatGs` → 2,673; `formatCp` → 152.7K / 1.2M). Componentes `CharStats` e `StatIcon` em `components/CharStats.tsx`.
+- **Ícones de GS/CP**: o app tem ícones próprios (SVG). Em Configurações → "Ícones de GS e CP" o usuário escolhe uma imagem, reduzida para PNG 64×64 e salva em `settings.icons` (data URL, só no PC dele). **Não embutir ícones do jogo no repositório** (é público e a arte é da NCSOFT).
+
 ## Ajustes da v1.1.0 (pedidos do usuário após testar a 1.0)
 
 - **Nome no app: "Aion 2 Manager"** (cabeçalho com "Manager" em ciano, título da janela, rodapé, textos do backup, README).
   - O `productName` do instalador **continua "AION2 Task Manager"** de propósito: trocá-lo faz o NSIS instalar numa pasta nova e criar atalho duplicado. Só trocar se o usuário pedir, com instrução de desinstalar/reinstalar (os dados ficam em `%APPDATA%\com.founderha.aion2taskmanager`, que depende do `identifier`, não do nome).
 - **Aba selecionada com fumaça subindo** (substituiu o arco luminoso): `.tab__smoke` com brilho na base e três volutas animadas (`smoke-rise`), bordas difusas por `mask-image` radial; respeita `prefers-reduced-motion`. Abas não mostram o retângulo de foco (o foco aparece como brilho no texto).
 - **Desligadas por padrão** (ainda não existem no Global): Subjugation, Sanctuary: Corroded Decontamination Facility e Sanctuary: Chalice of Muspel. A Ludra continua ligada. Quem já ligou manualmente mantém a escolha.
-- **Selo "EXPIRA HOJE" removido** das tarefas (aba Hoje e cards semanais); o aviso de expiração fica só nos alertas.
 - Em sessões do Claude: nunca usar `pkill -f "vite preview"` no mesmo comando que contém esse texto (mata o próprio shell). Encerrar o preview em um comando separado.
 
 ## Versão 1.0

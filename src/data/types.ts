@@ -10,7 +10,7 @@ export type TaskScope = "personagem" | "servidor";
  *  dias-fixos: 1 check só nos dias em que o evento acontece */
 export type TaskCadence = "diaria" | "ritmo" | "semanal" | "dias-fixos";
 
-export type TaskCategory = "missoes" | "dungeons" | "raids" | "abismo-pvp" | "lojas" | "eventos";
+export type TaskCategory = "missoes" | "dungeons" | "raids" | "abismo-pvp" | "lojas" | "eventos" | "compras";
 
 /** Dia da semana no padrão do JavaScript: 0 = domingo … 6 = sábado. */
 export type Weekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -31,6 +31,8 @@ export interface TaskDef {
   category: TaskCategory;
   /** Só para cadence "dias-fixos". */
   days?: Weekday[];
+  /** Loja onde se compra (só para category "compras"). */
+  shop?: string;
   /** Horário de referência do evento (texto livre, horário do servidor). */
   time?: string;
   enabledByDefault: boolean;

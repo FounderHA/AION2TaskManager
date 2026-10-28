@@ -1,6 +1,7 @@
 // Cadastro de personagens: nome, classe, facção, Main/Alt e Membership.
 import { useEffect, useState } from "react";
 import { AddCharacterCard, Alert, Badge, Button, CharacterCard, Panel, SectionTitle } from "../components/ui";
+import { CharStats, StatIcon } from "../components/CharStats";
 import { CLASSES, NAME_MAX, type Character, type CharacterClass, type Faction } from "../data/model";
 import { useStore } from "../data/store";
 
@@ -12,10 +13,16 @@ interface FormState {
   faction: Faction;
   member: boolean;
   makeMain: boolean;
+  /** Texto digitado (só dígitos); vazio = não informado. */
+  gs: string;
+  cp: string;
 }
 
-const blankForm = (faction: Faction = "Elyos"): FormState => ({ name: "", className: "Gladiator", faction, member: false, makeMain: false });
-const fromChar = (c: Character): FormState => ({ name: c.name, className: c.className, faction: c.faction, member: c.member, makeMain: c.role === "MAIN" });
+const onlyDigits = (v: string) => v.replace(/\D/g, "").slice(0, 9);
+const toStat = (v: string): number | null => (v ? Number(v) : null);
+
+const blankForm = (faction: Faction = "Elyos"): FormState => ({ name: "", className: "Gladiator", faction, member: false, makeMain: false, gs: "", cp: "" });
+const fromChar = (c: Character): FormState => ({ name: c.name, className: c.className, faction: c.faction, member: c.member, makeMain: c.role === "MAIN", gs: c.gs === null ? "" : String(c.gs), cp: c.cp === null ? "" : String(c.cp) });
 
 const STATUS_TEXT = { carregando: "Carregando…", salvando: "Salvando…", salvo: "Salvo automaticamente", erro: "Erro ao salvar! Seus dados podem não ter sido gravados." } as const;
 
@@ -59,10 +66,10 @@ export function CharactersScreen() {
     setTouched(true);
     if (nameError) return;
     if (mode.kind === "new") {
-      addCharacter({ name: nameTrim, className: form.className, faction: form.faction, member: form.member, makeMain: form.makeMain });
+      addCharacter({ name: nameTrim, className: form.className, faction: form.faction, member: form.member, makeMain: form.makeMain, gs: toStat(form.gs), cp: toStat(form.cp) });
       close();
     } else if (editing) {
-      updateCharacter(editing.id, { name: nameTrim, className: form.className, faction: form.faction, member: form.member });
+      updateCharacter(editing.id, { name: nameTrim, className: form.className, faction: form.faction, member: form.member, gs: toStat(form.gs), cp: toStat(form.cp) });
       if (form.makeMain && editing.role !== "MAIN") setMain(editing.id);
       close();
     }
@@ -96,7 +103,7 @@ export function CharactersScreen() {
         ) : (
           <div style={{ display: "flex", flexWrap: "wrap", gap: 14 }}>
             {characters.map((c) => (
-              <CharacterCard key={c.id} data={c} selected={mode.kind === "edit" && mode.id === c.id} onSelect={() => startEdit(c)} footer="Clique para editar" />
+              <CharacterCard key={c.id} data={c} stats={<CharStats gs={c.gs} cp={c.cp} />} selected={mode.kind === "edit" && mode.id === c.id} onSelect={() => startEdit(c)} footer="Clique para editar" />
             ))}
             <AddCharacterCard onClick={startNew} />
           </div>
@@ -119,6 +126,28 @@ export function CharactersScreen() {
               </label>
               <input id="char-name" className={`input ${touched && nameError ? "input--invalid" : ""}`} value={form.name} maxLength={NAME_MAX} autoFocus placeholder="Nome do personagem no jogo" onChange={(e) => set("name", e.target.value)} />
               {touched && nameError ? <span className="field__error">{nameError}</span> : <span className="field__hint">Até {NAME_MAX} caracteres.</span>}
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
+              <div className="field">
+                <label className="field__label" htmlFor="char-gs">
+                  GS (Gear Score)
+                </label>
+                <div className="input-with-icon">
+                  <StatIcon which="gs" size={20} />
+                  <input id="char-gs" className="input" inputMode="numeric" value={form.gs} placeholder="Ex.: 2673" onChange={(e) => set("gs", onlyDigits(e.target.value))} />
+                </div>
+              </div>
+              <div className="field">
+                <label className="field__label" htmlFor="char-cp">
+                  CP (Combat Power)
+                </label>
+                <div className="input-with-icon">
+                  <StatIcon which="cp" size={20} />
+                  <input id="char-cp" className="input" inputMode="numeric" value={form.cp} placeholder="Ex.: 152700" onChange={(e) => set("cp", onlyDigits(e.target.value))} />
+                </div>
+                <span className="field__hint">Digite o número inteiro; o card mostra no formato do jogo (152.7K).</span>
+              </div>
             </div>
 
             <div className="field">

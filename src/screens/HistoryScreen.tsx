@@ -81,6 +81,7 @@ export function HistoryScreen({ clock }: { clock: GameClock }) {
                     <th>Diárias feitas</th>
                     <th>Diárias perdidas</th>
                     <th>Semanais feitas</th>
+                    <th>Compras feitas</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -100,6 +101,9 @@ export function HistoryScreen({ clock }: { clock: GameClock }) {
                         <td style={{ color: p.missed ? "#e7a0aa" : undefined }}>{p.missed}</td>
                         <td>
                           {p.weeklyDone} / {p.weeklyTotal}
+                        </td>
+                        <td>
+                          {p.purchaseDone} / {p.purchaseTotal}
                         </td>
                       </tr>
                     );

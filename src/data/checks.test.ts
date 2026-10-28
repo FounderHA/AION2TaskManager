@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CATALOG } from "./catalog";
 import { activeTasks, cellState, dayCheckKey, earliestCheckDay, existedInWeek, SERVER_OWNER, weekCheckKey, weekProgress, type Checks } from "./checks";
-import type { Character } from "./model";
+import { formatCp, formatGs, parseData, type Character } from "./model";
 import { weekDayKeys } from "../time/gameTime";
 
-const main: Character = { id: "m1", name: "Kaelith", className: "Sorcerer", faction: "Elyos", role: "MAIN", member: true, createdAt: "2026-10-01T00:00:00Z" };
-const alt: Character = { id: "a1", name: "Varos", className: "Gladiator", faction: "Elyos", role: "ALT", member: false, createdAt: "2026-10-02T00:00:00Z" };
+const main: Character = { id: "m1", name: "Kaelith", className: "Sorcerer", faction: "Elyos", role: "MAIN", member: true, createdAt: "2026-10-01T00:00:00Z", gs: null, cp: null };
+const alt: Character = { id: "a1", name: "Varos", className: "Gladiator", faction: "Elyos", role: "ALT", member: false, createdAt: "2026-10-02T00:00:00Z", gs: null, cp: null };
 const task = (id: string) => DEFAULT_CATALOG.find((t) => t.id === id)!;
 const WEEK = "2026-10-28"; // quarta
 const days = weekDayKeys(WEEK);
@@ -57,10 +57,26 @@ describe("progresso da semana", () => {
       [weekCheckKey(tasks[1], alt, WEEK)]: "x",
     };
     const p = weekProgress(checks, tasks, alt, days, 2, WEEK);
-    expect(p).toEqual({ percent: 75, doneToday: 1, totalToday: 1, missed: 1, weeklyDone: 1, weeklyTotal: 1, dailyDone: 2, dailyTotal: 3 });
+    expect(p).toEqual({ percent: 75, doneToday: 1, totalToday: 1, missed: 1, weeklyDone: 1, weeklyTotal: 1, dailyDone: 2, dailyTotal: 3, purchaseDone: 0, purchaseTotal: 0 });
   });
   it("semana sem nada marcado = 0%", () => {
     expect(weekProgress({}, tasks, alt, days, 0, WEEK).percent).toBe(0);
+  });
+});
+
+describe("compras da semana", () => {
+  it("compras contam no progresso, mas separadas das semanais", () => {
+    const tasks = [task("ascension-trial"), task("wind-breeze-odyle-energy"), task("wind-breeze-lower-rift-stone")];
+    const checks: Checks = { [weekCheckKey(tasks[1], alt, WEEK)]: "x" };
+    const p = weekProgress(checks, tasks, alt, days, 0, WEEK);
+    expect(p).toMatchObject({ weeklyDone: 0, weeklyTotal: 1, purchaseDone: 1, purchaseTotal: 2, dailyTotal: 0, percent: 33 });
+  });
+  it("Exploration saiu do catálogo e as compras de servidor ficam só no main", () => {
+    expect(DEFAULT_CATALOG.some((t) => t.id === "exploration")).toBe(false);
+    const altIds = activeTasks(DEFAULT_CATALOG, alt, byDefault).map((t) => t.id);
+    expect(altIds).toContain("wind-breeze-odyle-energy");
+    expect(altIds).not.toContain("latesran-root-command");
+    expect(activeTasks(DEFAULT_CATALOG, main, byDefault).map((t) => t.id)).toContain("latesran-root-command-special");
   });
 });
 
@@ -82,5 +98,21 @@ describe("histórico", () => {
     expect(existedInWeek(late, {}, WEEK, "2026-11-03")).toBe(false);
     expect(existedInWeek(late, { "late|nightmare|d:2026-10-30": "x" }, WEEK, "2026-11-03")).toBe(true);
     expect(existedInWeek(alt, {}, WEEK, "2026-11-03")).toBe(true);
+  });
+});
+
+describe("GS e CP", () => {
+  it("formata como no jogo", () => {
+    expect(formatGs(2673)).toBe("2,673");
+    expect(formatCp(152700)).toBe("152.7K");
+    expect(formatCp(45210)).toBe("45,210");
+    expect(formatCp(1_200_000)).toBe("1.2M");
+    expect(formatCp(null)).toBe("—");
+  });
+  it("dados antigos sem GS/CP continuam válidos", () => {
+    const d = parseData(JSON.stringify({ characters: [{ id: "x", name: "A", role: "MAIN" }] }));
+    expect(d.characters[0]).toMatchObject({ gs: null, cp: null });
+    const d2 = parseData(JSON.stringify({ characters: [{ id: "x", name: "A", role: "MAIN", gs: 2673, cp: -5 }] }));
+    expect(d2.characters[0]).toMatchObject({ gs: 2673, cp: null });
   });
 });

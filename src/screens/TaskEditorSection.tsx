@@ -2,16 +2,19 @@
 // Ligar/desligar, editar descrição, criar e excluir tarefas próprias.
 import { useState } from "react";
 import { Alert, Badge, Button, Panel, SectionTitle, Switch } from "../components/ui";
-import { WEEKDAY_SHORT } from "../data/catalog";
+import { isPurchase, WEEKDAY_SHORT } from "../data/catalog";
 import { TASK_DESC_MAX, TASK_NAME_MAX, type ResolvedTask } from "../data/settings";
 import { useStore } from "../data/store";
-import type { TaskCadence, TaskScope, Weekday } from "../data/types";
+import type { TaskCadence, TaskDef, TaskScope, Weekday } from "../data/types";
 
-const GROUPS: { title: string; cadences: TaskCadence[]; hint: string }[] = [
-  { title: "Diárias", cadences: ["diaria", "ritmo"], hint: "Um check por dia" },
-  { title: "Semanais", cadences: ["semanal"], hint: "Um check por semana" },
-  { title: "Eventos em dias fixos", cadences: ["dias-fixos"], hint: "Um check só nos dias do evento" },
+const GROUPS: { title: string; match: (t: TaskDef) => boolean; hint: string }[] = [
+  { title: "Diárias", match: (t) => t.cadence === "diaria" || t.cadence === "ritmo", hint: "Um check por dia" },
+  { title: "Semanais", match: (t) => t.cadence === "semanal" && !isPurchase(t), hint: "Um check por semana" },
+  { title: "Compras da semana", match: isPurchase, hint: "Um check por semana, por loja" },
+  { title: "Eventos em dias fixos", match: (t) => t.cadence === "dias-fixos", hint: "Um check só nos dias do evento" },
 ];
+
+type Frequency = "diaria" | "semanal" | "compra" | "dias-fixos";
 
 // Ordem da semana do jogo: quarta → terça
 const WEEK_ORDER: Weekday[] = [3, 4, 5, 6, 0, 1, 2];
@@ -50,6 +53,7 @@ function TaskRow({ task }: { task: ResolvedTask }) {
         />
       ) : (
         <span className="task-edit-row__desc">
+          {task.shop && <span style={{ color: "var(--cyan-light)" }}>{task.shop} · </span>}
           {task.description || <em style={{ opacity: 0.6 }}>sem descrição</em>}
           {task.days && ` · ${task.days.map((d) => WEEKDAY_SHORT[d]).join(", ")}`}
           {task.descriptionEdited && !task.custom && <span style={{ color: "var(--text-muted)" }}> (editada)</span>}
@@ -107,7 +111,9 @@ function NewTaskForm({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [scope, setScope] = useState<TaskScope>("personagem");
-  const [cadence, setCadence] = useState<TaskCadence>("diaria");
+  const [freq, setFreq] = useState<Frequency>("diaria");
+  const [shop, setShop] = useState("");
+  const cadence: TaskCadence = freq === "compra" ? "semanal" : freq;
   const [days, setDays] = useState<Weekday[]>([]);
   const [touched, setTouched] = useState(false);
 
@@ -117,7 +123,7 @@ function NewTaskForm({ onClose }: { onClose: () => void }) {
   const save = () => {
     setTouched(true);
     if (nameError || daysError) return;
-    addCustomTask({ name, description, scope, cadence, category: "eventos", days: cadence === "dias-fixos" ? [...days].sort() : undefined });
+    addCustomTask({ name, description, scope, cadence, category: freq === "compra" ? "compras" : "eventos", shop: freq === "compra" ? shop.trim() || undefined : undefined, days: cadence === "dias-fixos" ? [...days].sort() : undefined });
     onClose();
   };
 
@@ -164,19 +170,32 @@ function NewTaskForm({ onClose }: { onClose: () => void }) {
           </div>
           <div className="field">
             <span className="field__label">Frequência</span>
-            <div className="choice-grid choice-grid--3" role="group" aria-label="Frequência">
-              <button type="button" className="choice" aria-pressed={cadence === "diaria"} onClick={() => setCadence("diaria")}>
-                Diária
-              </button>
-              <button type="button" className="choice" aria-pressed={cadence === "semanal"} onClick={() => setCadence("semanal")}>
-                Semanal
-              </button>
-              <button type="button" className="choice" aria-pressed={cadence === "dias-fixos"} onClick={() => setCadence("dias-fixos")}>
-                Dias fixos
-              </button>
+            <div className="choice-grid" role="group" aria-label="Frequência">
+              {(
+                [
+                  ["diaria", "Diária"],
+                  ["semanal", "Semanal"],
+                  ["compra", "Compra semanal"],
+                  ["dias-fixos", "Dias fixos"],
+                ] as [Frequency, string][]
+              ).map(([id, label]) => (
+                <button type="button" key={id} className="choice" aria-pressed={freq === id} onClick={() => setFreq(id)}>
+                  {label}
+                </button>
+              ))}
             </div>
           </div>
         </div>
+
+        {freq === "compra" && (
+          <div className="field">
+            <label className="field__label" htmlFor="task-shop">
+              Loja
+            </label>
+            <input id="task-shop" className="input" value={shop} maxLength={TASK_NAME_MAX} placeholder="Ex.: Wind Breeze Merchants (Special)" onChange={(e) => setShop(e.target.value)} />
+            <span className="field__hint">Aparece agrupada com os outros itens da mesma loja em "Compras da semana".</span>
+          </div>
+        )}
 
         {cadence === "dias-fixos" && (
           <div className="field">
@@ -227,7 +246,7 @@ export function TaskEditorSection() {
       {creating && <NewTaskForm onClose={() => setCreating(false)} />}
 
       {GROUPS.map((g) => {
-        const items = catalog.filter((t) => g.cadences.includes(t.cadence));
+        const items = catalog.filter(g.match);
         if (!items.length) return null;
         return (
           <div key={g.title} style={{ marginTop: 22 }}>

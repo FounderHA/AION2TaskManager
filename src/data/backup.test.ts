@@ -6,8 +6,8 @@ import { defaultSettings } from "./settings";
 const data: AppData = {
   schemaVersion: 1,
   characters: [
-    { id: "m1", name: "Kaelith", className: "Sorcerer", faction: "Elyos", role: "MAIN", member: true, createdAt: "2026-10-01T00:00:00Z" },
-    { id: "a1", name: "Varos", className: "Gladiator", faction: "Elyos", role: "ALT", member: false, createdAt: "2026-10-02T00:00:00Z" },
+    { id: "m1", name: "Kaelith", className: "Sorcerer", faction: "Elyos", role: "MAIN", member: true, createdAt: "2026-10-01T00:00:00Z", gs: null, cp: null },
+    { id: "a1", name: "Varos", className: "Gladiator", faction: "Elyos", role: "ALT", member: false, createdAt: "2026-10-02T00:00:00Z", gs: null, cp: null },
   ],
   checks: {
     "SERVER|duty-missions|d:2026-10-21": "2026-10-21T20:00:00Z",

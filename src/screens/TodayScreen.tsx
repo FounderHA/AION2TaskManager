@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Alert, Badge, Button, Panel, SectionTitle, TaskToggleRow } from "../components/ui";
 import { isEnabled } from "../components/WeekView";
-import { describe, occursOn } from "../data/catalog";
+import { describe, isPurchase, occursOn } from "../data/catalog";
 import { activeTasks, dayCheckKey, isWeekly, weekCheckKey } from "../data/checks";
 import type { Character } from "../data/model";
 import { useStore } from "../data/store";
@@ -18,6 +18,7 @@ interface CharToday {
   char: Character;
   daily: { task: TaskDef; key: string; done: boolean }[];
   weekly: { task: TaskDef; key: string; done: boolean }[];
+  purchases: { task: TaskDef; key: string; done: boolean }[];
 }
 
 export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onGoToCharacters: () => void }) {
@@ -54,7 +55,13 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
           const key = dayCheckKey(task, char, clock.todayKey);
           return { task, key, done: !!checks[key] };
         }),
-      weekly: tasks.filter(isWeekly).map((task) => {
+      weekly: tasks
+        .filter((t) => isWeekly(t) && !isPurchase(t))
+        .map((task) => {
+          const key = weekCheckKey(task, char, clock.weekKey);
+          return { task, key, done: !!checks[key] };
+        }),
+      purchases: tasks.filter(isPurchase).map((task) => {
         const key = weekCheckKey(task, char, clock.weekKey);
         return { task, key, done: !!checks[key] };
       }),
@@ -63,6 +70,7 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
 
   const dailyLeft = rows.reduce((n, r) => n + r.daily.filter((d) => !d.done).length, 0);
   const weeklyLeft = rows.reduce((n, r) => n + r.weekly.filter((w) => !w.done).length, 0);
+  const purchasesLeft = rows.reduce((n, r) => n + r.purchases.filter((w) => !w.done).length, 0);
   const today = dayLabel(clock.todayKey);
 
   return (
@@ -85,6 +93,8 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
           <dd style={{ color: dailyLeft ? "var(--cyan-light)" : "var(--gold)" }}>{dailyLeft === 0 ? "Tudo feito ✦" : dailyLeft}</dd>
           <dt>Semanais pendentes</dt>
           <dd style={{ color: weeklyLeft ? "#f0c86a" : "var(--gold)" }}>{weeklyLeft === 0 ? "Tudo feito ✦" : weeklyLeft}</dd>
+          <dt>Compras pendentes</dt>
+          <dd style={{ color: purchasesLeft ? "#f0c86a" : "var(--gold)" }}>{purchasesLeft === 0 ? "Tudo feito ✦" : purchasesLeft}</dd>
           <dt>Reset diário</dt>
           <dd>em {formatCountdown(toDaily)}</dd>
           <dt>Reset semanal</dt>
@@ -94,15 +104,21 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
         </dl>
       </Panel>
 
-      {lastDay && weeklyLeft > 0 && <Alert kind="danger">Último dia da semana: {weeklyLeft} semanais ainda pendentes expiram no reset de {localResetLabel(clock.nextWeekly)}.</Alert>}
+      {lastDay && weeklyLeft + purchasesLeft > 0 && (
+        <Alert kind="danger">
+          Último dia da semana: {weeklyLeft} semanais e {purchasesLeft} compras pendentes expiram no reset de {localResetLabel(clock.nextWeekly)}.
+        </Alert>
+      )}
 
       <div className="today-grid">
-        {rows.map(({ char, daily, weekly }) => {
+        {rows.map(({ char, daily, weekly, purchases }) => {
           const dailyDone = daily.filter((d) => d.done).length;
           const weeklyDone = weekly.filter((w) => w.done).length;
           const complete = daily.length > 0 && dailyDone === daily.length;
           const showDaily = hideDone ? daily.filter((d) => !d.done) : daily;
           const showWeekly = hideDone ? weekly.filter((w) => !w.done) : weekly;
+          const purchasesDone = purchases.filter((w) => w.done).length;
+          const showPurchases = hideDone ? purchases.filter((w) => !w.done) : purchases;
           return (
             <Panel key={char.id} label={char.name}>
               <div className="today-char__head">
@@ -140,10 +156,27 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
               </div>
               <div className="today-list">
                 {showWeekly.map(({ task, key, done }) => (
-                  <TaskToggleRow key={key} name={task.name} note={describe(task, char.member)} done={done} server={task.scope === "servidor"} onToggle={() => toggleCheck(key)} />
+                  <TaskToggleRow key={key} name={task.name} note={describe(task, char.member)} done={done} server={task.scope === "servidor"} expiring={lastDay} onToggle={() => toggleCheck(key)} />
                 ))}
                 {showWeekly.length === 0 && <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{weekly.length ? "Todas as semanais feitas ✦" : "Nenhuma semanal ligada."}</span>}
               </div>
+
+              {purchases.length > 0 && (
+                <>
+                  <div className="today-char__sub">
+                    <span>Compras da semana</span>
+                    <span>
+                      {purchasesDone}/{purchases.length}
+                    </span>
+                  </div>
+                  <div className="today-list">
+                    {showPurchases.map(({ task, key, done }) => (
+                      <TaskToggleRow key={key} name={task.name} note={`${task.shop ?? "Loja"} · ${describe(task, char.member)}`} done={done} server={task.scope === "servidor"} expiring={lastDay} onToggle={() => toggleCheck(key)} />
+                    ))}
+                    {showPurchases.length === 0 && <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Todas as compras feitas ✦</span>}
+                  </div>
+                </>
+              )}
             </Panel>
           );
         })}

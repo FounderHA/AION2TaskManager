@@ -49,3 +49,10 @@ describe("catálogo resolvido", () => {
     expect(byId("custom-1")).toMatchObject({ custom: true, enabled: true });
   });
 });
+
+describe("ícones de GS e CP", () => {
+  it("aceita só imagens em data URL", () => {
+    const s = parseSettings({ icons: { gs: "data:image/png;base64,AAAA", cp: "http://site/x.png" } });
+    expect(s.icons).toEqual({ gs: "data:image/png;base64,AAAA" });
+  });
+});

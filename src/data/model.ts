@@ -17,6 +17,24 @@ export interface Character {
   member: boolean;
   /** ISO 8601; usado para ordenar e para escolher o novo main. */
   createdAt: string;
+  /** Gear Score (GS) e Combat Power (CP) informados pelo usuário; null = não informado. */
+  gs: number | null;
+  cp: number | null;
+}
+
+const statOrNull = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.round(v) : null);
+
+/** GS no formato do jogo: 2,673 */
+export function formatGs(n: number | null): string {
+  return n === null ? "—" : n.toLocaleString("en-US");
+}
+
+/** CP no formato do jogo: 45,210 · 152.7K · 1.2M */
+export function formatCp(n: number | null): string {
+  if (n === null) return "—";
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1).replace(/\.0$/, "")}M`;
+  if (n >= 100_000) return `${(n / 1_000).toFixed(1).replace(/\.0$/, "")}K`;
+  return n.toLocaleString("en-US");
 }
 
 export interface AppData {
@@ -52,6 +70,8 @@ export function parseData(raw: string | null | undefined): AppData {
         role: c.role === "MAIN" ? "MAIN" : "ALT",
         member: c.member === true,
         createdAt: typeof c.createdAt === "string" ? c.createdAt : new Date().toISOString(),
+        gs: statOrNull(c.gs),
+        cp: statOrNull(c.cp),
       }));
     const checks: Record<string, string> = {};
     if (obj?.checks && typeof obj.checks === "object") {

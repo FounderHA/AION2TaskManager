@@ -31,6 +31,8 @@ interface StoreValue {
   addCustomTask: (task: Omit<TaskDef, "id" | "enabledByDefault">) => string;
   deleteCustomTask: (id: string) => void;
   setReset: (reset: ResetConfig) => void;
+  /** Imagem (data URL) do ícone de GS ou CP; null remove. */
+  setStatIcon: (which: "gs" | "cp", dataUrl: string | null) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -79,6 +81,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         className: input.className,
         faction: input.faction,
         member: input.member,
+        gs: input.gs,
+        cp: input.cp,
         role: isFirst || input.makeMain ? "MAIN" : "ALT",
         createdAt: new Date().toISOString(),
       };
@@ -165,6 +169,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setData((d) => ({ ...d, settings: { ...d.settings, reset } }));
   }, []);
 
+  const setStatIcon = useCallback((which: "gs" | "cp", dataUrl: string | null) => {
+    setData((d) => {
+      const icons = { ...d.settings.icons };
+      if (dataUrl) icons[which] = dataUrl;
+      else delete icons[which];
+      return { ...d, settings: { ...d.settings, icons } };
+    });
+  }, []);
+
   const catalog = useMemo(() => resolveCatalog(data.settings), [data.settings]);
 
   const value = useMemo<StoreValue>(() => {
@@ -187,8 +200,9 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       addCustomTask,
       deleteCustomTask,
       setReset,
+      setStatIcon,
     };
-  }, [data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
+  }, [setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

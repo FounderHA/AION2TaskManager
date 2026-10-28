@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Badge, ProgressBar } from "./Basics";
 import { CheckIcon, CrossIcon } from "./icons";
 
@@ -57,7 +58,7 @@ export type CharacterCardData = {
   progress?: number;
 };
 
-export function CharacterCard({ data, selected, onSelect, footer }: { data: CharacterCardData; selected: boolean; onSelect: () => void; footer?: string }) {
+export function CharacterCard({ data, selected, onSelect, footer, stats }: { data: CharacterCardData; selected: boolean; onSelect: () => void; footer?: string; stats?: ReactNode }) {
   return (
     <button className={`char-card ${selected ? "char-card--selected" : ""}`} aria-pressed={selected} onClick={onSelect}>
       <div className="char-card__top">
@@ -75,6 +76,7 @@ export function CharacterCard({ data, selected, onSelect, footer }: { data: Char
           </>
         )}
       </div>
+      {stats}
       {data.progress !== undefined && <ProgressBar value={data.progress} />}
       {footer && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{footer}</span>}
     </button>

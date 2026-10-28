@@ -130,7 +130,8 @@ src/
   updater/                      Atualização pelo app (hook + faixa de aviso + rodapé de versão)
   data/types.ts                 Tipos: TaskDef, TaskScope, TaskCadence, Weekday, CharacterRole
   data/catalog.ts               Catálogo padrão (DEFAULT_CATALOG) + tasksForRole, describe, occursOn
-  screens/CatalogScreen.tsx     Aba Catálogo: conferência das tarefas e prévia Main/Alt e membership
+  screens/CatalogSection.tsx    Seção do catálogo (dentro de Configurações): prévia Main/Alt e membership
+  screens/SettingsScreen.tsx    Aba Configurações: backup (exportar/importar), local dos dados, catálogo
   screens/CharactersScreen.tsx  Aba Personagens: cadastro, edição, exclusão, Main/Alt e membership
   data/model.ts                 Character, AppData (schemaVersion), CLASSES, parseData, ensureSingleMain
   data/store.tsx                StoreProvider/useStore: carrega ao abrir e salva 300 ms após cada mudança
@@ -142,6 +143,8 @@ src/
   screens/TodayScreen.tsx       Aba Hoje: todos os personagens, diárias de hoje + semanais, botões grandes
   data/checks.ts                Chaves das marcações, estado das células e progresso da semana (testado)
   data/checks.test.ts           Testes das marcações e do progresso
+  data/backup.ts                Formato do backup (envelope), leitura/validação e resumo (testado)
+  data/backupIO.ts              Janelas Salvar/Abrir (plugin dialog) e cópia de segurança
 src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do instalador
 ```
 
@@ -161,6 +164,14 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Backup e aba Configurações (desde a v0.9.0)
+
+- A aba **Catálogo** virou **Configurações** (Backup + Local dos dados + Catálogo). Ficam 5 abas finais: Semana, Hoje, Personagens, Histórico, Configurações (+ Componentes temporária).
+- Arquivo de backup: JSON com envelope `{ app, tipo: "backup", exportadoEm, versaoApp, dados }`; `dados` é igual ao `dados.json`. A importação também aceita um `dados.json` puro.
+- `readBackup()` nunca lança exceção; recusa arquivo que não é JSON ou não tem `characters`. Lê com o mesmo `parseData` tolerante.
+- Importar mostra a prévia (personagens, main, marcações, período, data da exportação) e pede confirmação. **Antes de substituir**, grava uma cópia dos dados atuais em `%APPDATA%\com.founderha.aion2taskmanager\copias-de-seguranca\antes-de-importar-AAAAMMDD-HHMMSS.json`; se a cópia falhar, a importação é cancelada.
+- Plugin `tauri-plugin-dialog` (permissão `dialog:default`) para as janelas Salvar/Abrir. Comandos Rust novos: `write_text_file`, `read_text_file` (limite 20 MB), `snapshot_data` (nome só com letras, números e hífen).
 
 ## Aba Hoje (desde a v0.8.0)
 
@@ -224,8 +235,8 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 | 7 | Painel Semanal (grade qua→ter, check por dia) | ✅ v0.7.0 |
 | 8 | Visão do Dia | ✅ v0.8.0 (aba Hoje) |
 | 9 | Salvamento local automático | ✅ Personagens (v0.5.0) e marcações (v0.7.0) |
-| 10 | Backup (exportar/importar `.json`) | ⏳ Próxima |
-| 11 | Histórico de semanas | |
+| 10 | Backup (exportar/importar `.json`) | ✅ v0.9.0 (aba Configurações) |
+| 11 | Histórico de semanas | ⏳ Próxima |
 | 12 | Configurações (horário de reset, editor de tarefas, tema) | |
 | 13 | Versão 1.0 | |
 | 14 | Extras: timers de Rift e chefes, aviso de Odyle, notificações do Windows | |

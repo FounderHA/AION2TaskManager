@@ -17,6 +17,8 @@ interface StoreValue {
   deleteCharacter: (id: string) => void;
   /** Liga/desliga uma marcação (chave de data/checks.ts). */
   toggleCheck: (key: string) => void;
+  /** Substitui todos os dados (importar backup). */
+  replaceAll: (next: AppData) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -104,10 +106,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const replaceAll = useCallback((next: AppData) => {
+    setData({ ...next, characters: ensureSingleMain(next.characters) });
+  }, []);
+
   const value = useMemo<StoreValue>(() => {
     const characters = sortCharacters(data.characters);
-    return { data, characters, main: characters.find((c) => c.role === "MAIN"), saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck };
-  }, [data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck]);
+    return { data, characters, main: characters.find((c) => c.role === "MAIN"), saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll };
+  }, [data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

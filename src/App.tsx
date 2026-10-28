@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { AppHeader, Panel, SectionTitle, type TabItem } from "./components/ui";
-import { CatalogScreen } from "./screens/CatalogScreen";
 import { CharactersScreen } from "./screens/CharactersScreen";
 import { ComponentShowcase } from "./screens/ComponentShowcase";
+import { SettingsScreen } from "./screens/SettingsScreen";
 import { TodayScreen } from "./screens/TodayScreen";
 import { WeeklyScreen } from "./screens/WeeklyScreen";
 import { formatCountdown, localResetLabel } from "./time/gameTime";
@@ -10,19 +10,19 @@ import { useGameClock } from "./time/useGameClock";
 import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
 import { useUpdater } from "./updater/useUpdater";
 
-type TabId = "semana" | "hoje" | "personagens" | "historico" | "catalogo" | "componentes";
+type TabId = "semana" | "hoje" | "personagens" | "historico" | "configuracoes" | "componentes";
 
 const TABS: TabItem<TabId>[] = [
   { id: "semana", label: "Semana" },
   { id: "hoje", label: "Hoje" },
   { id: "personagens", label: "Personagens" },
   { id: "historico", label: "Histórico" },
-  { id: "catalogo", label: "Catálogo" },
+  { id: "configuracoes", label: "Configurações" },
   { id: "componentes", label: "Componentes" },
 ];
 
 // Em qual etapa do plano cada tela será construída
-const COMING: Record<Exclude<TabId, "componentes" | "catalogo" | "personagens" | "semana" | "hoje">, string> = {
+const COMING: Record<Exclude<TabId, "componentes" | "configuracoes" | "personagens" | "semana" | "hoje">, string> = {
   historico: "Etapa 11 — Histórico",
 };
 
@@ -42,8 +42,8 @@ function App() {
       <UpdateBanner state={updater.state} dismissed={updater.dismissed} onInstall={updater.install} onDismiss={updater.dismiss} />
       {tab === "componentes" ? (
         <ComponentShowcase />
-      ) : tab === "catalogo" ? (
-        <CatalogScreen />
+      ) : tab === "configuracoes" ? (
+        <SettingsScreen appVersion={updater.currentVersion} />
       ) : tab === "semana" ? (
         <WeeklyScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
       ) : tab === "hoje" ? (

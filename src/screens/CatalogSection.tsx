@@ -29,7 +29,8 @@ function TaskRow({ task, member }: { task: TaskDef; member: boolean }) {
   );
 }
 
-export function CatalogScreen() {
+/** Seções do catálogo (usadas dentro da aba Configurações). */
+export function CatalogSection() {
   const [role, setRole] = useState<CharacterRole>("MAIN");
   const [member, setMember] = useState(false);
 
@@ -38,7 +39,7 @@ export function CatalogScreen() {
   const hiddenServer = DEFAULT_CATALOG.length - visible.length;
 
   return (
-    <div className="page">
+    <>
       <Panel label="Prévia">
         <SectionTitle aside={`${visible.length} tarefas visíveis · ${enabled.length} ligadas por padrão`}>Catálogo de tarefas</SectionTitle>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 20, alignItems: "center" }}>
@@ -86,8 +87,8 @@ export function CatalogScreen() {
       })}
 
       <p style={{ margin: 0, fontSize: 12, color: "var(--text-muted)" }}>
-        Legenda: {Object.values(CADENCE_LABEL).join(" · ")}. Tarefas desligadas aparecem apagadas e poderão ser ligadas na tela de Configurações (Etapa 12).
+        Legenda: {Object.values(CADENCE_LABEL).join(" · ")}. Tarefas desligadas aparecem apagadas e poderão ser ligadas aqui na Etapa 12.
       </p>
-    </div>
+    </>
   );
 }

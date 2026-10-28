@@ -4,6 +4,9 @@ import { CharactersScreen } from "./screens/CharactersScreen";
 import { HistoryScreen } from "./screens/HistoryScreen";
 import { OdyleScreen } from "./screens/OdyleScreen";
 import { RuneBackdrop } from "./components/RuneBackdrop";
+import { CompactView } from "./screens/CompactView";
+import { DayCompleteFx } from "./components/DayCompleteFx";
+import { enterCompact, exitCompact, setOnTop } from "./components/windowMode";
 import { SettingsScreen } from "./screens/SettingsScreen";
 import { ProgressScreen } from "./screens/ProgressScreen";
 import { WeeklyScreen } from "./screens/WeeklyScreen";
@@ -25,9 +28,49 @@ const BASE_TABS: TabItem<TabId>[] = [
   { id: "configuracoes", label: "Configurações" },
 ];
 
+function readFlag(key: string, fallback: boolean): boolean {
+  try {
+    const v = localStorage.getItem(key);
+    return v === null ? fallback : v === "1";
+  } catch {
+    return fallback;
+  }
+}
+function writeFlag(key: string, value: boolean) {
+  try {
+    localStorage.setItem(key, value ? "1" : "0");
+  } catch {
+    /* sem armazenamento */
+  }
+}
+
 function App() {
   const [tab, setTab] = useState<TabId>("progresso");
   const [selectedChar, setSelectedChar] = useState<string | null>(null);
+  // Modo compacto e "sempre no topo" lembrados neste PC
+  const [compact, setCompact] = useState(() => readFlag("aion2tm-compacto", false));
+  const [onTop, setOnTopState] = useState(() => readFlag("aion2tm-no-topo", true));
+  useEffect(() => {
+    if (compact) void enterCompact(onTop);
+    // só ao abrir o app
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const goCompact = () => {
+    writeFlag("aion2tm-compacto", true);
+    setCompact(true);
+    void enterCompact(onTop);
+  };
+  const goFull = () => {
+    writeFlag("aion2tm-compacto", false);
+    setCompact(false);
+    void exitCompact();
+  };
+  const toggleTop = () => {
+    const next = !onTop;
+    writeFlag("aion2tm-no-topo", next);
+    setOnTopState(next);
+    void setOnTop(next);
+  };
   const updater = useUpdater();
   const { reset, saveStatus, characters, data } = useStore();
 
@@ -39,6 +82,14 @@ function App() {
     if (characters.length === 0) setTab("personagens");
   }, [saveStatus, characters.length]);
   const clock = useGameClock(reset);
+
+  // Tema por facção: "auto" segue a facção do main
+  const themeChoice = data.settings.theme;
+  const mainFaction = characters.find((c) => c.role === "MAIN")?.faction;
+  const faction = themeChoice === "auto" ? (mainFaction === "Asmodian" ? "asmodian" : "elyos") : themeChoice;
+  useEffect(() => {
+    document.documentElement.dataset.faction = faction;
+  }, [faction]);
   const toWeekly = clock.nextWeekly.getTime() - clock.now.getTime();
   const resets = [
     { label: "Diário", value: formatCountdown(clock.nextDaily.getTime() - clock.now.getTime()) },
@@ -50,10 +101,33 @@ function App() {
   const odyleAlert = characters.some((c) => c.odyle && currentOdyle(c.odyle, odyleRules, clock.now).level !== "ok");
   const tabs = BASE_TABS.map((t) => (t.id === "odyle" ? { ...t, alert: odyleAlert } : t));
 
+  if (compact) {
+    return (
+      <div className="app-bg app-bg--compact">
+        <RuneBackdrop />
+        <CompactView clock={clock} onExpand={goFull} onTop={onTop} onToggleTop={toggleTop} />
+        <DayCompleteFx todayKey={clock.todayKey} weekKey={clock.weekKey} />
+      </div>
+    );
+  }
+
   return (
     <div className="app-bg">
       <RuneBackdrop />
-      <AppHeader tabs={tabs} active={tab} onTabChange={setTab} resets={resets} />
+      <AppHeader
+        tabs={tabs}
+        active={tab}
+        onTabChange={setTab}
+        resets={resets}
+        actions={
+          <button type="button" className="header-btn" onClick={goCompact} title="Modo compacto: janela pequena, sempre por cima do jogo">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4" fill="none" stroke="currentColor" strokeWidth="1.4" />
+            </svg>
+            Compacto
+          </button>
+        }
+      />
       <UpdateBanner state={updater.state} dismissed={updater.dismissed} onInstall={updater.install} onDismiss={updater.dismiss} />
       {saveStatus === "erro" && (
         <div style={{ margin: "16px 40px 0" }}>
@@ -80,6 +154,7 @@ function App() {
       ) : (
         <HistoryScreen clock={clock} />
       )}
+      <DayCompleteFx todayKey={clock.todayKey} weekKey={clock.weekKey} />
       <VersionFooter version={updater.currentVersion} state={updater.state} onCheck={updater.checkNow} />
     </div>
   );

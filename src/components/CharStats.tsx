@@ -17,8 +17,8 @@ function DefaultCpIcon() {
   // Duas lâminas cruzadas (arte própria)
   return (
     <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path d="M3 2.5 L11.5 11 M15 2.5 L6.5 11" stroke="#8fdcef" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M10 12.5 L13.5 9 M8 12.5 L4.5 9 M12.2 13.8 L14.8 16.4 M5.8 13.8 L3.2 16.4" stroke="#8fdcef" strokeWidth="1.3" strokeLinecap="round" />
+      <path d="M3 2.5 L11.5 11 M15 2.5 L6.5 11" stroke="var(--cyan-light)" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M10 12.5 L13.5 9 M8 12.5 L4.5 9 M12.2 13.8 L14.8 16.4 M5.8 13.8 L3.2 16.4" stroke="var(--cyan-light)" strokeWidth="1.3" strokeLinecap="round" />
     </svg>
   );
 }

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Tabs, type TabItem } from "./Basics";
 import { LogoStar } from "./icons";
 
@@ -9,7 +10,7 @@ export interface ResetInfo {
   urgent?: boolean;
 }
 
-export function AppHeader<T extends string>({ tabs, active, onTabChange, resets }: { tabs: TabItem<T>[]; active: T; onTabChange: (id: T) => void; resets: ResetInfo[] }) {
+export function AppHeader<T extends string>({ tabs, active, onTabChange, resets, actions }: { tabs: TabItem<T>[]; active: T; onTabChange: (id: T) => void; resets: ResetInfo[]; actions?: ReactNode }) {
   return (
     <header className="app-header">
       <div className="app-header__brand">
@@ -19,6 +20,7 @@ export function AppHeader<T extends string>({ tabs, active, onTabChange, resets 
         </span>
       </div>
       <Tabs className="app-header__nav" items={tabs} active={active} onChange={onTabChange} />
+      {actions && <div className="app-header__actions">{actions}</div>}
       <div className="app-header__reset">
         {resets.map((r) => (
           <div key={r.label} className="app-header__reset-row">

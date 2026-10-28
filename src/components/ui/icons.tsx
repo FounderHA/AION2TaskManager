@@ -6,8 +6,8 @@ export function LogoStar({ size = 34 }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 34 34" fill="none" aria-hidden="true">
       <path d="M17 2 L19.5 14.5 L32 17 L19.5 19.5 L17 32 L14.5 19.5 L2 17 L14.5 14.5 Z" stroke="#dfe7f2" strokeWidth="1.2" />
-      <path d="M6 9 Q11 4 17 6 M28 9 Q23 4 17 6" stroke="#8fdcef" strokeWidth="1" />
-      <circle cx="17" cy="17" r="2" fill="#8fdcef" />
+      <path d="M6 9 Q11 4 17 6 M28 9 Q23 4 17 6" stroke="var(--cyan-light)" strokeWidth="1" />
+      <circle cx="17" cy="17" r="2" fill="var(--cyan-light)" />
     </svg>
   );
 }
@@ -36,7 +36,7 @@ export function CrownIcon({ size = 12, color = "#2a1d05" }: IconProps) {
   );
 }
 
-export function InfoIcon({ size = 16, color = "#8fdcef" }: IconProps) {
+export function InfoIcon({ size = 16, color = "var(--cyan-light)" }: IconProps) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <circle cx="8" cy="8" r="7" stroke={color} strokeWidth="1.2" />

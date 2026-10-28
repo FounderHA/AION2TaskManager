@@ -16,6 +16,20 @@
 
   --cyan: #5fd3e6;
   --cyan-light: #8fdcef;
+  --accent-rgb: 143, 220, 239;
+  --accent2-rgb: 95, 211, 230;
+  --accent-soft-rgb: 190, 240, 248;
+
+  /* Fundo animado */
+  --bd-top: #0c1a22;
+  --bd-mid: #08121a;
+  --bd-bottom: #050a10;
+  --bd-fog1-rgb: 64, 120, 132;
+  --bd-fog2-rgb: 44, 86, 104;
+  --rune-rgb: 150, 214, 226;
+  --rune2-rgb: 224, 196, 120;
+  --ember: #ffd9a0;
+  --ember-rgb: 255, 190, 110;
 
   --gold-light: #f6dc8c;
   --gold: #e0b452;
@@ -27,6 +41,35 @@
 
   --font: "Noto Sans", system-ui, sans-serif;
   --radius: 4px;
+}
+
+/* Tema Asmodian: carmesim + roxo (o dourado continua sendo "concluído") */
+:root[data-faction="asmodian"] {
+  --bg-deep: #0c0610;
+  --bg: #170b1b;
+  --bg-glow: #2c1430;
+  --panel-top: rgba(40, 22, 46, 0.78);
+  --panel-bottom: rgba(22, 12, 28, 0.86);
+  --line: rgba(205, 170, 215, 0.22);
+  --line-soft: rgba(205, 170, 215, 0.1);
+  --text-muted: #a593ad;
+  --text-soft: #b3a2bb;
+
+  --cyan: #c46be0;
+  --cyan-light: #dca6f0;
+  --accent-rgb: 220, 166, 240;
+  --accent2-rgb: 196, 107, 224;
+  --accent-soft-rgb: 240, 200, 250;
+
+  --bd-top: #1c0b18;
+  --bd-mid: #12070f;
+  --bd-bottom: #080308;
+  --bd-fog1-rgb: 150, 40, 70;
+  --bd-fog2-rgb: 96, 40, 128;
+  --rune-rgb: 222, 140, 205;
+  --rune2-rgb: 232, 86, 104;
+  --ember: #ffb3a3;
+  --ember-rgb: 255, 90, 90;
 }
 
 * {

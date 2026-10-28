@@ -7,7 +7,7 @@ import type { CharacterRole, TaskDef, Weekday } from "./types";
 export const DEFAULT_CATALOG: TaskDef[] = [
   // ---------- Diárias ----------
   { id: "duty-missions", name: "Duty Missions", description: "5 missões do Diário (não acumulam)", scope: "servidor", cadence: "diaria", category: "missoes", enabledByDefault: true },
-  { id: "daily-dungeon", name: "Daily Dungeon", description: "2 entradas por dia (14 na semana)", scope: "servidor", cadence: "ritmo", category: "dungeons", enabledByDefault: true },
+  { id: "daily-dungeon", name: "Daily Dungeon", description: "14 entradas por semana", scope: "servidor", cadence: "semanal", category: "dungeons", enabledByDefault: true },
   { id: "shugo-festival", name: "Shugo Festival", description: "Usar as chaves do dia", scope: "servidor", cadence: "diaria", category: "eventos", enabledByDefault: true },
   { id: "dimensional-invasion", name: "Dimensional Invasion", description: "Usar a chave do dia", scope: "servidor", cadence: "diaria", category: "eventos", enabledByDefault: true },
   { id: "nightmare", name: "Nightmare", description: "2 tentativas (só gasta se vencer)", scope: "personagem", cadence: "diaria", category: "dungeons", enabledByDefault: true },

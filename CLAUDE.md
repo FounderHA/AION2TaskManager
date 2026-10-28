@@ -20,7 +20,11 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- **Daily Dungeon virou semanal** ("14 entradas por semana", cadência `semanal`, mesmo id). Marcações antigas por dia ficam guardadas mas não aparecem mais.
+- **Modo compacto** (`screens/CompactView.tsx` + `components/windowMode.ts`): botão "Compacto" no cabeçalho. A janela vai para 380×720, sempre no topo (alfinete liga/desliga). Mostra anéis de % de Hoje e da Semana, e por personagem: barra do dia, diárias que faltam com check, "▸ Semana" que abre semanais + compras com check, selo de Odyle perto do limite. "Mostrar concluídas" opcional. Lembra o modo e o alfinete no localStorage. Permissões novas em `capabilities/default.json`: `core:window:allow-set-size`, `allow-set-min-size`, `allow-set-always-on-top`, `allow-unmaximize`. No navegador só troca a tela.
+- **Efeito "Dia completo"** (`components/DayCompleteFx.tsx`): asas de luz + anel de runas dourado + texto, quando um personagem fecha todas as diárias de hoje (versão maior quando todos fecham). Só dispara por marcação feita agora (ignora carregar/importar dados, mudança de catálogo e virada do dia). Funciona também no modo compacto. `data/today.ts` (`charDays`, `completeToday`) é compartilhado com o modo compacto.
+- **Tema por facção**: `settings.theme` = `auto` (facção do main) | `elyos` | `asmodian`, em Configurações → Aparência. Aplica `data-faction` no `<html>`; o tema Asmodian (carmesim + roxo) redefine os tokens em `theme.css` (`--cyan*`, `--accent-rgb`, `--accent2-rgb`, fundo animado `--bd-*`, `--rune*`, `--ember*`). O dourado continua sendo "concluído". Cores de destaque e do fundo agora vêm desses tokens (não usar mais rgba fixo de ciano).
+- Cuidado: `.app-bg > :not(.backdrop):not(.fx-day)` recebe `position: relative`; elementos fixos novos dentro do `.app-bg` precisam entrar nessa exceção.
 
 ## Decisões de produto (já tomadas)
 
@@ -32,7 +36,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 | Membership (Special Quai) | **Por conta** (desde a v1.3.0; antes era por personagem). Um switch em Configurações → Conta. Muda os textos das tarefas (ex.: Abismo 7h → 14h) e o limite/recarga da Odyle Energy |
 | Marcação | **Check simples** (feito / não feito) |
 | Tarefas diárias | Um check por dia |
-| Semanais com ritmo diário | Um check por dia com a meta do dia (ex.: Daily Dungeon "2 entradas" por dia → 14 na semana) |
+| Semanais com ritmo diário | Um check por dia com a meta do dia (cadência `ritmo`; a Daily Dungeon saiu daqui e virou semanal em 28/10/2026) |
 | Semanais únicas | Um check na semana (ex.: Ascension Trial, raids) |
 | Catálogo de tarefas | Editável pelo usuário (números mudam com patches) |
 | Armazenamento | Arquivo local na pasta do app, salvo automaticamente |
@@ -338,7 +342,5 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 
 ## Ideias registradas para depois
 
-- Tema Asmodian (carmesim + roxo) além do Elyos (dourado + azul), trocando conforme a facção do personagem.
-- Animação de asas ao fechar 100% do dia.
 - Alerta "cubos restantes no servidor" (10/semana).
 - Backup automático semanal numa pasta escolhida (ex.: Google Drive) para sincronizar PCs.

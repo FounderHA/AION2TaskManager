@@ -27,10 +27,14 @@ export interface OdyleConfig {
 
 export const DEFAULT_ODYLE: OdyleConfig = { capMember: 840, rateMember: 15, capFree: 560, rateFree: 10 };
 
+export type ThemeChoice = "auto" | "elyos" | "asmodian";
+
 export interface Settings {
   reset: ResetConfig;
   /** Membership é da conta (vale para todos os personagens). */
   membership: boolean;
+  /** Tema visual: automático (facção do main), Elyos ou Asmodian. */
+  theme: ThemeChoice;
   odyle: OdyleConfig;
   icons: StatIcons;
   tasks: Record<string, TaskOverride>;
@@ -45,7 +49,7 @@ export const TASK_NAME_MAX = 40;
 export const TASK_DESC_MAX = 120;
 
 export function defaultSettings(): Settings {
-  return { reset: { ...DEFAULT_RESET }, membership: false, odyle: { ...DEFAULT_ODYLE }, icons: {}, tasks: {}, customTasks: [] };
+  return { reset: { ...DEFAULT_RESET }, membership: false, theme: "auto", odyle: { ...DEFAULT_ODYLE }, icons: {}, tasks: {}, customTasks: [] };
 }
 
 const SCOPES: TaskScope[] = ["personagem", "servidor"];
@@ -60,6 +64,7 @@ export function parseSettings(raw: unknown, legacy: { membership?: boolean } = {
   const o = raw as Record<string, unknown>;
 
   if (typeof o.membership === "boolean") s.membership = o.membership;
+  if (o.theme === "elyos" || o.theme === "asmodian" || o.theme === "auto") s.theme = o.theme;
   const od = o.odyle as Record<string, unknown> | undefined;
   for (const k of ["capMember", "rateMember", "capFree", "rateFree"] as const) {
     const v = od?.[k];

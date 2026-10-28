@@ -2,7 +2,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { emptyData, ensureSingleMain, NAME_MAX, parseData, sortCharacters, type AppData, type Character, type OdyleSnapshot } from "./model";
 import { addCharged, reanchor, rulesFor, snapshotFromInput, spend } from "./odyle";
-import { CUSTOM_PREFIX, resolveCatalog, TASK_DESC_MAX, TASK_NAME_MAX, type OdyleConfig, type ResolvedTask, type Settings } from "./settings";
+import { CUSTOM_PREFIX, resolveCatalog, TASK_DESC_MAX, TASK_NAME_MAX, type OdyleConfig, type ResolvedTask, type Settings, type ThemeChoice } from "./settings";
 import { loadRaw, saveRaw } from "./storage";
 import type { TaskDef } from "./types";
 import type { ResetConfig } from "../time/gameTime";
@@ -36,6 +36,7 @@ interface StoreValue {
   setStatIcon: (which: "gs" | "cp", dataUrl: string | null) => void;
   /** Membership da conta (vale para todos os personagens). */
   setMembership: (on: boolean) => void;
+  setTheme: (theme: ThemeChoice) => void;
   setOdyleConfig: (cfg: OdyleConfig) => void;
   /** Corrige os valores atuais de Odyle Energy (null = parar de controlar). */
   setOdyle: (id: string, values: { basic: number; charged: number } | null) => void;
@@ -198,6 +199,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setData((d) => (d.settings.membership === on ? d : { ...d, characters: reanchorAll(d, new Date()), settings: { ...d.settings, membership: on } }));
   }, []);
 
+  const setTheme = useCallback((theme: ThemeChoice) => {
+    setData((d) => ({ ...d, settings: { ...d.settings, theme } }));
+  }, []);
+
   const setOdyleConfig = useCallback((cfg: OdyleConfig) => {
     setData((d) => ({ ...d, characters: reanchorAll(d, new Date()), settings: { ...d.settings, odyle: { ...cfg } } }));
   }, []);
@@ -248,12 +253,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setReset,
       setStatIcon,
       setMembership,
+      setTheme,
       setOdyleConfig,
       setOdyle,
       spendOdyle,
       addChargedOdyle,
     };
-  }, [setMembership, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
+  }, [setMembership, setTheme, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

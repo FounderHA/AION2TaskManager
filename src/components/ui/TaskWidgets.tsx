@@ -78,23 +78,21 @@ export type CharacterCardData = {
 export function CharacterCard({ data, selected, onSelect, footer, stats }: { data: CharacterCardData; selected: boolean; onSelect: () => void; footer?: string; stats?: ReactNode }) {
   return (
     <button className={`char-card ${selected ? "char-card--selected" : ""}`} aria-pressed={selected} onClick={onSelect}>
-      <div className="char-card__head">
-        <CharPortrait photo={data.photo ?? null} name={data.name} />
-        <div className="char-card__id">
-          <div className="char-card__top">
-            <span className="char-card__name">{data.name}</span>
-            <Badge kind={data.role === "MAIN" ? "main" : "alt"} />
-          </div>
-          <div className="char-card__meta">
-            <span>{data.className}</span>
-            <span className="char-card__dot">·</span>
-            <span>{data.faction}</span>
-          </div>
+      <CharPortrait photo={data.photo ?? null} name={data.name} size={96} />
+      <div className="char-card__body">
+        <div className="char-card__top">
+          <span className="char-card__name">{data.name}</span>
+          <Badge kind={data.role === "MAIN" ? "main" : "alt"} />
         </div>
+        <div className="char-card__meta">
+          <span>{data.className}</span>
+          <span className="char-card__dot">·</span>
+          <span>{data.faction}</span>
+        </div>
+        {stats}
+        {data.progress !== undefined && <ProgressBar value={data.progress} />}
+        {footer && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{footer}</span>}
       </div>
-      {stats}
-      {data.progress !== undefined && <ProgressBar value={data.progress} />}
-      {footer && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{footer}</span>}
     </button>
   );
 }

@@ -301,12 +301,12 @@
 
 /* ---------- Card de personagem ---------- */
 .char-card {
-  min-width: 230px;
-  flex: 0 1 260px;
+  min-width: 290px;
+  flex: 0 1 320px;
   min-height: 112px;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: flex-start;
+  gap: 14px;
   text-align: left;
   padding: 16px 18px;
   cursor: pointer;
@@ -349,6 +349,8 @@
 .char-card--add {
   min-width: 150px;
   flex: 0 0 auto;
+  flex-direction: column;
+  align-self: stretch;
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -1392,17 +1394,12 @@
 .char-card--selected .portrait {
   border-color: var(--gold-light);
 }
-.char-card__head {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.char-card__id {
+.char-card__body {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 .photo-field {
   display: flex;

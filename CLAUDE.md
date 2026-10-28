@@ -20,7 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- Foto maior no card do personagem: moldura de 96 px à esquerda, com nome, classe, GS/CP e progresso ao lado (`char-card__body`).
 
 ## Decisões de produto (já tomadas)
 
@@ -185,7 +185,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 ## Foto do personagem (v1.3.1)
 - `Character.photo`: data URL (JPEG 160×160, cortado em quadrado no centro) ou null; dados antigos viram null; acima de `PHOTO_MAX` (250 KB) é descartada ao ler.
 - Escolhida no formulário de Personagens ("Escolher foto"/"Trocar foto"/"Remover"); fica só no dados.json do PC (e vai no backup).
-- `CharPortrait` (moldura dourada com silhueta quando não há foto) aparece no card do personagem (Personagens, Semana, Histórico), no Hoje e na aba Odyle.
+- `CharPortrait` (moldura dourada com silhueta quando não há foto) aparece no card do personagem (96 px; Cadastro, Personagem, Histórico), no Progresso e na aba Odyle.
 - `components/pickImage.ts` é o seletor de imagem compartilhado (fit `contain` para ícones de GS/CP, `cover` para a foto).
 
 ## Odyle Energy e Membership por conta (v1.3.0)

@@ -20,8 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- **Season Mission: Weekly** (nova, id `season-mission-weekly`, semanal, por personagem, ligada): um check de "conferi as missões da semana e peguei as recompensas". A aba Season (reset de temporada) ficou de fora.
-- **Abyss Supply Request** ligado por padrão, por personagem: "Abyss Supply Request: Emergency" (diária, id `supply-requests-urgent`) e "Abyss Supply Request: Weekly" (semanal, id `supply-requests-weekly`). Ids antigos mantidos (antes eram "Supply Requests (urgente/semanal)", desligados). Um check só: "já olhei e entreguei o que dava".
+- (nenhuma)
 
 ## Decisões de produto (já tomadas)
 
@@ -176,6 +175,11 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Ajustes da v1.6.0
+- **Season Mission: Weekly** (nova, id `season-mission-weekly`, semanal, por personagem, ligada): um check de "conferi as missões da semana e peguei as recompensas". A aba Season (reset de temporada) ficou de fora.
+- **Abyss Supply Request** ligado por padrão, por personagem: "Abyss Supply Request: Emergency" (diária, id `supply-requests-urgent`) e "Abyss Supply Request: Weekly" (semanal, id `supply-requests-weekly`). Ids antigos mantidos (antes eram "Supply Requests (urgente/semanal)", desligados). Um check só: "já olhei e entreguei o que dava".
+- Ideia registrada (pensar depois): ler dados do jogo pela rede como os DPS meters (Npcap + engenharia reversa do protocolo). Riscos: quebra a cada patch, Npcap exige administrador, zona cinzenta nos termos da NCSOFT. Se fizer, começar só pela Odyle Energy e como opção desligada.
 
 ## Ajustes da v1.5.0
 - Wind Breeze Merchants (Special): Odyle Energy passou de 20/personagem para **4 por personagem** (mesmo id `wind-breeze-odyle-energy`, marcações mantidas) + nova **Odyle Energy (servidor) 16 por servidor** (id `wind-breeze-odyle-energy-server`, só no main). Pedido do usuário em 28/10/2026.

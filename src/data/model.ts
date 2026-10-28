@@ -14,12 +14,31 @@ export interface Character {
   className: CharacterClass;
   faction: Faction;
   role: CharacterRole;
-  member: boolean;
   /** ISO 8601; usado para ordenar e para escolher o novo main. */
   createdAt: string;
   /** Gear Score (GS) e Combat Power (CP) informados pelo usuário; null = não informado. */
   gs: number | null;
   cp: number | null;
+  /** Última "foto" da Odyle Energy (ver data/odyle.ts); null = não informada. */
+  odyle: OdyleSnapshot | null;
+}
+
+/** Valores informados num momento; o valor atual é calculado somando as recargas desde então. */
+export interface OdyleSnapshot {
+  basic: number;
+  charged: number;
+  /** ISO 8601 do momento da foto. */
+  at: string;
+}
+
+function parseOdyle(v: unknown): OdyleSnapshot | null {
+  if (!v || typeof v !== "object") return null;
+  const o = v as Record<string, unknown>;
+  const n = (x: unknown) => (typeof x === "number" && Number.isFinite(x) && x >= 0 ? Math.round(x) : null);
+  const basic = n(o.basic);
+  const charged = n(o.charged);
+  if (basic === null || charged === null || typeof o.at !== "string" || Number.isNaN(Date.parse(o.at))) return null;
+  return { basic, charged, at: o.at };
 }
 
 const statOrNull = (v: unknown): number | null => (typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.round(v) : null);
@@ -68,18 +87,20 @@ export function parseData(raw: string | null | undefined): AppData {
         className: (CLASSES as readonly string[]).includes(String(c.className)) ? (c.className as CharacterClass) : "Gladiator",
         faction: c.faction === "Asmodian" ? "Asmodian" : "Elyos",
         role: c.role === "MAIN" ? "MAIN" : "ALT",
-        member: c.member === true,
         createdAt: typeof c.createdAt === "string" ? c.createdAt : new Date().toISOString(),
         gs: statOrNull(c.gs),
         cp: statOrNull(c.cp),
+        odyle: parseOdyle(c.odyle),
       }));
+    // Versões antigas guardavam membership por personagem: se algum tinha, a conta passa a ter
+    const legacyMember = list.some((c) => !!c && typeof c === "object" && (c as { member?: unknown }).member === true);
     const checks: Record<string, string> = {};
     if (obj?.checks && typeof obj.checks === "object") {
       for (const [k, v] of Object.entries(obj.checks as Record<string, unknown>)) {
         if (typeof v === "string" && k.includes("|")) checks[k] = v;
       }
     }
-    return { schemaVersion: SCHEMA_VERSION, characters: ensureSingleMain(characters), checks, settings: parseSettings(obj?.settings) };
+    return { schemaVersion: SCHEMA_VERSION, characters: ensureSingleMain(characters), checks, settings: parseSettings(obj?.settings, { membership: legacyMember }) };
   } catch {
     return emptyData();
   }

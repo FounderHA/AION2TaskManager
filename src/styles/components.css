@@ -1157,3 +1157,215 @@
   border: 1px dashed rgba(160, 180, 210, 0.4);
   background: rgba(7, 11, 20, 0.55);
 }
+
+/* ---------- Aba Odyle ---------- */
+.tab__alert {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f0a43c;
+  box-shadow: 0 0 8px rgba(240, 164, 60, 0.8);
+  z-index: 2;
+}
+.odyle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 1180px) {
+  .odyle-grid {
+    grid-template-columns: 1fr;
+  }
+}
+.odyle-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.odyle-card__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.odyle-flag {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+.odyle-flag--warn {
+  color: #2b1a02;
+  background: linear-gradient(180deg, #f6c66a, #d9952c);
+}
+.odyle-flag--full {
+  color: var(--danger-text);
+  background: rgba(196, 64, 82, 0.35);
+  border: 1px solid rgba(196, 64, 82, 0.7);
+}
+.odyle-card__row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 4px 14px;
+  align-items: center;
+}
+.odyle-card__label {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+.odyle-card__info {
+  grid-column: 2;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.odyle-card__alert {
+  color: #f2a3ae;
+}
+.odyle-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line-soft);
+}
+.odyle-card__group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.odyle-card__group-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-right: 2px;
+}
+.odyle-card__empty {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: var(--text-soft);
+}
+.energy {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.energy__track {
+  flex: 1;
+  height: 10px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line-soft);
+  overflow: hidden;
+}
+.energy__fill {
+  height: 100%;
+  transition: width 0.4s ease;
+}
+.energy__track--basic .energy__fill {
+  background: linear-gradient(90deg, var(--gold-dark), #f3d27a);
+}
+.energy__track--warn .energy__fill {
+  background: linear-gradient(90deg, #c7781e, #f6b14f);
+  box-shadow: 0 0 10px rgba(246, 177, 79, 0.5);
+}
+.energy__track--full .energy__fill {
+  background: linear-gradient(90deg, #8e2433, #e05667);
+  box-shadow: 0 0 10px rgba(224, 86, 103, 0.5);
+}
+.energy__track--charged .energy__fill {
+  background: linear-gradient(90deg, #2c8ea3, var(--cyan-light));
+}
+.energy__value {
+  min-width: 96px;
+  text-align: right;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.energy__value strong {
+  font-size: 16px;
+  color: var(--text-strong);
+}
+.odyle-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.odyle-editor__hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+.odyle-editor__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(140px, 220px));
+  gap: 16px;
+}
+.odyle-editor__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.odyle-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+  align-items: flex-start;
+}
+.odyle-summary__list {
+  flex: 1 1 360px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.odyle-summary__item {
+  display: grid;
+  grid-template-columns: 1fr 90px 150px;
+  gap: 12px;
+  padding: 7px 12px;
+  border-radius: 3px;
+  background: rgba(7, 11, 20, 0.4);
+  border-left: 3px solid var(--gold-dark);
+  font-variant-numeric: tabular-nums;
+}
+.odyle-summary__item--warn {
+  border-left-color: #f0a43c;
+}
+.odyle-summary__item--full {
+  border-left-color: var(--danger);
+}
+.odyle-summary__name {
+  color: var(--text);
+}
+.odyle-summary__val {
+  text-align: right;
+  color: var(--text-strong);
+}
+.odyle-summary__when {
+  text-align: right;
+  color: var(--text-muted);
+}
+.odyle-summary__side {
+  flex: 1 1 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--text-soft);
+}

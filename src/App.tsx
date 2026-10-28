@@ -2,20 +2,23 @@ import { useEffect, useRef, useState } from "react";
 import { Alert, AppHeader, type TabItem } from "./components/ui";
 import { CharactersScreen } from "./screens/CharactersScreen";
 import { HistoryScreen } from "./screens/HistoryScreen";
+import { OdyleScreen } from "./screens/OdyleScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
 import { TodayScreen } from "./screens/TodayScreen";
 import { WeeklyScreen } from "./screens/WeeklyScreen";
 import { formatCountdown, localResetLabel } from "./time/gameTime";
 import { useGameClock } from "./time/useGameClock";
 import { useStore } from "./data/store";
+import { currentOdyle, rulesFor } from "./data/odyle";
 import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
 import { useUpdater } from "./updater/useUpdater";
 
-type TabId = "semana" | "hoje" | "personagens" | "historico" | "configuracoes";
+type TabId = "semana" | "hoje" | "odyle" | "personagens" | "historico" | "configuracoes";
 
-const TABS: TabItem<TabId>[] = [
+const BASE_TABS: TabItem<TabId>[] = [
   { id: "hoje", label: "Hoje" },
   { id: "semana", label: "Semana" },
+  { id: "odyle", label: "Odyle" },
   { id: "personagens", label: "Personagens" },
   { id: "historico", label: "Histórico" },
   { id: "configuracoes", label: "Configurações" },
@@ -24,7 +27,7 @@ const TABS: TabItem<TabId>[] = [
 function App() {
   const [tab, setTab] = useState<TabId>("hoje");
   const updater = useUpdater();
-  const { reset, saveStatus, characters } = useStore();
+  const { reset, saveStatus, characters, data } = useStore();
 
   // Ao abrir: sem personagens cadastrados, começa na aba Personagens
   const decidedStart = useRef(false);
@@ -40,9 +43,14 @@ function App() {
     { label: "Semanal", value: formatCountdown(toWeekly), hint: localResetLabel(clock.nextWeekly), urgent: toWeekly < 86_400_000 },
   ];
 
+  // Ponto de alerta na aba Odyle quando alguém está perto do limite
+  const odyleRules = rulesFor(data.settings.odyle, data.settings.membership);
+  const odyleAlert = characters.some((c) => c.odyle && currentOdyle(c.odyle, odyleRules, clock.now).level !== "ok");
+  const tabs = BASE_TABS.map((t) => (t.id === "odyle" ? { ...t, alert: odyleAlert } : t));
+
   return (
     <div className="app-bg">
-      <AppHeader tabs={TABS} active={tab} onTabChange={setTab} resets={resets} />
+      <AppHeader tabs={tabs} active={tab} onTabChange={setTab} resets={resets} />
       <UpdateBanner state={updater.state} dismissed={updater.dismissed} onInstall={updater.install} onDismiss={updater.dismiss} />
       {saveStatus === "erro" && (
         <div style={{ margin: "16px 40px 0" }}>
@@ -55,6 +63,8 @@ function App() {
         <WeeklyScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
       ) : tab === "hoje" ? (
         <TodayScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
+      ) : tab === "odyle" ? (
+        <OdyleScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
       ) : tab === "personagens" ? (
         <CharactersScreen />
       ) : (

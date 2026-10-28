@@ -1,13 +1,14 @@
 // Estado global do app: carrega dados.json ao abrir e salva sozinho a cada mudança.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { emptyData, ensureSingleMain, NAME_MAX, parseData, sortCharacters, type AppData, type Character } from "./model";
-import { CUSTOM_PREFIX, resolveCatalog, TASK_DESC_MAX, TASK_NAME_MAX, type ResolvedTask } from "./settings";
+import { emptyData, ensureSingleMain, NAME_MAX, parseData, sortCharacters, type AppData, type Character, type OdyleSnapshot } from "./model";
+import { addCharged, reanchor, rulesFor, snapshotFromInput, spend } from "./odyle";
+import { CUSTOM_PREFIX, resolveCatalog, TASK_DESC_MAX, TASK_NAME_MAX, type OdyleConfig, type ResolvedTask, type Settings } from "./settings";
 import { loadRaw, saveRaw } from "./storage";
 import type { TaskDef } from "./types";
 import type { ResetConfig } from "../time/gameTime";
 
 export type SaveStatus = "carregando" | "salvo" | "salvando" | "erro";
-export type CharacterInput = Omit<Character, "id" | "createdAt" | "role"> & { makeMain?: boolean };
+export type CharacterInput = Omit<Character, "id" | "createdAt" | "role" | "odyle"> & { makeMain?: boolean; odyle?: OdyleSnapshot | null };
 
 interface StoreValue {
   data: AppData;
@@ -33,7 +34,21 @@ interface StoreValue {
   setReset: (reset: ResetConfig) => void;
   /** Imagem (data URL) do ícone de GS ou CP; null remove. */
   setStatIcon: (which: "gs" | "cp", dataUrl: string | null) => void;
+  /** Membership da conta (vale para todos os personagens). */
+  setMembership: (on: boolean) => void;
+  setOdyleConfig: (cfg: OdyleConfig) => void;
+  /** Corrige os valores atuais de Odyle Energy (null = parar de controlar). */
+  setOdyle: (id: string, values: { basic: number; charged: number } | null) => void;
+  spendOdyle: (id: string, amount: number) => void;
+  addChargedOdyle: (id: string, amount: number) => void;
 }
+
+/** Fixa os valores atuais de todos os personagens antes de mudar as regras (membership/limites). */
+function reanchorAll(d: AppData, now: Date): Character[] {
+  const rules = rulesFor(d.settings.odyle, d.settings.membership);
+  return d.characters.map((c) => (c.odyle ? { ...c, odyle: reanchor(c.odyle, rules, now) } : c));
+}
+const rulesOf = (s: Settings) => rulesFor(s.odyle, s.membership);
 
 const StoreContext = createContext<StoreValue | null>(null);
 
@@ -80,7 +95,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         name: cleanName(input.name),
         className: input.className,
         faction: input.faction,
-        member: input.member,
+        odyle: input.odyle ?? null,
         gs: input.gs,
         cp: input.cp,
         role: isFirst || input.makeMain ? "MAIN" : "ALT",
@@ -178,6 +193,36 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const setMembership = useCallback((on: boolean) => {
+    setData((d) => (d.settings.membership === on ? d : { ...d, characters: reanchorAll(d, new Date()), settings: { ...d.settings, membership: on } }));
+  }, []);
+
+  const setOdyleConfig = useCallback((cfg: OdyleConfig) => {
+    setData((d) => ({ ...d, characters: reanchorAll(d, new Date()), settings: { ...d.settings, odyle: { ...cfg } } }));
+  }, []);
+
+  const updateOdyle = useCallback((id: string, fn: (c: Character, d: AppData, now: Date) => Character["odyle"] | undefined) => {
+    setData((d) => {
+      const now = new Date();
+      let changed = false;
+      const characters = d.characters.map((c) => {
+        if (c.id !== id) return c;
+        const next = fn(c, d, now);
+        if (next === undefined) return c;
+        changed = true;
+        return { ...c, odyle: next };
+      });
+      return changed ? { ...d, characters } : d;
+    });
+  }, []);
+
+  const setOdyle = useCallback(
+    (id: string, values: { basic: number; charged: number } | null) => updateOdyle(id, (_c, d, now) => (values ? snapshotFromInput(values.basic, values.charged, rulesOf(d.settings), now) : null)),
+    [updateOdyle],
+  );
+  const spendOdyle = useCallback((id: string, amount: number) => updateOdyle(id, (c, d, now) => (c.odyle ? (spend(c.odyle, rulesOf(d.settings), amount, now) ?? undefined) : undefined)), [updateOdyle]);
+  const addChargedOdyle = useCallback((id: string, amount: number) => updateOdyle(id, (c, d, now) => (c.odyle ? addCharged(c.odyle, rulesOf(d.settings), amount, now) : undefined)), [updateOdyle]);
+
   const catalog = useMemo(() => resolveCatalog(data.settings), [data.settings]);
 
   const value = useMemo<StoreValue>(() => {
@@ -201,8 +246,13 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       deleteCustomTask,
       setReset,
       setStatIcon,
+      setMembership,
+      setOdyleConfig,
+      setOdyle,
+      spendOdyle,
+      addChargedOdyle,
     };
-  }, [setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
+  }, [setMembership, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

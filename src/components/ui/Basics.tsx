@@ -24,7 +24,7 @@ export function SectionTitle({ children, aside }: { children: ReactNode; aside?:
 }
 
 /* ---------- Abas com arco luminoso ---------- */
-export type TabItem<T extends string> = { id: T; label: string };
+export type TabItem<T extends string> = { id: T; label: string; /** Ponto de alerta ao lado do nome. */ alert?: boolean };
 
 export function Tabs<T extends string>({ items, active, onChange, className = "" }: { items: TabItem<T>[]; active: T; onChange: (id: T) => void; className?: string }) {
   return (
@@ -39,6 +39,7 @@ export function Tabs<T extends string>({ items, active, onChange, className = ""
             </span>
           )}
           <span className="tab__label">{t.label}</span>
+          {t.alert && <span className="tab__alert" title="Odyle Energy perto do limite" />}
         </button>
       ))}
     </nav>

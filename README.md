@@ -20,9 +20,10 @@ O app se atualiza sozinho: ao abrir, se houver versão nova, aparece uma faixa d
 |---|---|
 | **Hoje** | O que falta hoje, de todos os personagens numa tela. É a aba para usar enquanto joga. |
 | **Semana** | A semana inteira (quarta a terça) de um personagem por vez: diárias dia a dia, semanais e progresso. |
-| **Personagens** | Cadastro do main e dos alts: nome, classe, facção e membership. |
+| **Odyle** | Odyle Energy de cada personagem: Basic (recarrega sozinha a cada 3h, às 01h, 04h, 07h… de Brasília) e Charged (dos itens, até 2000). Botões −40/−80 para gastar, +40/+10 para Charged, aviso quando passa de 800 e horário em que enche. |
+| **Personagens** | Cadastro do main e dos alts: nome, classe, facção, GS/CP e Odyle Energy inicial. |
 | **Histórico** | Semanas encerradas, só para consulta: o que foi feito e o que ficou para trás. |
-| **Configurações** | Backup, ligar/desligar tarefas, criar tarefas próprias e horário do reset. |
+| **Configurações** | Membership da conta (vale para todos os personagens), backup, ligar/desligar tarefas, criar tarefas próprias e horário do reset. |
 
 **Regras principais**
 

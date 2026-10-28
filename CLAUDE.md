@@ -25,7 +25,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 | Plataforma | Só Windows |
 | Personagens | Todos no **mesmo servidor**, com **um único main** |
 | Conteúdo de servidor | Aparece **só no main**. Alts mostram só tarefas de personagem |
-| Membership (Special Quai) | Por personagem (alguns têm, outros não). Com check simples, só muda os textos das tarefas (ex.: Abismo 7h → 14h) |
+| Membership (Special Quai) | **Por conta** (desde a v1.3.0; antes era por personagem). Um switch em Configurações → Conta. Muda os textos das tarefas (ex.: Abismo 7h → 14h) e o limite/recarga da Odyle Energy |
 | Marcação | **Check simples** (feito / não feito) |
 | Tarefas diárias | Um check por dia |
 | Semanais com ritmo diário | Um check por dia com a meta do dia (ex.: Daily Dungeon "2 entradas" por dia → 14 na semana) |
@@ -134,7 +134,10 @@ src/
   screens/TaskEditorSection.tsx Editor de tarefas: ligar/desligar, editar descrição, criar/excluir tarefas próprias
   screens/ResetSection.tsx      Horário do reset diário (hora local do PC) e dia do reset semanal
   data/settings.ts              Settings (reset, ajustes por tarefa, tarefas próprias), parseSettings, resolveCatalog (testado)
-  screens/CharactersScreen.tsx  Aba Personagens: cadastro, edição, exclusão, Main/Alt e membership
+  screens/CharactersScreen.tsx  Aba Personagens: cadastro, edição, exclusão, Main/Alt, GS/CP e Odyle inicial
+  screens/OdyleScreen.tsx       Aba Odyle: Basic/Charged por personagem, gastar −40/−80, Charged +40/+10, desfazer, corrigir
+  screens/AccountSection.tsx    Configurações → Conta: Membership da conta e números da Odyle
+  data/odyle.ts                 Cálculo da Odyle Energy (recargas, valor atual, enche às, gastar, charged) + odyle.test.ts
   data/model.ts                 Character, AppData (schemaVersion), CLASSES, parseData, ensureSingleMain
   data/store.tsx                StoreProvider/useStore: carrega ao abrir e salva 300 ms após cada mudança
   data/storage.ts               Ponte com o Rust (load_data/save_data); no navegador usa localStorage
@@ -168,6 +171,16 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Odyle Energy e Membership por conta (v1.3.0)
+- **Membership é da conta**: `settings.membership` (boolean). `Character.member` foi removido; ao abrir dados antigos, se qualquer personagem tinha `member: true`, a conta vira membership (migração em `parseData`). `describe(task, membership)` usa o da conta.
+- **Regras** (`settings.odyle`, editáveis em Configurações → Conta): com membership limite 840 e +15; sem, 560 e +10. Recarga a cada 3h às 01, 04, 07, 10, 13, 16, 19, 22 de Brasília (= horas UTC ≡ 1 mod 3), confirmado pelo usuário. Charged Energy (itens) até 2000, não recarrega.
+- **Modelo "foto + relógio"**: `Character.odyle = { basic, charged, at }` (ou null = não controla). Valor atual = foto + recargas em (at, agora], parando no limite; se a foto já está acima do limite, fica parada. Não precisa do app aberto.
+- Qualquer ação gera uma foto nova com o valor atual: gastar (Basic primeiro, depois Charged; botão desabilita se não houver o suficiente), Charged +40/+10, "Corrigir valores" (o usuário digita o que vê no jogo e a contagem recomeça dali). Mudar membership ou os números refaz a foto de todos com as regras antigas antes de trocar.
+- Gasto só por botão (−40 / −80), sem campo livre — pedido do usuário. "Desfazer" restaura a foto anterior (por card, só da última ação).
+- Aviso a partir de limite − 40 (800 com membership): selo QUASE CHEIA, barra laranja, ponto na aba Odyle; cheia = barra vermelha, selo CHEIA.
+- No cadastro do personagem há campos opcionais Basic/Charged; ao editar, só regrava a foto se o usuário mudou esses números.
+- A tarefa diária "Odyle Energy" continua no catálogo: serve para marcar "já gastei o que queria hoje".
 
 ## Ajustes da v1.2.0
 
@@ -257,7 +270,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 
 ## Personagens e salvamento (desde a v0.5.0)
 
-- Campos: nome (até 24 caracteres, sem repetir), classe (nomes do cliente em inglês: Gladiator, Templar, Assassin, Ranger, Sorcerer, Spiritmaster, Cleric, Chanter), facção (Elyos/Asmodian), papel (MAIN/ALT) e membership.
+- Campos: nome (até 24 caracteres, sem repetir), classe (nomes do cliente em inglês: Gladiator, Templar, Assassin, Ranger, Sorcerer, Spiritmaster, Cleric, Chanter), facção (Elyos/Asmodian), papel (MAIN/ALT), GS/CP e Odyle inicial (membership saiu do personagem na v1.3.0).
 - **Regra do main:** sempre exatamente um main quando há personagens. O primeiro cadastrado é main; promover outro rebaixa o atual; excluir o main promove o alt mais antigo (`ensureSingleMain`).
 - Exclusão pede confirmação em dois cliques (sem diálogos nativos).
 - Dados em `%APPDATA%\com.founderha.aion2taskmanager\dados.json`, escritos pelos comandos Rust `load_data`, `save_data`, `data_location` (`src-tauri/src/lib.rs`). A gravação é segura: escreve `.tmp`, guarda a versão anterior em `dados.json.bak` e troca.

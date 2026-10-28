@@ -36,7 +36,8 @@ interface WeekViewProps {
 }
 
 export function WeekView({ characters, main, checks, days, weekKey, todayIndex, readOnly, onToggle, weeklyExpiring, sideExtra }: WeekViewProps) {
-  const { catalog } = useStore();
+  const { catalog, data } = useStore();
+  const membership = data.settings.membership;
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = characters.find((c) => c.id === selectedId) ?? characters.find((c) => c.id === main?.id) ?? characters[0];
   const progress = useMemo(() => progressFor(catalog, characters, checks, days, todayIndex, weekKey), [catalog, characters, checks, days, todayIndex, weekKey]);
@@ -90,7 +91,7 @@ export function WeekView({ characters, main, checks, days, weekKey, todayIndex, 
                           {t.name}
                           {t.scope === "servidor" && <Badge kind="server" />}
                         </span>
-                        <span className="task-table__desc">{describe(t, selected.member)}</span>
+                        <span className="task-table__desc">{describe(t, membership)}</span>
                       </div>
                       {days.map((key, i) => {
                         const l = dayLabel(key);
@@ -115,7 +116,7 @@ export function WeekView({ characters, main, checks, days, weekKey, todayIndex, 
               <div className="weekly-grid">
                 {weeklyTasks.map((t) => {
                   const key = weekCheckKey(t, selected, weekKey);
-                  return <WeeklyCard key={t.id} name={t.name} note={describe(t, selected.member)} done={!!checks[key]} server={t.scope === "servidor"} expiring={weeklyExpiring} readOnly={readOnly} onToggle={() => toggle(key)} />;
+                  return <WeeklyCard key={t.id} name={t.name} note={describe(t, membership)} done={!!checks[key]} server={t.scope === "servidor"} expiring={weeklyExpiring} readOnly={readOnly} onToggle={() => toggle(key)} />;
                 })}
               </div>
             )}
@@ -133,7 +134,7 @@ export function WeekView({ characters, main, checks, days, weekKey, todayIndex, 
                     <div className="weekly-grid">
                       {g.items.map((t) => {
                         const key = weekCheckKey(t, selected, weekKey);
-                        return <WeeklyCard key={t.id} name={t.name} note={describe(t, selected.member)} done={!!checks[key]} server={t.scope === "servidor"} expiring={weeklyExpiring} readOnly={readOnly} onToggle={() => toggle(key)} />;
+                        return <WeeklyCard key={t.id} name={t.name} note={describe(t, membership)} done={!!checks[key]} server={t.scope === "servidor"} expiring={weeklyExpiring} readOnly={readOnly} onToggle={() => toggle(key)} />;
                       })}
                     </div>
                   </div>

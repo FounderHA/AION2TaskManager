@@ -23,6 +23,7 @@ interface CharToday {
 
 export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onGoToCharacters: () => void }) {
   const { characters, data, toggleCheck, catalog } = useStore();
+  const membership = data.settings.membership;
   const [hideDone, setHideDone] = useState(false);
   const checks = data.checks;
   const weekday = gameWeekday(clock.todayKey);
@@ -126,7 +127,6 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
                 <Badge kind={char.role === "MAIN" ? "main" : "alt"} />
                 <span className="today-char__meta">
                   {char.className}
-                  {char.member ? " · Membership" : ""}
                 </span>
                 <span className="today-char__count">
                   {dailyDone}/{daily.length} hoje
@@ -143,7 +143,7 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
               </div>
               <div className="today-list">
                 {showDaily.map(({ task, key, done }) => (
-                  <TaskToggleRow key={key} name={task.name} note={describe(task, char.member)} done={done} server={task.scope === "servidor"} onToggle={() => toggleCheck(key)} />
+                  <TaskToggleRow key={key} name={task.name} note={describe(task, membership)} done={done} server={task.scope === "servidor"} onToggle={() => toggleCheck(key)} />
                 ))}
                 {showDaily.length === 0 && <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{daily.length ? "Nada pendente." : "Nenhuma diária ligada."}</span>}
               </div>
@@ -156,7 +156,7 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
               </div>
               <div className="today-list">
                 {showWeekly.map(({ task, key, done }) => (
-                  <TaskToggleRow key={key} name={task.name} note={describe(task, char.member)} done={done} server={task.scope === "servidor"} expiring={lastDay} onToggle={() => toggleCheck(key)} />
+                  <TaskToggleRow key={key} name={task.name} note={describe(task, membership)} done={done} server={task.scope === "servidor"} expiring={lastDay} onToggle={() => toggleCheck(key)} />
                 ))}
                 {showWeekly.length === 0 && <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{weekly.length ? "Todas as semanais feitas ✦" : "Nenhuma semanal ligada."}</span>}
               </div>
@@ -171,7 +171,7 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
                   </div>
                   <div className="today-list">
                     {showPurchases.map(({ task, key, done }) => (
-                      <TaskToggleRow key={key} name={task.name} note={`${task.shop ?? "Loja"} · ${describe(task, char.member)}`} done={done} server={task.scope === "servidor"} expiring={lastDay} onToggle={() => toggleCheck(key)} />
+                      <TaskToggleRow key={key} name={task.name} note={`${task.shop ?? "Loja"} · ${describe(task, membership)}`} done={done} server={task.scope === "servidor"} expiring={lastDay} onToggle={() => toggleCheck(key)} />
                     ))}
                     {showPurchases.length === 0 && <span style={{ fontSize: 13, color: "var(--text-muted)" }}>Todas as compras feitas ✦</span>}
                   </div>

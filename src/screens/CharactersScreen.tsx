@@ -1,9 +1,11 @@
-// Cadastro de personagens: nome, classe, facção, Main/Alt e Membership.
+// Cadastro de personagens: nome, classe, facção, Main/Alt, GS/CP e Odyle Energy inicial.
+// Membership é da conta: fica em Configurações.
 import { useEffect, useState } from "react";
 import { AddCharacterCard, Alert, Badge, Button, CharacterCard, Panel, SectionTitle } from "../components/ui";
 import { CharStats, StatIcon } from "../components/CharStats";
 import { CLASSES, NAME_MAX, type Character, type CharacterClass, type Faction } from "../data/model";
 import { useStore } from "../data/store";
+import { CHARGED_CAP, currentOdyle, rulesFor, snapshotFromInput, type OdyleRules } from "../data/odyle";
 
 type Mode = { kind: "none" } | { kind: "new" } | { kind: "edit"; id: string };
 
@@ -11,23 +13,31 @@ interface FormState {
   name: string;
   className: CharacterClass;
   faction: Faction;
-  member: boolean;
   makeMain: boolean;
   /** Texto digitado (só dígitos); vazio = não informado. */
   gs: string;
   cp: string;
+  /** Odyle Energy atual (vazio = não controlar). */
+  basic: string;
+  charged: string;
 }
 
 const onlyDigits = (v: string) => v.replace(/\D/g, "").slice(0, 9);
 const toStat = (v: string): number | null => (v ? Number(v) : null);
+const onlyDigits4 = (v: string) => v.replace(/\D/g, "").slice(0, 4);
 
-const blankForm = (faction: Faction = "Elyos"): FormState => ({ name: "", className: "Gladiator", faction, member: false, makeMain: false, gs: "", cp: "" });
-const fromChar = (c: Character): FormState => ({ name: c.name, className: c.className, faction: c.faction, member: c.member, makeMain: c.role === "MAIN", gs: c.gs === null ? "" : String(c.gs), cp: c.cp === null ? "" : String(c.cp) });
+const blankForm = (faction: Faction = "Elyos"): FormState => ({ name: "", className: "Gladiator", faction, makeMain: false, gs: "", cp: "", basic: "", charged: "" });
+const fromChar = (c: Character, rules: OdyleRules): FormState => {
+  const cur = c.odyle ? currentOdyle(c.odyle, rules, new Date()) : null;
+  return { name: c.name, className: c.className, faction: c.faction, makeMain: c.role === "MAIN", gs: c.gs === null ? "" : String(c.gs), cp: c.cp === null ? "" : String(c.cp), basic: cur ? String(cur.basic) : "", charged: cur ? String(cur.charged) : "" };
+};
 
 const STATUS_TEXT = { carregando: "Carregando…", salvando: "Salvando…", salvo: "Salvo automaticamente", erro: "Erro ao salvar! Seus dados podem não ter sido gravados." } as const;
 
 export function CharactersScreen() {
-  const { characters, main, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter } = useStore();
+  const { characters, main, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, data } = useStore();
+  const rules = rulesFor(data.settings.odyle, data.settings.membership);
+  const [initialOdyle, setInitialOdyle] = useState({ basic: "", charged: "" });
   const [mode, setMode] = useState<Mode>({ kind: "none" });
   const [form, setForm] = useState<FormState>(blankForm());
   const [touched, setTouched] = useState(false);
@@ -43,12 +53,15 @@ export function CharactersScreen() {
 
   const startNew = () => {
     setForm(blankForm(main?.faction ?? "Elyos"));
+    setInitialOdyle({ basic: "", charged: "" });
     setMode({ kind: "new" });
     setTouched(false);
     setConfirmDelete(false);
   };
   const startEdit = (c: Character) => {
-    setForm(fromChar(c));
+    const f = fromChar(c, rules);
+    setForm(f);
+    setInitialOdyle({ basic: f.basic, charged: f.charged });
     setMode({ kind: "edit", id: c.id });
     setTouched(false);
     setConfirmDelete(false);
@@ -62,14 +75,18 @@ export function CharactersScreen() {
   const duplicate = characters.some((c) => c.name.toLowerCase() === nameTrim.toLowerCase() && c.id !== editing?.id);
   const nameError = !nameTrim ? "Digite o nome do personagem." : duplicate ? "Já existe um personagem com esse nome." : "";
 
+  // Odyle: os dois vazios = não controlar; um vazio conta como 0.
+  const odyleFromForm = () => (form.basic === "" && form.charged === "" ? null : snapshotFromInput(Number(form.basic || 0), Number(form.charged || 0), rules, new Date()));
+  const odyleChanged = form.basic !== initialOdyle.basic || form.charged !== initialOdyle.charged;
+
   const save = () => {
     setTouched(true);
     if (nameError) return;
     if (mode.kind === "new") {
-      addCharacter({ name: nameTrim, className: form.className, faction: form.faction, member: form.member, makeMain: form.makeMain, gs: toStat(form.gs), cp: toStat(form.cp) });
+      addCharacter({ name: nameTrim, className: form.className, faction: form.faction, makeMain: form.makeMain, gs: toStat(form.gs), cp: toStat(form.cp), odyle: odyleFromForm() });
       close();
     } else if (editing) {
-      updateCharacter(editing.id, { name: nameTrim, className: form.className, faction: form.faction, member: form.member, gs: toStat(form.gs), cp: toStat(form.cp) });
+      updateCharacter(editing.id, { name: nameTrim, className: form.className, faction: form.faction, gs: toStat(form.gs), cp: toStat(form.cp), ...(odyleChanged ? { odyle: odyleFromForm() } : {}) });
       if (form.makeMain && editing.role !== "MAIN") setMain(editing.id);
       close();
     }
@@ -174,19 +191,6 @@ export function CharactersScreen() {
               </div>
 
               <div className="field">
-                <span className="field__label">Membership</span>
-                <div className="choice-grid choice-grid--2" role="group" aria-label="Membership">
-                  <button type="button" className="choice" aria-pressed={!form.member} onClick={() => set("member", false)}>
-                    Sem
-                  </button>
-                  <button type="button" className="choice" aria-pressed={form.member} onClick={() => set("member", true)}>
-                    Com
-                  </button>
-                </div>
-                <span className="field__hint">Muda os limites mostrados (Abyss 14h, Odyle 840).</span>
-              </div>
-
-              <div className="field">
                 <span className="field__label">Papel</span>
                 {isFirst || editing?.role === "MAIN" ? (
                   <>
@@ -213,6 +217,23 @@ export function CharactersScreen() {
                     <span className="field__hint">{form.makeMain && main ? `${main.name} deixa de ser main e vira alt.` : "O conteúdo de servidor fica só no main."}</span>
                   </>
                 )}
+              </div>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
+              <div className="field">
+                <label className="field__label" htmlFor="char-basic">
+                  Odyle Energy — Basic (agora)
+                </label>
+                <input id="char-basic" className="input" inputMode="numeric" value={form.basic} placeholder={`0 a ${rules.cap}`} onChange={(e) => set("basic", onlyDigits4(e.target.value))} />
+                <span className="field__hint">O valor que aparece no jogo agora. A partir dele o app soma +{rules.rate} a cada recarga (limite {rules.cap}).</span>
+              </div>
+              <div className="field">
+                <label className="field__label" htmlFor="char-charged">
+                  Odyle Energy — Charged (agora)
+                </label>
+                <input id="char-charged" className="input" inputMode="numeric" value={form.charged} placeholder={`0 a ${CHARGED_CAP}`} onChange={(e) => set("charged", onlyDigits4(e.target.value))} />
+                <span className="field__hint">Energia extra dos itens (até {CHARGED_CAP}). Deixe os dois vazios para não controlar este personagem.</span>
               </div>
             </div>
 

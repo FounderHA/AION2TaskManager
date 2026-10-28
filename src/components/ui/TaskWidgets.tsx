@@ -53,7 +53,6 @@ export type CharacterCardData = {
   className: string;
   faction: "Elyos" | "Asmodian";
   role: "MAIN" | "ALT";
-  member: boolean;
   /** Progresso da semana em %; se omitido, a barra não aparece. */
   progress?: number;
 };
@@ -69,12 +68,6 @@ export function CharacterCard({ data, selected, onSelect, footer, stats }: { dat
         <span>{data.className}</span>
         <span className="char-card__dot">·</span>
         <span>{data.faction}</span>
-        {data.member && (
-          <>
-            <span className="char-card__dot">·</span>
-            <span style={{ color: "var(--cyan-light)" }}>Membership</span>
-          </>
-        )}
       </div>
       {stats}
       {data.progress !== undefined && <ProgressBar value={data.progress} />}

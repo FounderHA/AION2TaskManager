@@ -17,8 +17,21 @@ export interface StatIcons {
   cp?: string;
 }
 
+/** Números da Odyle Energy (editáveis caso o jogo mude). */
+export interface OdyleConfig {
+  capMember: number;
+  rateMember: number;
+  capFree: number;
+  rateFree: number;
+}
+
+export const DEFAULT_ODYLE: OdyleConfig = { capMember: 840, rateMember: 15, capFree: 560, rateFree: 10 };
+
 export interface Settings {
   reset: ResetConfig;
+  /** Membership é da conta (vale para todos os personagens). */
+  membership: boolean;
+  odyle: OdyleConfig;
   icons: StatIcons;
   tasks: Record<string, TaskOverride>;
   customTasks: TaskDef[];
@@ -32,7 +45,7 @@ export const TASK_NAME_MAX = 40;
 export const TASK_DESC_MAX = 120;
 
 export function defaultSettings(): Settings {
-  return { reset: { ...DEFAULT_RESET }, icons: {}, tasks: {}, customTasks: [] };
+  return { reset: { ...DEFAULT_RESET }, membership: false, odyle: { ...DEFAULT_ODYLE }, icons: {}, tasks: {}, customTasks: [] };
 }
 
 const SCOPES: TaskScope[] = ["personagem", "servidor"];
@@ -40,10 +53,18 @@ const CADENCES: TaskCadence[] = ["diaria", "ritmo", "semanal", "dias-fixos"];
 const CATEGORIES: TaskCategory[] = ["missoes", "dungeons", "raids", "abismo-pvp", "lojas", "eventos", "compras"];
 
 /** Lê as configurações salvas com tolerância (valores inválidos voltam ao padrão). */
-export function parseSettings(raw: unknown): Settings {
+export function parseSettings(raw: unknown, legacy: { membership?: boolean } = {}): Settings {
   const s = defaultSettings();
+  if (legacy.membership) s.membership = true;
   if (!raw || typeof raw !== "object") return s;
   const o = raw as Record<string, unknown>;
+
+  if (typeof o.membership === "boolean") s.membership = o.membership;
+  const od = o.odyle as Record<string, unknown> | undefined;
+  for (const k of ["capMember", "rateMember", "capFree", "rateFree"] as const) {
+    const v = od?.[k];
+    if (typeof v === "number" && Number.isInteger(v) && v > 0 && v <= 100_000) s.odyle[k] = v;
+  }
 
   const r = o.reset as Record<string, unknown> | undefined;
   if (r && Number.isInteger(r.utcHour) && (r.utcHour as number) >= 0 && (r.utcHour as number) <= 23) s.reset.utcHour = r.utcHour as number;

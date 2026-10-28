@@ -7,6 +7,7 @@ import type { AppData } from "../data/model";
 import { dataLocation } from "../data/storage";
 import { useStore } from "../data/store";
 import { dayLabel } from "../time/gameTime";
+import { AccountSection } from "./AccountSection";
 import { ResetSection } from "./ResetSection";
 import { StatIconsSection } from "./StatIconsSection";
 import { TaskEditorSection } from "./TaskEditorSection";
@@ -106,6 +107,8 @@ export function SettingsScreen({ appVersion }: { appVersion: string }) {
 
   return (
     <div className="page">
+      <AccountSection />
+
       <Panel label="Backup">
         <SectionTitle>Backup</SectionTitle>
         <p style={{ margin: "0 0 18px", color: "var(--text-soft)", lineHeight: 1.6 }}>

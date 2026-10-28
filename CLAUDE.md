@@ -172,7 +172,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
 
-## Abas Progresso e Personagem (v1.4.0, aguardando aprovação para publicar)
+## Abas Progresso e Personagem (v1.4.0)
 - Abas: **Progresso · Personagem · Odyle · Cadastro · Histórico · Configurações**. O app abre em Progresso (ou Cadastro sem personagens).
 - **Progresso** (`screens/ProgressScreen.tsx`, substituiu a aba Hoje/`TodayScreen`): só leitura. Três quadros (diárias de hoje somadas, % médio da semana, semanais/compras pendentes), bloco "Hoje — diárias" e bloco "Esta semana — semanais e compras" com chips do que falta (servidor em dourado; compras com o nome da loja). Clicar no personagem abre a aba Personagem com ele selecionado.
 - **Personagem** = antiga aba Semana (`WeeklyScreen` + `WeekView`); a seleção fica no App (`selectedId`/`onSelect` opcionais no `WeekView`; o Histórico continua com seleção interna).

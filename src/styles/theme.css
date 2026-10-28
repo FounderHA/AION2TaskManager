@@ -88,3 +88,12 @@ button {
   background: var(--bg);
   border: 1px solid var(--ornament);
 }
+
+/* Contorno de foco visível ao navegar pelo teclado (Tab) */
+:focus-visible {
+  outline: 2px solid var(--cyan-light);
+  outline-offset: 2px;
+}
+button:focus:not(:focus-visible) {
+  outline: none;
+}

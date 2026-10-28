@@ -9,11 +9,14 @@ import "./styles/theme.css";
 import "./styles/components.css";
 import App from "./App";
 import { StoreProvider } from "./data/store";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <StoreProvider>
-      <App />
-    </StoreProvider>
+    <ErrorBoundary>
+      <StoreProvider>
+        <App />
+      </StoreProvider>
+    </ErrorBoundary>
   </React.StrictMode>,
 );

@@ -56,7 +56,7 @@ No Aion 2 quase nada é "da conta" de verdade; o que é compartilhado costuma se
 - **Nomes em inglês** (o usuário joga com o cliente em inglês); descrições em português.
 - Cada tarefa tem `id` estável (o histórico é salvo por ele — **nunca renomear um id**), `scope` (`personagem`/`servidor`), `cadence` (`diaria`, `ritmo`, `semanal`, `dias-fixos`), `category`, `enabledByDefault` e, quando muda com membership, `descriptionMember`.
 - `tasksForRole()` aplica a regra main/alt; `occursOn()` filtra eventos de dias fixos.
-- Ao mudar o catálogo padrão, aumentar `CATALOG_VERSION` (a migração dos dados salvos vai usar isso).
+- Tarefas novas adicionadas ao `DEFAULT_CATALOG` aparecem sozinhas para quem atualizar (o `resolveCatalog` junta o padrão com os ajustes salvos), sem migração.
 - Ficaram de fora de propósito: Spacetime Rifts (timers na Etapa 14), "sempre pegar o cubo" (vira alerta fixo), Season Mission (automática).
 - O usuário pode pedir tarefas novas depois; adicionar ao catálogo com `id` novo.
 
@@ -126,7 +126,7 @@ src/
     TaskWidgets.tsx             CheckCell, WeeklyCard, CharacterCard, AddCharacterCard
     AppHeader.tsx               Cabeçalho com logo, abas e contagem do reset
     icons.tsx                   Ícones SVG próprios
-  screens/ComponentShowcase.tsx Tela de amostra da Etapa 3 (temporária)
+  components/ErrorBoundary.tsx  Tela amigável de erro (em vez de tela em branco)
   updater/                      Atualização pelo app (hook + faixa de aviso + rodapé de versão)
   data/types.ts                 Tipos: TaskDef, TaskScope, TaskCadence, Weekday, CharacterRole
   data/catalog.ts               Catálogo padrão (DEFAULT_CATALOG) + tasksForRole, describe, occursOn
@@ -169,6 +169,16 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
 
+## Versão 1.0 (estado atual)
+
+- **5 abas, nesta ordem:** Hoje, Semana, Personagens, Histórico, Configurações. A aba Componentes foi removida.
+- O app abre em **Hoje**; se não houver personagens, abre em **Personagens**.
+- Faixa vermelha global se o salvamento falhar (`saveStatus === "erro"`); `ErrorBoundary` em volta de tudo.
+- Contorno de foco visível (`:focus-visible`) para navegar pelo teclado.
+- README reescrito para usuário final (instalar, atualizar, usar, backup) com seção para desenvolvedores.
+- `npm audit`: 0 vulnerabilidades (vitest 5).
+- A partir daqui, mudanças vêm de pedidos do usuário após ele testar a 1.0. Manter o mesmo fluxo: uma etapa por vez, mostrar e aprovar antes de seguir.
+
 ## Configurações do usuário (desde a v0.11.0)
 
 - `AppData.settings` = `{ reset: { utcHour, weeklyWeekday }, tasks: { [idTarefa]: { enabled?, description? } }, customTasks: TaskDef[] }`. Vai junto no backup.
@@ -190,7 +200,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 
 ## Backup e aba Configurações (desde a v0.9.0)
 
-- A aba **Catálogo** virou **Configurações** (Backup + Local dos dados + Catálogo). Ficam 5 abas finais: Semana, Hoje, Personagens, Histórico, Configurações (+ Componentes temporária).
+- A aba **Catálogo** virou **Configurações**.
 - Arquivo de backup: JSON com envelope `{ app, tipo: "backup", exportadoEm, versaoApp, dados }`; `dados` é igual ao `dados.json`. A importação também aceita um `dados.json` puro.
 - `readBackup()` nunca lança exceção; recusa arquivo que não é JSON ou não tem `characters`. Lê com o mesmo `parseData` tolerante.
 - Importar mostra a prévia (personagens, main, marcações, período, data da exportação) e pede confirmação. **Antes de substituir**, grava uma cópia dos dados atuais em `%APPDATA%\com.founderha.aion2taskmanager\copias-de-seguranca\antes-de-importar-AAAAMMDD-HHMMSS.json`; se a cópia falhar, a importação é cancelada.
@@ -261,8 +271,8 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 | 10 | Backup (exportar/importar `.json`) | ✅ v0.9.0 (aba Configurações) |
 | 11 | Histórico de semanas | ✅ v0.10.0 |
 | 12 | Configurações (horário de reset, editor de tarefas, tema) | ✅ v0.11.0 (tema de facção ficou para os extras) |
-| 13 | Versão 1.0 | ⏳ Próxima |
-| 14 | Extras: timers de Rift e chefes, aviso de Odyle, notificações do Windows | |
+| 13 | Versão 1.0 | ✅ v1.0.0 |
+| 14 | Extras: timers de Rift e chefes, aviso de Odyle, notificações do Windows | ⏳ Opcional, sob pedido do usuário |
 
 ## Ideias registradas para depois
 

@@ -1,10 +1,8 @@
 // Catálogo inicial de tarefas (revisado e aprovado na Etapa 4).
 // Fonte: pesquisa do cliente Global de 27/10/2026 (ver CLAUDE.md).
 // IMPORTANTE: não mudar os "id" depois de publicado — o histórico é salvo por eles.
-import type { CharacterRole, TaskCadence, TaskDef, Weekday } from "./types";
+import type { CharacterRole, TaskDef, Weekday } from "./types";
 
-/** Aumentar quando o catálogo padrão mudar, para a migração da Etapa 9/12 saber o que adicionar. */
-export const CATALOG_VERSION = 1;
 
 export const DEFAULT_CATALOG: TaskDef[] = [
   // ---------- Diárias ----------
@@ -60,11 +58,5 @@ export function occursOn(task: TaskDef, weekday: Weekday): boolean {
   return task.cadence !== "dias-fixos" || (task.days ?? []).includes(weekday);
 }
 
-export const CADENCE_LABEL: Record<TaskCadence, string> = {
-  diaria: "Diária",
-  ritmo: "Semanal com ritmo diário",
-  semanal: "Semanal",
-  "dias-fixos": "Dias fixos",
-};
 
 export const WEEKDAY_SHORT: Record<Weekday, string> = { 0: "Dom", 1: "Seg", 2: "Ter", 3: "Qua", 4: "Qui", 5: "Sex", 6: "Sáb" };

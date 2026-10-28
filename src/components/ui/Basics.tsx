@@ -39,7 +39,7 @@ export function Tabs<T extends string>({ items, active, onChange, className = ""
 }
 
 /* ---------- Badges ---------- */
-export type BadgeKind = "server" | "main" | "alt" | "expiring" | "done" | "member" | "on" | "off" | "neutral" | "custom";
+export type BadgeKind = "server" | "main" | "alt" | "expiring" | "done" | "member" | "custom";
 
 const BADGE_TEXT: Record<BadgeKind, string> = {
   server: "SERVIDOR",
@@ -48,9 +48,6 @@ const BADGE_TEXT: Record<BadgeKind, string> = {
   expiring: "EXPIRA HOJE",
   done: "CONCLUÍDA",
   member: "MEMBERSHIP",
-  on: "LIGADA",
-  off: "DESLIGADA",
-  neutral: "",
   custom: "SUA TAREFA",
 };
 

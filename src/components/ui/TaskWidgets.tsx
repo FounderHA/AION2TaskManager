@@ -43,10 +43,11 @@ export type CharacterCardData = {
   faction: "Elyos" | "Asmodian";
   role: "MAIN" | "ALT";
   member: boolean;
-  progress: number;
+  /** Progresso da semana em %; se omitido, a barra não aparece. */
+  progress?: number;
 };
 
-export function CharacterCard({ data, selected, onSelect }: { data: CharacterCardData; selected: boolean; onSelect: () => void }) {
+export function CharacterCard({ data, selected, onSelect, footer }: { data: CharacterCardData; selected: boolean; onSelect: () => void; footer?: string }) {
   return (
     <button className={`char-card ${selected ? "char-card--selected" : ""}`} aria-pressed={selected} onClick={onSelect}>
       <div className="char-card__top">
@@ -64,7 +65,8 @@ export function CharacterCard({ data, selected, onSelect }: { data: CharacterCar
           </>
         )}
       </div>
-      <ProgressBar value={data.progress} />
+      {data.progress !== undefined && <ProgressBar value={data.progress} />}
+      {footer && <span style={{ fontSize: 12, color: "var(--text-muted)" }}>{footer}</span>}
     </button>
   );
 }

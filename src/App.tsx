@@ -1,31 +1,31 @@
 import { useState } from "react";
 import { AppHeader, Panel, SectionTitle, type TabItem } from "./components/ui";
 import { CatalogScreen } from "./screens/CatalogScreen";
+import { CharactersScreen } from "./screens/CharactersScreen";
 import { ComponentShowcase } from "./screens/ComponentShowcase";
 import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
 import { useUpdater } from "./updater/useUpdater";
 
-type TabId = "semana" | "hoje" | "conta" | "historico" | "catalogo" | "componentes";
+type TabId = "semana" | "hoje" | "personagens" | "historico" | "catalogo" | "componentes";
 
 const TABS: TabItem<TabId>[] = [
   { id: "semana", label: "Semana" },
   { id: "hoje", label: "Hoje" },
-  { id: "conta", label: "Conta" },
+  { id: "personagens", label: "Personagens" },
   { id: "historico", label: "Histórico" },
   { id: "catalogo", label: "Catálogo" },
   { id: "componentes", label: "Componentes" },
 ];
 
 // Em qual etapa do plano cada tela será construída
-const COMING: Record<Exclude<TabId, "componentes" | "catalogo">, string> = {
+const COMING: Record<Exclude<TabId, "componentes" | "catalogo" | "personagens">, string> = {
   semana: "Etapa 7 — Painel Semanal",
   hoje: "Etapa 8 — Visão do Dia",
-  conta: "Etapa 6 — Personagens",
   historico: "Etapa 11 — Histórico",
 };
 
 function App() {
-  const [tab, setTab] = useState<TabId>("catalogo");
+  const [tab, setTab] = useState<TabId>("personagens");
   const updater = useUpdater();
 
   return (
@@ -36,6 +36,8 @@ function App() {
         <ComponentShowcase />
       ) : tab === "catalogo" ? (
         <CatalogScreen />
+      ) : tab === "personagens" ? (
+        <CharactersScreen />
       ) : (
         <div className="page">
           <Panel>

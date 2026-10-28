@@ -8,9 +8,12 @@ import "@fontsource/noto-sans/700.css";
 import "./styles/theme.css";
 import "./styles/components.css";
 import App from "./App";
+import { StoreProvider } from "./data/store";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <App />
+    <StoreProvider>
+      <App />
+    </StoreProvider>
   </React.StrictMode>,
 );

@@ -131,6 +131,10 @@ src/
   data/types.ts                 Tipos: TaskDef, TaskScope, TaskCadence, Weekday, CharacterRole
   data/catalog.ts               Catálogo padrão (DEFAULT_CATALOG) + tasksForRole, describe, occursOn
   screens/CatalogScreen.tsx     Aba Catálogo: conferência das tarefas e prévia Main/Alt e membership
+  screens/CharactersScreen.tsx  Aba Personagens: cadastro, edição, exclusão, Main/Alt e membership
+  data/model.ts                 Character, AppData (schemaVersion), CLASSES, parseData, ensureSingleMain
+  data/store.tsx                StoreProvider/useStore: carrega ao abrir e salva 300 ms após cada mudança
+  data/storage.ts               Ponte com o Rust (load_data/save_data); no navegador usa localStorage
 src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do instalador
 ```
 
@@ -150,6 +154,15 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Personagens e salvamento (desde a v0.5.0)
+
+- Campos: nome (até 24 caracteres, sem repetir), classe (nomes do cliente em inglês: Gladiator, Templar, Assassin, Ranger, Sorcerer, Spiritmaster, Cleric, Chanter), facção (Elyos/Asmodian), papel (MAIN/ALT) e membership.
+- **Regra do main:** sempre exatamente um main quando há personagens. O primeiro cadastrado é main; promover outro rebaixa o atual; excluir o main promove o alt mais antigo (`ensureSingleMain`).
+- Exclusão pede confirmação em dois cliques (sem diálogos nativos).
+- Dados em `%APPDATA%\com.founderha.aion2taskmanager\dados.json`, escritos pelos comandos Rust `load_data`, `save_data`, `data_location` (`src-tauri/src/lib.rs`). A gravação é segura: escreve `.tmp`, guarda a versão anterior em `dados.json.bak` e troca.
+- `parseData()` é tolerante (campos faltando recebem padrão). Ao mudar a estrutura, aumentar `schemaVersion` e migrar em `parseData`.
+- Não foi possível rodar `cargo check` para Windows no ambiente do Claude (o `rustup target add` falha); o Rust é validado pelo build do GitHub.
 
 ## Atualização pelo próprio app (desde a v0.3.0)
 
@@ -172,10 +185,10 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 | 3.1 | Atualização pelo próprio app (v0.3.0) | ✅ Testado de 0.3.0 → 0.3.1, funcionando |
 | 4 | Catálogo de tarefas (dados com escopo, ciclo, regra main/alt) | ✅ Aprovado; código na v0.4.0 (aba Catálogo) |
 | 5 | Lógica de tempo (semana qua 04:00 → ter 03:59, dia vira às 04:00) | ⏳ Próxima |
-| 6 | Personagens (cadastro, main/alt, membership) | |
+| 6 | Personagens (cadastro, main/alt, membership) | ✅ Adiantada a pedido do usuário; v0.5.0 (aba Personagens) |
 | 7 | Painel Semanal (grade qua→ter, check por dia) | |
 | 8 | Visão do Dia | |
-| 9 | Salvamento local automático | |
+| 9 | Salvamento local automático | 🟡 Base pronta na v0.5.0 (dados.json); falta incluir as marcações quando existirem |
 | 10 | Backup (exportar/importar `.json`) | |
 | 11 | Histórico de semanas | |
 | 12 | Configurações (horário de reset, editor de tarefas, tema) | |

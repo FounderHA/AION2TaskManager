@@ -1,7 +1,10 @@
 // Estado global do app: carrega dados.json ao abrir e salva sozinho a cada mudança.
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { emptyData, ensureSingleMain, NAME_MAX, parseData, sortCharacters, type AppData, type Character } from "./model";
+import { CUSTOM_PREFIX, resolveCatalog, TASK_DESC_MAX, TASK_NAME_MAX, type ResolvedTask } from "./settings";
 import { loadRaw, saveRaw } from "./storage";
+import type { TaskDef } from "./types";
+import type { ResetConfig } from "../time/gameTime";
 
 export type SaveStatus = "carregando" | "salvo" | "salvando" | "erro";
 export type CharacterInput = Omit<Character, "id" | "createdAt" | "role"> & { makeMain?: boolean };
@@ -19,6 +22,15 @@ interface StoreValue {
   toggleCheck: (key: string) => void;
   /** Substitui todos os dados (importar backup). */
   replaceAll: (next: AppData) => void;
+  /** Catálogo com os ajustes do usuário e as tarefas próprias. */
+  catalog: ResolvedTask[];
+  reset: ResetConfig;
+  setTaskEnabled: (id: string, enabled: boolean) => void;
+  /** Texto novo, ou null para voltar à descrição padrão. */
+  setTaskDescription: (id: string, description: string | null) => void;
+  addCustomTask: (task: Omit<TaskDef, "id" | "enabledByDefault">) => string;
+  deleteCustomTask: (id: string) => void;
+  setReset: (reset: ResetConfig) => void;
 }
 
 const StoreContext = createContext<StoreValue | null>(null);
@@ -110,10 +122,73 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setData({ ...next, characters: ensureSingleMain(next.characters) });
   }, []);
 
+  const setTaskEnabled = useCallback((id: string, enabled: boolean) => {
+    setData((d) => ({ ...d, settings: { ...d.settings, tasks: { ...d.settings.tasks, [id]: { ...d.settings.tasks[id], enabled } } } }));
+  }, []);
+
+  const setTaskDescription = useCallback((id: string, description: string | null) => {
+    setData((d) => {
+      const current = { ...d.settings.tasks[id] };
+      if (description === null) delete current.description;
+      else current.description = description.trim().slice(0, TASK_DESC_MAX);
+      const tasks = { ...d.settings.tasks, [id]: current };
+      if (!Object.keys(current).length) delete tasks[id];
+      return { ...d, settings: { ...d.settings, tasks } };
+    });
+  }, []);
+
+  const addCustomTask = useCallback((task: Omit<TaskDef, "id" | "enabledByDefault">) => {
+    const id = `${CUSTOM_PREFIX}${newId()}`;
+    const def: TaskDef = {
+      ...task,
+      id,
+      name: task.name.trim().slice(0, TASK_NAME_MAX),
+      description: task.description.trim().slice(0, TASK_DESC_MAX),
+      days: task.cadence === "dias-fixos" ? task.days : undefined,
+      enabledByDefault: true,
+    };
+    setData((d) => ({ ...d, settings: { ...d.settings, customTasks: [...d.settings.customTasks, def] } }));
+    return id;
+  }, []);
+
+  const deleteCustomTask = useCallback((id: string) => {
+    setData((d) => {
+      const tasks = { ...d.settings.tasks };
+      delete tasks[id];
+      // Remove também as marcações dessa tarefa
+      const checks = Object.fromEntries(Object.entries(d.checks).filter(([k]) => k.split("|")[1] !== id));
+      return { ...d, checks, settings: { ...d.settings, tasks, customTasks: d.settings.customTasks.filter((t) => t.id !== id) } };
+    });
+  }, []);
+
+  const setReset = useCallback((reset: ResetConfig) => {
+    setData((d) => ({ ...d, settings: { ...d.settings, reset } }));
+  }, []);
+
+  const catalog = useMemo(() => resolveCatalog(data.settings), [data.settings]);
+
   const value = useMemo<StoreValue>(() => {
     const characters = sortCharacters(data.characters);
-    return { data, characters, main: characters.find((c) => c.role === "MAIN"), saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll };
-  }, [data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll]);
+    return {
+      data,
+      characters,
+      main: characters.find((c) => c.role === "MAIN"),
+      saveStatus,
+      addCharacter,
+      updateCharacter,
+      setMain,
+      deleteCharacter,
+      toggleCheck,
+      replaceAll,
+      catalog,
+      reset: data.settings.reset,
+      setTaskEnabled,
+      setTaskDescription,
+      addCustomTask,
+      deleteCustomTask,
+      setReset,
+    };
+  }, [data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

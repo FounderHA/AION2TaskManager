@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Alert, Badge, Button, Panel, SectionTitle, TaskToggleRow } from "../components/ui";
 import { isEnabled } from "../components/WeekView";
-import { DEFAULT_CATALOG, describe, occursOn } from "../data/catalog";
+import { describe, occursOn } from "../data/catalog";
 import { activeTasks, dayCheckKey, isWeekly, weekCheckKey } from "../data/checks";
 import type { Character } from "../data/model";
 import { useStore } from "../data/store";
@@ -21,7 +21,7 @@ interface CharToday {
 }
 
 export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onGoToCharacters: () => void }) {
-  const { characters, data, toggleCheck } = useStore();
+  const { characters, data, toggleCheck, catalog } = useStore();
   const [hideDone, setHideDone] = useState(false);
   const checks = data.checks;
   const weekday = gameWeekday(clock.todayKey);
@@ -45,7 +45,7 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
   }
 
   const rows: CharToday[] = characters.map((char) => {
-    const tasks = activeTasks(DEFAULT_CATALOG, char, isEnabled);
+    const tasks = activeTasks(catalog, char, isEnabled);
     return {
       char,
       daily: tasks

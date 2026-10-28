@@ -39,7 +39,7 @@ export function Tabs<T extends string>({ items, active, onChange, className = ""
 }
 
 /* ---------- Badges ---------- */
-export type BadgeKind = "server" | "main" | "alt" | "expiring" | "done" | "member" | "on" | "off" | "neutral";
+export type BadgeKind = "server" | "main" | "alt" | "expiring" | "done" | "member" | "on" | "off" | "neutral" | "custom";
 
 const BADGE_TEXT: Record<BadgeKind, string> = {
   server: "SERVIDOR",
@@ -51,6 +51,7 @@ const BADGE_TEXT: Record<BadgeKind, string> = {
   on: "LIGADA",
   off: "DESLIGADA",
   neutral: "",
+  custom: "SUA TAREFA",
 };
 
 export function Badge({ kind, children }: { kind: BadgeKind; children?: ReactNode }) {
@@ -129,4 +130,13 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: "primar
 
 export function Button({ variant = "secondary", className = "", ...rest }: ButtonProps) {
   return <button className={`btn btn--${variant} ${className}`} {...rest} />;
+}
+
+/* ---------- Interruptor liga/desliga ---------- */
+export function Switch({ checked, onChange, label }: { checked: boolean; onChange: (v: boolean) => void; label: string }) {
+  return (
+    <button type="button" role="switch" aria-checked={checked} aria-label={label} className={`switch ${checked ? "switch--on" : ""}`} onClick={() => onChange(!checked)}>
+      <span className="switch__knob" />
+    </button>
+  );
 }

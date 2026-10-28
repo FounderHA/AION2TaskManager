@@ -8,7 +8,7 @@ import { addDays, gameDayKey, weekDayKeys, weekRangeLabel, weekStartKey } from "
 import type { GameClock } from "../time/useGameClock";
 
 export function HistoryScreen({ clock }: { clock: GameClock }) {
-  const { characters, main, data } = useStore();
+  const { characters, main, data, catalog, reset } = useStore();
   const checks = data.checks;
 
   // Semanas disponíveis: da primeira com dados até a última já encerrada
@@ -16,10 +16,10 @@ export function HistoryScreen({ clock }: { clock: GameClock }) {
   const firstWeek = useMemo(() => {
     const candidates: string[] = [];
     const firstCheck = earliestCheckDay(checks);
-    if (firstCheck) candidates.push(weekStartKey(firstCheck));
-    for (const c of characters) candidates.push(weekStartKey(gameDayKey(new Date(c.createdAt))));
+    if (firstCheck) candidates.push(weekStartKey(firstCheck, reset));
+    for (const c of characters) candidates.push(weekStartKey(gameDayKey(new Date(c.createdAt), reset), reset));
     return candidates.sort()[0] ?? null;
-  }, [checks, characters]);
+  }, [checks, characters, reset]);
 
   const [viewWeek, setViewWeek] = useState<string>(lastClosed);
   const hasHistory = !!firstWeek && firstWeek <= lastClosed;
@@ -27,7 +27,7 @@ export function HistoryScreen({ clock }: { clock: GameClock }) {
   const weekEnd = addDays(week, 6);
   const days = useMemo(() => weekDayKeys(week), [week]);
   const weekChars = useMemo(() => characters.filter((c) => existedInWeek(c, checks, week, weekEnd)), [characters, checks, week, weekEnd]);
-  const progress = useMemo(() => progressFor(weekChars, checks, days, 7, week), [weekChars, checks, days, week]);
+  const progress = useMemo(() => progressFor(catalog, weekChars, checks, days, 7, week), [catalog, weekChars, checks, days, week]);
 
   if (!hasHistory) {
     return (

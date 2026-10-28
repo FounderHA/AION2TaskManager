@@ -28,7 +28,7 @@ export function weekCheckKey(task: TaskDef, char: Character, weekKey: string): s
 }
 
 /** Tarefas que o personagem vê e que estão ligadas. */
-export function activeTasks(catalog: TaskDef[], char: Character, enabled: (t: TaskDef) => boolean): TaskDef[] {
+export function activeTasks<T extends TaskDef>(catalog: T[], char: Character, enabled: (t: T) => boolean): T[] {
   return tasksForRole(catalog, char.role).filter(enabled);
 }
 

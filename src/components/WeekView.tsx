@@ -2,18 +2,19 @@
 // Usada pela aba Semana (editável) e pela aba Histórico (somente leitura).
 import { useMemo, useState, type ReactNode } from "react";
 import { Alert, Badge, CharacterCard, CheckCell, Panel, ProgressRing, SectionTitle, WeeklyCard } from "./ui";
-import { DEFAULT_CATALOG, describe } from "../data/catalog";
+import { describe } from "../data/catalog";
 import { activeTasks, cellState, dayCheckKey, isWeekly, weekCheckKey, weekProgress, type Checks, type WeekProgress } from "../data/checks";
 import type { Character } from "../data/model";
-import type { TaskDef } from "../data/types";
+import type { ResolvedTask } from "../data/settings";
+import { useStore } from "../data/store";
 import { dayLabel, weekRangeLabel } from "../time/gameTime";
 
-// Até a Etapa 12 (Configurações), vale o padrão do catálogo
-export const isEnabled = (t: TaskDef) => t.enabledByDefault;
+/** Tarefa ligada pelo usuário (aba Configurações). */
+export const isEnabled = (t: ResolvedTask) => t.enabled;
 
-export function progressFor(characters: Character[], checks: Checks, days: string[], todayIndex: number, weekKey: string): Record<string, WeekProgress> {
+export function progressFor(catalog: ResolvedTask[], characters: Character[], checks: Checks, days: string[], todayIndex: number, weekKey: string): Record<string, WeekProgress> {
   const map: Record<string, WeekProgress> = {};
-  for (const c of characters) map[c.id] = weekProgress(checks, activeTasks(DEFAULT_CATALOG, c, isEnabled), c, days, todayIndex, weekKey);
+  for (const c of characters) map[c.id] = weekProgress(checks, activeTasks(catalog, c, isEnabled), c, days, todayIndex, weekKey);
   return map;
 }
 
@@ -34,14 +35,15 @@ interface WeekViewProps {
 }
 
 export function WeekView({ characters, main, checks, days, weekKey, todayIndex, readOnly, onToggle, weeklyExpiring, sideExtra }: WeekViewProps) {
+  const { catalog } = useStore();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selected = characters.find((c) => c.id === selectedId) ?? characters.find((c) => c.id === main?.id) ?? characters[0];
-  const progress = useMemo(() => progressFor(characters, checks, days, todayIndex, weekKey), [characters, checks, days, todayIndex, weekKey]);
+  const progress = useMemo(() => progressFor(catalog, characters, checks, days, todayIndex, weekKey), [catalog, characters, checks, days, todayIndex, weekKey]);
   const toggle = onToggle ?? (() => {});
 
   if (!selected) return null;
 
-  const tasks = activeTasks(DEFAULT_CATALOG, selected, isEnabled);
+  const tasks = activeTasks(catalog, selected, isEnabled);
   const dailyTasks = tasks.filter((t) => !isWeekly(t));
   const weeklyTasks = tasks.filter(isWeekly);
   const prog = progress[selected.id];

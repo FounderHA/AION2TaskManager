@@ -46,7 +46,7 @@ export const DEFAULT_CATALOG: TaskDef[] = [
 /* ---------- Funções de apoio ---------- */
 
 /** Tarefas que um personagem deve ver: o main vê tudo; alts não veem as de servidor. */
-export function tasksForRole(catalog: TaskDef[], role: CharacterRole): TaskDef[] {
+export function tasksForRole<T extends TaskDef>(catalog: T[], role: CharacterRole): T[] {
   return catalog.filter((t) => role === "MAIN" || t.scope !== "servidor");
 }
 

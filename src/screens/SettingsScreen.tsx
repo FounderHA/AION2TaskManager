@@ -7,7 +7,8 @@ import type { AppData } from "../data/model";
 import { dataLocation } from "../data/storage";
 import { useStore } from "../data/store";
 import { dayLabel } from "../time/gameTime";
-import { CatalogSection } from "./CatalogSection";
+import { ResetSection } from "./ResetSection";
+import { TaskEditorSection } from "./TaskEditorSection";
 
 type Message = { kind: "info" | "warning" | "danger"; text: string } | null;
 type Pending = { fileName: string; data: AppData; summary: BackupSummary } | null;
@@ -154,6 +155,10 @@ export function SettingsScreen({ appVersion }: { appVersion: string }) {
         )}
       </Panel>
 
+      <TaskEditorSection />
+
+      <ResetSection />
+
       <Panel label="Local dos dados">
         <SectionTitle>Local dos dados</SectionTitle>
         <p style={{ margin: "0 0 8px", color: "var(--text-soft)" }}>Seus dados são salvos automaticamente neste arquivo (com uma cópia da versão anterior em dados.json.bak):</p>
@@ -161,7 +166,6 @@ export function SettingsScreen({ appVersion }: { appVersion: string }) {
         <p style={{ margin: "8px 0 0", fontSize: 12, color: "var(--text-muted)" }}>As cópias feitas antes de cada importação ficam na pasta "copias-de-seguranca", no mesmo lugar.</p>
       </Panel>
 
-      <CatalogSection />
     </div>
   );
 }

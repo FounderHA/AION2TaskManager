@@ -8,6 +8,7 @@ import { TodayScreen } from "./screens/TodayScreen";
 import { WeeklyScreen } from "./screens/WeeklyScreen";
 import { formatCountdown, localResetLabel } from "./time/gameTime";
 import { useGameClock } from "./time/useGameClock";
+import { useStore } from "./data/store";
 import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
 import { useUpdater } from "./updater/useUpdater";
 
@@ -25,7 +26,8 @@ const TABS: TabItem<TabId>[] = [
 function App() {
   const [tab, setTab] = useState<TabId>("semana");
   const updater = useUpdater();
-  const clock = useGameClock();
+  const { reset } = useStore();
+  const clock = useGameClock(reset);
   const toWeekly = clock.nextWeekly.getTime() - clock.now.getTime();
   const resets = [
     { label: "Diário", value: formatCountdown(clock.nextDaily.getTime() - clock.now.getTime()) },

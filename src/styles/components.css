@@ -1002,3 +1002,98 @@
   font-weight: 600;
   color: var(--text-strong);
 }
+
+/* ---------- Interruptor ---------- */
+.switch {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(160, 180, 210, 0.35);
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.switch__knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #8d9ab0;
+  transition: transform 0.15s, background 0.15s;
+}
+.switch--on {
+  background: linear-gradient(135deg, rgba(246, 220, 140, 0.35), rgba(184, 134, 42, 0.45));
+  border-color: #f0cf7a;
+}
+.switch--on .switch__knob {
+  transform: translateX(20px);
+  background: #fff3cf;
+}
+.badge--custom {
+  color: #d9c2ff;
+  border: 1px solid rgba(190, 160, 255, 0.45);
+  background: rgba(150, 110, 230, 0.12);
+}
+
+/* ---------- Editor de tarefas ---------- */
+.task-edit-row {
+  display: grid;
+  grid-template-columns: 52px minmax(180px, 320px) minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 0;
+  border-top: 1px solid var(--line-soft);
+}
+.task-edit-row--off .task-edit-row__name,
+.task-edit-row--off .task-edit-row__desc {
+  opacity: 0.5;
+}
+.task-edit-row__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #eef2f8;
+}
+.task-edit-row__desc {
+  font-size: 13px;
+  color: var(--text-soft);
+}
+.task-edit-row__actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.btn--small {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+.input--small {
+  height: 34px;
+  font-size: 13px;
+  width: 100%;
+}
+.choice-grid--7 {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.choice-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.select {
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 3px;
+  border: 1px solid rgba(160, 180, 210, 0.3);
+  background: #0d1424;
+  color: var(--text-strong);
+  font-family: inherit;
+  font-size: 15px;
+}

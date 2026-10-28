@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { backupFileName, makeBackup, readBackup, snapshotName } from "./backup";
 import type { AppData } from "./model";
+import { defaultSettings } from "./settings";
 
 const data: AppData = {
   schemaVersion: 1,
@@ -13,6 +14,7 @@ const data: AppData = {
     "m1|nightmare|d:2026-10-27": "2026-10-27T20:00:00Z",
     "m1|ascension-trial|w:2026-10-21": "2026-10-22T20:00:00Z",
   },
+  settings: defaultSettings(),
 };
 
 describe("backup", () => {

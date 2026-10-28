@@ -130,8 +130,10 @@ src/
   updater/                      Atualização pelo app (hook + faixa de aviso + rodapé de versão)
   data/types.ts                 Tipos: TaskDef, TaskScope, TaskCadence, Weekday, CharacterRole
   data/catalog.ts               Catálogo padrão (DEFAULT_CATALOG) + tasksForRole, describe, occursOn
-  screens/CatalogSection.tsx    Seção do catálogo (dentro de Configurações): prévia Main/Alt e membership
-  screens/SettingsScreen.tsx    Aba Configurações: backup (exportar/importar), local dos dados, catálogo
+  screens/SettingsScreen.tsx    Aba Configurações: Backup, Tarefas, Horário do reset, Local dos dados
+  screens/TaskEditorSection.tsx Editor de tarefas: ligar/desligar, editar descrição, criar/excluir tarefas próprias
+  screens/ResetSection.tsx      Horário do reset diário (hora local do PC) e dia do reset semanal
+  data/settings.ts              Settings (reset, ajustes por tarefa, tarefas próprias), parseSettings, resolveCatalog (testado)
   screens/CharactersScreen.tsx  Aba Personagens: cadastro, edição, exclusão, Main/Alt e membership
   data/model.ts                 Character, AppData (schemaVersion), CLASSES, parseData, ensureSingleMain
   data/store.tsx                StoreProvider/useStore: carrega ao abrir e salva 300 ms após cada mudança
@@ -167,6 +169,16 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
 
+## Configurações do usuário (desde a v0.11.0)
+
+- `AppData.settings` = `{ reset: { utcHour, weeklyWeekday }, tasks: { [idTarefa]: { enabled?, description? } }, customTasks: TaskDef[] }`. Vai junto no backup.
+- **Catálogo final = `resolveCatalog(settings)`**: catálogo padrão + tarefas próprias, com ligar/desligar e descrição do usuário aplicados (`ResolvedTask` tem `enabled`, `custom`, `descriptionEdited`). O store expõe `catalog` e `reset`; todas as telas usam `catalog` (nunca `DEFAULT_CATALOG` direto) e `isEnabled = t.enabled`.
+- Descrição editada substitui as duas variantes (com/sem membership); "Restaurar padrão" apaga o ajuste.
+- Tarefas próprias têm id `custom-<uuid>`, escopo personagem/servidor e cadência diária/semanal/dias fixos (dias fixos exige ao menos um dia). Excluir uma tarefa própria apaga as marcações dela.
+- Desligar uma tarefa só a esconde; as marcações antigas ficam guardadas.
+- Reset: guardado em UTC; a tela mostra e recebe a hora **local do PC** (`utcHourToLocal`/`localHourToUtc`). O `useGameClock(reset)` usa a configuração. Mudar o reset reorganiza em que dia as marcações caem, por isso há aviso na tela.
+- `parseSettings` é tolerante: valores inválidos voltam ao padrão; tarefas próprias sem `custom-` no id ou sem nome são ignoradas.
+
 ## Histórico (desde a v0.10.0)
 
 - Mostra só semanas **encerradas**: da semana mais antiga com dados (primeira marcação ou cadastro de personagem) até a semana passada. Abre na semana passada.
@@ -174,7 +186,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Resumo por personagem: progresso, diárias feitas/devidas, diárias perdidas, semanais feitas; e a média da conta.
 - Personagem cadastrado depois da semana não aparece nela, a menos que tenha marcações nela (`existedInWeek`).
 - O histórico é calculado com o catálogo e os papéis (main/alt) **atuais**.
-- `isEnabled` agora fica em `components/WeekView.tsx` e é usado por Semana, Hoje e Histórico (vira configuração na Etapa 12).
+- `isEnabled` fica em `components/WeekView.tsx` e é usado por Semana, Hoje e Histórico.
 
 ## Backup e aba Configurações (desde a v0.9.0)
 
@@ -200,7 +212,7 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Excluir um personagem apaga as marcações dele (as de `SERVER` ficam).
 - Estados da célula: `done` (dourado), `today` (ciano), `missed` (tracejado, ainda clicável), `future` (desativado, não marca), `none` (evento de dias fixos fora do dia).
 - Progresso (`weekProgress`) conta só os dias **até hoje** + as semanais; dias futuros não pesam.
-- Tarefas ligadas: por enquanto `enabledByDefault` do catálogo (`isEnabled` em `WeeklyScreen.tsx`); na Etapa 12 vira configuração do usuário.
+- Tarefas ligadas: definidas pelo usuário na aba Configurações (ver seção Configurações do usuário).
 - O selo "EXPIRA HOJE" aparece nas semanais pendentes só no último dia (terça).
 
 ## Lógica de tempo (desde a v0.6.0)
@@ -248,8 +260,8 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 | 9 | Salvamento local automático | ✅ Personagens (v0.5.0) e marcações (v0.7.0) |
 | 10 | Backup (exportar/importar `.json`) | ✅ v0.9.0 (aba Configurações) |
 | 11 | Histórico de semanas | ✅ v0.10.0 |
-| 12 | Configurações (horário de reset, editor de tarefas, tema) | ⏳ Próxima |
-| 13 | Versão 1.0 | |
+| 12 | Configurações (horário de reset, editor de tarefas, tema) | ✅ v0.11.0 (tema de facção ficou para os extras) |
+| 13 | Versão 1.0 | ⏳ Próxima |
 | 14 | Extras: timers de Rift e chefes, aviso de Odyle, notificações do Windows | |
 
 ## Ideias registradas para depois

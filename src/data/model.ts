@@ -1,5 +1,6 @@
 // Modelo dos dados salvos em dados.json (e no backup da Etapa 10).
 import type { CharacterRole } from "./types";
+import { defaultSettings, parseSettings, type Settings } from "./settings";
 
 export type Faction = "Elyos" | "Asmodian";
 
@@ -24,13 +25,15 @@ export interface AppData {
   characters: Character[];
   /** Marcações: chave (ver data/checks.ts) → data/hora em que foi marcada (ISO). */
   checks: Record<string, string>;
+  /** Horário do reset, tarefas ligadas/desligadas e tarefas próprias. */
+  settings: Settings;
 }
 
 export const SCHEMA_VERSION = 1 as const;
 export const NAME_MAX = 24;
 
 export function emptyData(): AppData {
-  return { schemaVersion: SCHEMA_VERSION, characters: [], checks: {} };
+  return { schemaVersion: SCHEMA_VERSION, characters: [], checks: {}, settings: defaultSettings() };
 }
 
 /** Lê o JSON salvo com tolerância: campos estranhos são ignorados, faltantes recebem padrão. */
@@ -56,7 +59,7 @@ export function parseData(raw: string | null | undefined): AppData {
         if (typeof v === "string" && k.includes("|")) checks[k] = v;
       }
     }
-    return { schemaVersion: SCHEMA_VERSION, characters: ensureSingleMain(characters), checks };
+    return { schemaVersion: SCHEMA_VERSION, characters: ensureSingleMain(characters), checks, settings: parseSettings(obj?.settings) };
   } catch {
     return emptyData();
   }

@@ -1,4 +1,4 @@
-# AION2 Task Manager
+# Aion 2 Manager
 
 Aplicativo para Windows que organiza as tarefas diárias e semanais do **Aion 2** (versão Global) em todos os seus personagens: um **main** e quantos **alts** você quiser. Você marca o que já fez, acompanha a semana e consulta o histórico. Tudo fica salvo no seu PC, e dá para levar para outro computador com um backup.
 

@@ -31,7 +31,14 @@ export function Tabs<T extends string>({ items, active, onChange, className = ""
     <nav className={`tabs ${className}`} aria-label="Seções">
       {items.map((t) => (
         <button key={t.id} className={`tab ${t.id === active ? "tab--active" : ""}`} aria-current={t.id === active ? "page" : undefined} onClick={() => onChange(t.id)}>
-          {t.label}
+          {t.id === active && (
+            <span className="tab__smoke" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+          )}
+          <span className="tab__label">{t.label}</span>
         </button>
       ))}
     </nav>

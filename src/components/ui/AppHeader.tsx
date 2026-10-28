@@ -14,8 +14,9 @@ export function AppHeader<T extends string>({ tabs, active, onTabChange, resets 
     <header className="app-header">
       <div className="app-header__brand">
         <LogoStar />
-        <span className="app-header__title">Registro do Daeva</span>
-        <span className="app-header__subtitle">Tarefas</span>
+        <span className="app-header__title">
+          Aion 2 <span className="app-header__subtitle">Manager</span>
+        </span>
       </div>
       <Tabs className="app-header__nav" items={tabs} active={active} onChange={onTabChange} />
       <div className="app-header__reset">

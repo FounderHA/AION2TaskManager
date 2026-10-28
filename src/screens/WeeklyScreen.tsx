@@ -34,7 +34,6 @@ export function WeeklyScreen({ clock, onGoToCharacters }: { clock: GameClock; on
         weekKey={clock.weekKey}
         todayIndex={clock.todayIndex}
         onToggle={toggleCheck}
-        weeklyExpiring={clock.todayIndex === 6}
         sideExtra={
           <Panel label="Atenção">
             <SectionTitle>Atenção</SectionTitle>

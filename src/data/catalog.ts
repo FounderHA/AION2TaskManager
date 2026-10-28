@@ -18,10 +18,10 @@ export const DEFAULT_CATALOG: TaskDef[] = [
 
   // ---------- Semanais ----------
   { id: "ascension-trial", name: "Ascension Trial", description: "3 entradas", scope: "personagem", cadence: "semanal", category: "dungeons", enabledByDefault: true },
-  { id: "subjugation", name: "Subjugation", description: "3 tickets", scope: "personagem", cadence: "semanal", category: "dungeons", enabledByDefault: true },
+  { id: "subjugation", name: "Subjugation", description: "3 tickets", scope: "personagem", cadence: "semanal", category: "dungeons", enabledByDefault: false },
   { id: "sanctuary-ludra", name: "Sanctuary: Abyssal Forge (Ludra)", description: "1 kill do chefe final", scope: "personagem", cadence: "semanal", category: "raids", enabledByDefault: true },
-  { id: "sanctuary-corroded", name: "Sanctuary: Corroded Decontamination Facility", description: "2 kills do chefe final", scope: "personagem", cadence: "semanal", category: "raids", enabledByDefault: true },
-  { id: "sanctuary-muspel", name: "Sanctuary: Chalice of Muspel", description: "2 kills do chefe final", scope: "personagem", cadence: "semanal", category: "raids", enabledByDefault: true },
+  { id: "sanctuary-corroded", name: "Sanctuary: Corroded Decontamination Facility", description: "2 kills do chefe final", scope: "personagem", cadence: "semanal", category: "raids", enabledByDefault: false },
+  { id: "sanctuary-muspel", name: "Sanctuary: Chalice of Muspel", description: "2 kills do chefe final", scope: "personagem", cadence: "semanal", category: "raids", enabledByDefault: false },
   { id: "exploration", name: "Exploration", description: "7 recompensas por dungeon de Expedition", scope: "personagem", cadence: "semanal", category: "dungeons", enabledByDefault: true },
   { id: "abyss", name: "Abyss", description: "7h por camada (Lower, Middle e Upper)", descriptionMember: "14h em Lower e Middle, 7h em Upper", scope: "personagem", cadence: "semanal", category: "abismo-pvp", enabledByDefault: true },
   { id: "growth-dungeons", name: "Growth Dungeons", description: "Silent Graveyard e Fafnite Amphitheater, 7h cada", scope: "personagem", cadence: "semanal", category: "dungeons", enabledByDefault: false },

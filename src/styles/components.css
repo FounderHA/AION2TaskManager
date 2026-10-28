@@ -49,16 +49,98 @@
   color: var(--text-strong);
   font-weight: 600;
 }
-.tab--active::after {
+.tab--active {
+  text-shadow: 0 0 12px rgba(143, 220, 239, 0.55);
+}
+.tab__label {
+  position: relative;
+  z-index: 1;
+}
+/* Fumaça: um brilho na base + três volutas que sobem e somem */
+.tab__smoke {
+  position: absolute;
+  left: -18px;
+  right: -18px;
+  top: -6px;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+  /* bordas difusas: some nas laterais e no alto */
+  -webkit-mask-image: radial-gradient(ellipse 50% 100% at 50% 100%, #000 35%, rgba(0, 0, 0, 0.6) 60%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 100% at 50% 100%, #000 35%, rgba(0, 0, 0, 0.6) 60%, transparent 100%);
+}
+.tab__smoke::before {
   content: "";
   position: absolute;
-  left: 10%;
-  right: 10%;
-  bottom: -1px;
-  height: 8px;
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  border-top: 2px solid var(--cyan-light);
-  box-shadow: 0 -4px 12px rgba(95, 211, 230, 0.45);
+  left: 14%;
+  right: 14%;
+  bottom: -16px;
+  height: 40px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 60%, rgba(155, 231, 242, 0.75), rgba(95, 211, 230, 0.25) 45%, transparent 72%);
+  filter: blur(6px);
+  animation: smoke-breathe 3.2s ease-in-out infinite;
+}
+.tab__smoke i {
+  position: absolute;
+  bottom: -10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(190, 240, 248, 0.55), rgba(95, 211, 230, 0.15) 55%, transparent 72%);
+  filter: blur(5px);
+  opacity: 0;
+  animation: smoke-rise 3.6s ease-out infinite;
+}
+.tab__smoke i:nth-child(1) {
+  left: 28%;
+  animation-delay: 0s;
+}
+.tab__smoke i:nth-child(2) {
+  left: 45%;
+  width: 32px;
+  height: 32px;
+  animation-delay: 1.2s;
+}
+.tab__smoke i:nth-child(3) {
+  left: 58%;
+  animation-delay: 2.4s;
+}
+@keyframes smoke-rise {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  100% {
+    transform: translate(6px, -54px) scale(1.9);
+    opacity: 0;
+  }
+}
+@keyframes smoke-breathe {
+  0%,
+  100% {
+    opacity: 0.75;
+    transform: scaleX(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1.08);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab__smoke i,
+  .tab__smoke::before {
+    animation: none;
+  }
+}
+/* Abas não usam o contorno retangular de foco; o foco aparece como brilho */
+.tab:focus-visible {
+  outline: none;
+  color: var(--text-strong);
+  text-shadow: 0 0 12px rgba(143, 220, 239, 0.8);
 }
 
 /* ---------- Badges ---------- */
@@ -397,9 +479,8 @@
   letter-spacing: 0.02em;
 }
 .app-header__subtitle {
-  font-size: 26px;
   font-weight: 300;
-  color: #5d6a80;
+  color: var(--cyan-light);
 }
 .app-header__nav {
   flex: 1 1 auto;
@@ -407,11 +488,7 @@
   justify-content: center;
   gap: 2px;
 }
-@media (max-width: 1360px) {
-  .app-header__subtitle {
-    display: none;
-  }
-}
+
 .app-header__reset {
   display: flex;
   flex-direction: column;

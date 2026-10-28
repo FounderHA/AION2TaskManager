@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { open, save } from "@tauri-apps/plugin-dialog";
 
 const isTauri = () => typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
-const FILTERS = [{ name: "Backup do AION2 Task Manager", extensions: ["json"] }];
+const FILTERS = [{ name: "Backup do Aion 2 Manager", extensions: ["json"] }];
 
 /** Abre "Salvar como" e grava o backup. Retorna o caminho salvo, ou null se o usuário cancelou. */
 export async function saveBackupFile(contents: string, defaultName: string): Promise<string | null> {

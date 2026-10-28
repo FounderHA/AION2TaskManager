@@ -140,7 +140,7 @@ export function TodayScreen({ clock, onGoToCharacters }: { clock: GameClock; onG
               </div>
               <div className="today-list">
                 {showWeekly.map(({ task, key, done }) => (
-                  <TaskToggleRow key={key} name={task.name} note={describe(task, char.member)} done={done} server={task.scope === "servidor"} expiring={lastDay} onToggle={() => toggleCheck(key)} />
+                  <TaskToggleRow key={key} name={task.name} note={describe(task, char.member)} done={done} server={task.scope === "servidor"} onToggle={() => toggleCheck(key)} />
                 ))}
                 {showWeekly.length === 0 && <span style={{ fontSize: 13, color: "var(--text-muted)" }}>{weekly.length ? "Todas as semanais feitas ✦" : "Nenhuma semanal ligada."}</span>}
               </div>

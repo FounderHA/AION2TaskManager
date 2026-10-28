@@ -2,7 +2,7 @@
 //
 // O arquivo é um JSON legível no Bloco de Notas:
 // {
-//   "app": "AION2 Task Manager",
+//   "app": "Aion 2 Manager",
 //   "tipo": "backup",
 //   "exportadoEm": "2026-10-27T23:30:00.000Z",
 //   "versaoApp": "0.9.0",
@@ -11,7 +11,7 @@
 // Também aceita um dados.json "puro" (copiado direto da pasta do app).
 import { parseData, type AppData } from "./model";
 
-export const BACKUP_APP = "AION2 Task Manager";
+export const BACKUP_APP = "Aion 2 Manager";
 
 export interface BackupSummary {
   exportedAt: string | null;
@@ -63,7 +63,7 @@ export function readBackup(text: string): ReadResult {
   try {
     obj = JSON.parse(text);
   } catch {
-    return { ok: false, error: "O arquivo não é um JSON válido. Escolha um arquivo de backup do AION2 Task Manager." };
+    return { ok: false, error: "O arquivo não é um JSON válido. Escolha um arquivo de backup do Aion 2 Manager." };
   }
   if (!obj || typeof obj !== "object") return { ok: false, error: "Arquivo vazio ou em formato desconhecido." };
 
@@ -71,7 +71,7 @@ export function readBackup(text: string): ReadResult {
   const isWrapper = o.tipo === "backup" && o.dados && typeof o.dados === "object";
   const raw = isWrapper ? o.dados : o;
   if (!raw || typeof raw !== "object" || !Array.isArray((raw as Record<string, unknown>).characters)) {
-    return { ok: false, error: "Este arquivo não parece ser um backup do AION2 Task Manager (não tem a lista de personagens)." };
+    return { ok: false, error: "Este arquivo não parece ser um backup do Aion 2 Manager (não tem a lista de personagens)." };
   }
   const data = parseData(JSON.stringify(raw));
   const summary = summarize(data, isWrapper && typeof o.exportadoEm === "string" ? o.exportadoEm : null, isWrapper && typeof o.versaoApp === "string" ? o.versaoApp : null);

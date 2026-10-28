@@ -1,4 +1,4 @@
-# CLAUDE.md — AION2 Task Manager
+# CLAUDE.md — Aion 2 Manager
 
 Contexto do projeto para qualquer sessão do Claude (ou pessoa) que for trabalhar neste repositório.
 
@@ -169,7 +169,16 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
 
-## Versão 1.0 (estado atual)
+## Ajustes da v1.1.0 (pedidos do usuário após testar a 1.0)
+
+- **Nome no app: "Aion 2 Manager"** (cabeçalho com "Manager" em ciano, título da janela, rodapé, textos do backup, README).
+  - O `productName` do instalador **continua "AION2 Task Manager"** de propósito: trocá-lo faz o NSIS instalar numa pasta nova e criar atalho duplicado. Só trocar se o usuário pedir, com instrução de desinstalar/reinstalar (os dados ficam em `%APPDATA%\com.founderha.aion2taskmanager`, que depende do `identifier`, não do nome).
+- **Aba selecionada com fumaça subindo** (substituiu o arco luminoso): `.tab__smoke` com brilho na base e três volutas animadas (`smoke-rise`), bordas difusas por `mask-image` radial; respeita `prefers-reduced-motion`. Abas não mostram o retângulo de foco (o foco aparece como brilho no texto).
+- **Desligadas por padrão** (ainda não existem no Global): Subjugation, Sanctuary: Corroded Decontamination Facility e Sanctuary: Chalice of Muspel. A Ludra continua ligada. Quem já ligou manualmente mantém a escolha.
+- **Selo "EXPIRA HOJE" removido** das tarefas (aba Hoje e cards semanais); o aviso de expiração fica só nos alertas.
+- Em sessões do Claude: nunca usar `pkill -f "vite preview"` no mesmo comando que contém esse texto (mata o próprio shell). Encerrar o preview em um comando separado.
+
+## Versão 1.0
 
 - **5 abas, nesta ordem:** Hoje, Semana, Personagens, Histórico, Configurações. A aba Componentes foi removida.
 - O app abre em **Hoje**; se não houver personagens, abre em **Personagens**.

@@ -45,7 +45,7 @@ export function VersionFooter({ version, state, onCheck }: { version: string; st
           : "";
   return (
     <footer className="version-footer">
-      <span>AION2 Task Manager {version ? `v${version}` : ""}</span>
+      <span>Aion 2 Manager {version ? `v${version}` : ""}</span>
       <button className="version-footer__link" onClick={onCheck} disabled={state.kind === "checking" || state.kind === "downloading" || state.kind === "installing"}>
         Verificar atualizações
       </button>

@@ -39,7 +39,7 @@ export function Tabs<T extends string>({ items, active, onChange, className = ""
 }
 
 /* ---------- Badges ---------- */
-export type BadgeKind = "server" | "main" | "alt" | "expiring" | "done" | "member";
+export type BadgeKind = "server" | "main" | "alt" | "expiring" | "done" | "member" | "on" | "off" | "neutral";
 
 const BADGE_TEXT: Record<BadgeKind, string> = {
   server: "SERVIDOR",
@@ -48,6 +48,9 @@ const BADGE_TEXT: Record<BadgeKind, string> = {
   expiring: "EXPIRA HOJE",
   done: "CONCLUÍDA",
   member: "MEMBERSHIP",
+  on: "LIGADA",
+  off: "DESLIGADA",
+  neutral: "",
 };
 
 export function Badge({ kind, children }: { kind: BadgeKind; children?: ReactNode }) {

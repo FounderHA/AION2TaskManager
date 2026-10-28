@@ -50,7 +50,17 @@ No Aion 2 quase nada é "da conta" de verdade; o que é compartilhado costuma se
 - **Servidor:** todos os personagens do mesmo servidor dividem a cota → no app, vai só para o **main**.
 - **Conta (global):** segue o jogador em qualquer servidor (ex.: cosméticos do Founder's Pack). Quase não gera tarefas.
 
-## Catálogo inicial de tarefas (pesquisa de 27/10/2026, cliente Global)
+## Catálogo de tarefas no código (Etapa 4)
+
+- Fica em `src/data/catalog.ts` (`DEFAULT_CATALOG`, 29 tarefas, 18 ligadas por padrão). Aprovado pelo usuário em 27/10/2026.
+- **Nomes em inglês** (o usuário joga com o cliente em inglês); descrições em português.
+- Cada tarefa tem `id` estável (o histórico é salvo por ele — **nunca renomear um id**), `scope` (`personagem`/`servidor`), `cadence` (`diaria`, `ritmo`, `semanal`, `dias-fixos`), `category`, `enabledByDefault` e, quando muda com membership, `descriptionMember`.
+- `tasksForRole()` aplica a regra main/alt; `occursOn()` filtra eventos de dias fixos.
+- Ao mudar o catálogo padrão, aumentar `CATALOG_VERSION` (a migração dos dados salvos vai usar isso).
+- Ficaram de fora de propósito: Spacetime Rifts (timers na Etapa 14), "sempre pegar o cubo" (vira alerta fixo), Season Mission (automática).
+- O usuário pode pedir tarefas novas depois; adicionar ao catálogo com `id` novo.
+
+## Pesquisa de origem do catálogo (27/10/2026, cliente Global)
 
 Fontes principais: metabot.gg (lê os dados do cliente), leprestore.com, playnews.gg, guildorder.com, mein-mmo.de. Os números podem mudar com patches.
 
@@ -118,6 +128,9 @@ src/
     icons.tsx                   Ícones SVG próprios
   screens/ComponentShowcase.tsx Tela de amostra da Etapa 3 (temporária)
   updater/                      Atualização pelo app (hook + faixa de aviso + rodapé de versão)
+  data/types.ts                 Tipos: TaskDef, TaskScope, TaskCadence, Weekday, CharacterRole
+  data/catalog.ts               Catálogo padrão (DEFAULT_CATALOG) + tasksForRole, describe, occursOn
+  screens/CatalogScreen.tsx     Aba Catálogo: conferência das tarefas e prévia Main/Alt e membership
 src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do instalador
 ```
 
@@ -155,10 +168,10 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 |---|---|---|
 | 1 | Mockup visual do Painel Semanal | ✅ Aprovado |
 | 2 | Base do projeto + GitHub Actions (v0.1.0) | ✅ Instalador testado e funcionando |
-| 3 | Sistema visual (componentes reutilizáveis + tela de amostra) | ✅ Entregue na v0.2.0, aguardando validação |
-| 3.1 | Atualização pelo próprio app (v0.3.0) | ✅ Implementado; depende do repositório público e do segredo de assinatura |
-| 4 | Catálogo de tarefas (dados com escopo, ciclo, regra main/alt) | ⏳ Próxima |
-| 5 | Lógica de tempo (semana qua 04:00 → ter 03:59, dia vira às 04:00) | |
+| 3 | Sistema visual (componentes reutilizáveis + tela de amostra) | ✅ Aprovado |
+| 3.1 | Atualização pelo próprio app (v0.3.0) | ✅ Testado de 0.3.0 → 0.3.1, funcionando |
+| 4 | Catálogo de tarefas (dados com escopo, ciclo, regra main/alt) | ✅ Aprovado; código na v0.4.0 (aba Catálogo) |
+| 5 | Lógica de tempo (semana qua 04:00 → ter 03:59, dia vira às 04:00) | ⏳ Próxima |
 | 6 | Personagens (cadastro, main/alt, membership) | |
 | 7 | Painel Semanal (grade qua→ter, check por dia) | |
 | 8 | Visão do Dia | |

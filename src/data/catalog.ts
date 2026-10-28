@@ -28,6 +28,7 @@ export const DEFAULT_CATALOG: TaskDef[] = [
   { id: "arena-battlefield", name: "Arena / Battlefield", description: "Recompensas semanais de vitória e participação", scope: "personagem", cadence: "semanal", category: "abismo-pvp", enabledByDefault: false },
   { id: "abyss-corridor", name: "Abyss Corridor", description: "Usar as entradas antes do próximo Artifact Siege", scope: "personagem", cadence: "semanal", category: "abismo-pvp", enabledByDefault: false },
   { id: "supply-requests-weekly", name: "Abyss Supply Request: Weekly", description: "Entregas da semana: conferir e entregar o que der", scope: "personagem", cadence: "semanal", category: "missoes", enabledByDefault: true },
+  { id: "season-mission-weekly", name: "Season Mission: Weekly", description: "Missões da semana (Abyss, Arena, Transcendence, Nightmare…): conferir e pegar as recompensas", scope: "personagem", cadence: "semanal", category: "missoes", enabledByDefault: true },
 
   // ---------- Compras da semana (agrupadas por loja) ----------
   // Os ids "command-scrolls-pve", "odyle-morph-character" e "odyle-morph-server" vêm de versões

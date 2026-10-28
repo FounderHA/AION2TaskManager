@@ -20,6 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
+- **Season Mission: Weekly** (nova, id `season-mission-weekly`, semanal, por personagem, ligada): um check de "conferi as missões da semana e peguei as recompensas". A aba Season (reset de temporada) ficou de fora.
 - **Abyss Supply Request** ligado por padrão, por personagem: "Abyss Supply Request: Emergency" (diária, id `supply-requests-urgent`) e "Abyss Supply Request: Weekly" (semanal, id `supply-requests-weekly`). Ids antigos mantidos (antes eram "Supply Requests (urgente/semanal)", desligados). Um check só: "já olhei e entreguei o que dava".
 
 ## Decisões de produto (já tomadas)
@@ -61,7 +62,7 @@ No Aion 2 quase nada é "da conta" de verdade; o que é compartilhado costuma se
 - Cada tarefa tem `id` estável (o histórico é salvo por ele — **nunca renomear um id**), `scope` (`personagem`/`servidor`), `cadence` (`diaria`, `ritmo`, `semanal`, `dias-fixos`), `category`, `enabledByDefault` e, quando muda com membership, `descriptionMember`.
 - `tasksForRole()` aplica a regra main/alt; `occursOn()` filtra eventos de dias fixos.
 - Tarefas novas adicionadas ao `DEFAULT_CATALOG` aparecem sozinhas para quem atualizar (o `resolveCatalog` junta o padrão com os ajustes salvos), sem migração.
-- Ficaram de fora de propósito: Spacetime Rifts (timers na Etapa 14), "sempre pegar o cubo" (vira alerta fixo), Season Mission (automática).
+- Ficaram de fora de propósito: Spacetime Rifts (timers na Etapa 14), "sempre pegar o cubo" (vira alerta fixo). Season Mission entrou depois como check semanal (pedido do usuário).
 - O usuário pode pedir tarefas novas depois; adicionar ao catálogo com `id` novo.
 
 ## Pesquisa de origem do catálogo (27/10/2026, cliente Global)

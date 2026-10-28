@@ -20,11 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- Wind Breeze Merchants (Special): Odyle Energy passou de 20/personagem para **4 por personagem** (mesmo id `wind-breeze-odyle-energy`, marcações mantidas) + nova **Odyle Energy (servidor) 16 por servidor** (id `wind-breeze-odyle-energy-server`, só no main). Pedido do usuário em 28/10/2026.
-- Tarefa diária **Odyle Energy desligada por padrão** (a aba Odyle cuida disso; quem quiser religa em Configurações → Tarefas; marcações antigas ficam guardadas). Alerta fixo de Odyle saiu da lateral da aba Personagem. As compras de Odyle Energy nas lojas continuam.
-- **Fundo animado** inspirado no estilo do God of War 4 (pedido do usuário, arte 100% original): `components/RuneBackdrop.tsx` montado no App, atrás de tudo (`.backdrop`, fixo, sem cliques). Névoa fria azul-esverdeada que se move, anel grande de runas Elder Futhark (traços SVG desenhados no código) girando em 120 s, anel dourado interno girando ao contrário (80 s), anel menor no canto inferior esquerdo (100 s), brasas subindo e vinheta. Respeita `prefers-reduced-motion`. Painéis ficaram um pouco mais transparentes (`--panel-top/bottom`). Evitar `filter` em elementos que giram (custa a cada quadro).
-- Texto do rodapé da aba Odyle atualizado (não fala mais da tarefa diária).
-- Foto maior no card do personagem: moldura de 96 px à esquerda, com nome, classe, GS/CP e progresso ao lado (`char-card__body`).
+- (nenhuma)
 
 ## Decisões de produto (já tomadas)
 
@@ -179,6 +175,13 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Ajustes da v1.5.0
+- Wind Breeze Merchants (Special): Odyle Energy passou de 20/personagem para **4 por personagem** (mesmo id `wind-breeze-odyle-energy`, marcações mantidas) + nova **Odyle Energy (servidor) 16 por servidor** (id `wind-breeze-odyle-energy-server`, só no main). Pedido do usuário em 28/10/2026.
+- Tarefa diária **Odyle Energy desligada por padrão** (a aba Odyle cuida disso; quem quiser religa em Configurações → Tarefas; marcações antigas ficam guardadas). Alerta fixo de Odyle saiu da lateral da aba Personagem. As compras de Odyle Energy nas lojas continuam.
+- **Fundo animado** inspirado no estilo do God of War 4 (pedido do usuário, arte 100% original): `components/RuneBackdrop.tsx` montado no App, atrás de tudo (`.backdrop`, fixo, sem cliques). Névoa fria azul-esverdeada que se move, anel grande de runas Elder Futhark (traços SVG desenhados no código) girando em 120 s, anel dourado interno girando ao contrário (80 s), anel menor no canto inferior esquerdo (100 s), brasas subindo e vinheta. Respeita `prefers-reduced-motion`. Painéis ficaram um pouco mais transparentes (`--panel-top/bottom`). Evitar `filter` em elementos que giram (custa a cada quadro).
+- Texto do rodapé da aba Odyle atualizado (não fala mais da tarefa diária).
+- Foto maior no card do personagem: moldura de 96 px à esquerda, com nome, classe, GS/CP e progresso ao lado (`char-card__body`).
 
 ## Abas Progresso e Personagem (v1.4.0)
 - Abas: **Progresso · Personagem · Odyle · Cadastro · Histórico · Configurações**. O app abre em Progresso (ou Cadastro sem personagens).

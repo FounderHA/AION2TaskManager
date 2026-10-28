@@ -1,6 +1,6 @@
 [package]
 name = "aion2taskmanager"
-version = "0.5.0"
+version = "0.6.0"
 description = "Controle de tarefas diárias e semanais do Aion 2"
 authors = ["FounderHA"]
 edition = "2024"

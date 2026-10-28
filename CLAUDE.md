@@ -135,6 +135,10 @@ src/
   data/model.ts                 Character, AppData (schemaVersion), CLASSES, parseData, ensureSingleMain
   data/store.tsx                StoreProvider/useStore: carrega ao abrir e salva 300 ms após cada mudança
   data/storage.ts               Ponte com o Rust (load_data/save_data); no navegador usa localStorage
+  time/gameTime.ts              Dia/semana do jogo, próximos resets, textos (funções puras, testadas)
+  time/gameTime.test.ts         Testes (vitest) da lógica de tempo
+  time/useGameClock.ts          Hook que atualiza o relógio a cada 15 s
+  screens/WeekPreviewScreen.tsx Aba Semana (provisória): faixa qua→ter com hoje destacado e resets
 src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do instalador
 ```
 
@@ -154,6 +158,15 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Lógica de tempo (desde a v0.6.0)
+
+- Tudo calculado em **UTC**: o "dia do jogo" é a data UTC de `agora − 7h` (`gameDayKey`), então o fuso e o horário de verão do PC não interferem. Reset configurável em `ResetConfig` (`utcHour` = 7, `weeklyWeekday` = 3 quarta).
+- Chaves de dia no formato `"YYYY-MM-DD"`; a semana é identificada pela chave da sua **quarta** (`weekStartKey`). Essas chaves serão usadas para gravar as marcações.
+- `useGameClock()` devolve `todayKey`, `weekKey`, `days` (7 chaves qua→ter), `todayIndex`, `nextDaily`, `nextWeekly`; atualiza a cada 15 s, então o app vira o dia sozinho se ficar aberto.
+- Cabeçalho mostra contagem do reset diário e semanal; o semanal fica vermelho com menos de 24h.
+- Testes: `npm test` (vitest). O workflow roda os testes antes de compilar; teste falhando impede a release.
+- Para simular datas nos testes de tela, usar o relógio falso do Playwright (`page.clock.install`) com `timezone_id="America/Sao_Paulo"`.
 
 ## Personagens e salvamento (desde a v0.5.0)
 
@@ -184,9 +197,9 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 | 3 | Sistema visual (componentes reutilizáveis + tela de amostra) | ✅ Aprovado |
 | 3.1 | Atualização pelo próprio app (v0.3.0) | ✅ Testado de 0.3.0 → 0.3.1, funcionando |
 | 4 | Catálogo de tarefas (dados com escopo, ciclo, regra main/alt) | ✅ Aprovado; código na v0.4.0 (aba Catálogo) |
-| 5 | Lógica de tempo (semana qua 04:00 → ter 03:59, dia vira às 04:00) | ⏳ Próxima |
+| 5 | Lógica de tempo (semana qua 04:00 → ter 03:59, dia vira às 04:00) | ✅ v0.6.0 (contagem no cabeçalho + prévia na aba Semana) |
 | 6 | Personagens (cadastro, main/alt, membership) | ✅ Adiantada a pedido do usuário; v0.5.0 (aba Personagens) |
-| 7 | Painel Semanal (grade qua→ter, check por dia) | |
+| 7 | Painel Semanal (grade qua→ter, check por dia) | ⏳ Próxima |
 | 8 | Visão do Dia | |
 | 9 | Salvamento local automático | 🟡 Base pronta na v0.5.0 (dados.json); falta incluir as marcações quando existirem |
 | 10 | Backup (exportar/importar `.json`) | |

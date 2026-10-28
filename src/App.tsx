@@ -3,6 +3,9 @@ import { AppHeader, Panel, SectionTitle, type TabItem } from "./components/ui";
 import { CatalogScreen } from "./screens/CatalogScreen";
 import { CharactersScreen } from "./screens/CharactersScreen";
 import { ComponentShowcase } from "./screens/ComponentShowcase";
+import { WeekPreviewScreen } from "./screens/WeekPreviewScreen";
+import { formatCountdown, localResetLabel } from "./time/gameTime";
+import { useGameClock } from "./time/useGameClock";
 import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
 import { useUpdater } from "./updater/useUpdater";
 
@@ -18,24 +21,31 @@ const TABS: TabItem<TabId>[] = [
 ];
 
 // Em qual etapa do plano cada tela será construída
-const COMING: Record<Exclude<TabId, "componentes" | "catalogo" | "personagens">, string> = {
-  semana: "Etapa 7 — Painel Semanal",
+const COMING: Record<Exclude<TabId, "componentes" | "catalogo" | "personagens" | "semana">, string> = {
   hoje: "Etapa 8 — Visão do Dia",
   historico: "Etapa 11 — Histórico",
 };
 
 function App() {
-  const [tab, setTab] = useState<TabId>("personagens");
+  const [tab, setTab] = useState<TabId>("semana");
   const updater = useUpdater();
+  const clock = useGameClock();
+  const toWeekly = clock.nextWeekly.getTime() - clock.now.getTime();
+  const resets = [
+    { label: "Diário", value: formatCountdown(clock.nextDaily.getTime() - clock.now.getTime()) },
+    { label: "Semanal", value: formatCountdown(toWeekly), hint: localResetLabel(clock.nextWeekly), urgent: toWeekly < 86_400_000 },
+  ];
 
   return (
     <div className="app-bg">
-      <AppHeader tabs={TABS} active={tab} onTabChange={setTab} resetLabel="Próximo reset" resetValue="--h --m" resetHint="qua 04:00" />
+      <AppHeader tabs={TABS} active={tab} onTabChange={setTab} resets={resets} />
       <UpdateBanner state={updater.state} dismissed={updater.dismissed} onInstall={updater.install} onDismiss={updater.dismiss} />
       {tab === "componentes" ? (
         <ComponentShowcase />
       ) : tab === "catalogo" ? (
         <CatalogScreen />
+      ) : tab === "semana" ? (
+        <WeekPreviewScreen clock={clock} />
       ) : tab === "personagens" ? (
         <CharactersScreen />
       ) : (

@@ -415,19 +415,33 @@
 .app-header__reset {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
   gap: 2px;
   padding-bottom: 14px;
 }
+.app-header__reset-row {
+  display: grid;
+  grid-template-columns: 56px 92px 64px;
+  column-gap: 8px;
+  align-items: baseline;
+}
 .app-header__reset-label {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--text-muted);
+  text-align: right;
 }
 .app-header__reset-value {
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 600;
   color: var(--cyan-light);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.app-header__reset-value--urgent {
+  color: #f2a3ae;
+}
+.app-header__reset-hint {
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 /* ---------- Conteúdo ---------- */
@@ -678,4 +692,74 @@
     padding: 12px 12px 16px;
     font-size: 15px;
   }
+}
+
+/* ---------- Faixa de dias da semana ---------- */
+.week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+.day-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 0;
+  border-radius: 3px;
+  color: var(--text-soft);
+  border: 1px solid transparent;
+}
+.day-head__wd {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+.day-head__num {
+  font-size: 20px;
+  font-weight: 600;
+}
+.day-head__tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  min-height: 13px;
+}
+.day-head--past {
+  color: #5d6a80;
+}
+.day-head--today {
+  color: #0d1424;
+  background: linear-gradient(180deg, #9be7f2, var(--cyan));
+  box-shadow: 0 0 16px rgba(95, 211, 230, 0.35);
+}
+.day-head--future {
+  border-color: var(--line-soft);
+}
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 20px;
+}
+.info-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line-soft);
+}
+.info-card__label {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.info-card__value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.info-card__hint {
+  font-size: 12px;
+  color: var(--text-soft);
 }

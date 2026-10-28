@@ -2,6 +2,7 @@
 // Usa as mesmas marcações da aba Semana.
 import { useState } from "react";
 import { Alert, Badge, Button, Panel, SectionTitle, TaskToggleRow } from "../components/ui";
+import { isEnabled } from "../components/WeekView";
 import { DEFAULT_CATALOG, describe, occursOn } from "../data/catalog";
 import { activeTasks, dayCheckKey, isWeekly, weekCheckKey } from "../data/checks";
 import type { Character } from "../data/model";
@@ -10,8 +11,6 @@ import type { TaskDef } from "../data/types";
 import { dayLabel, formatCountdown, gameWeekday, localResetLabel } from "../time/gameTime";
 import type { GameClock } from "../time/useGameClock";
 
-// Até a Etapa 12 (Configurações), vale o padrão do catálogo
-const isEnabled = (t: TaskDef) => t.enabledByDefault;
 
 const FULL_WEEKDAY: Record<string, string> = { DOM: "Domingo", SEG: "Segunda", TER: "Terça", QUA: "Quarta", QUI: "Quinta", SEX: "Sexta", SÁB: "Sábado" };
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CATALOG } from "./catalog";
-import { activeTasks, cellState, dayCheckKey, SERVER_OWNER, weekCheckKey, weekProgress, type Checks } from "./checks";
+import { activeTasks, cellState, dayCheckKey, earliestCheckDay, existedInWeek, SERVER_OWNER, weekCheckKey, weekProgress, type Checks } from "./checks";
 import type { Character } from "./model";
 import { weekDayKeys } from "../time/gameTime";
 
@@ -57,9 +57,30 @@ describe("progresso da semana", () => {
       [weekCheckKey(tasks[1], alt, WEEK)]: "x",
     };
     const p = weekProgress(checks, tasks, alt, days, 2, WEEK);
-    expect(p).toEqual({ percent: 75, doneToday: 1, totalToday: 1, missed: 1, weeklyDone: 1, weeklyTotal: 1 });
+    expect(p).toEqual({ percent: 75, doneToday: 1, totalToday: 1, missed: 1, weeklyDone: 1, weeklyTotal: 1, dailyDone: 2, dailyTotal: 3 });
   });
   it("semana sem nada marcado = 0%", () => {
     expect(weekProgress({}, tasks, alt, days, 0, WEEK).percent).toBe(0);
+  });
+});
+
+describe("histórico", () => {
+  it("semana passada inteira: todos os 7 dias contam (todayIndex = 7)", () => {
+    const nm = task("nightmare");
+    const checks: Checks = { [dayCheckKey(nm, alt, days[0])]: "x" };
+    const p = weekProgress(checks, [nm], alt, days, 7, WEEK);
+    expect(p.dailyTotal).toBe(7);
+    expect(p.dailyDone).toBe(1);
+    expect(p.missed).toBe(6);
+  });
+  it("dia mais antigo com marcação", () => {
+    expect(earliestCheckDay({ "a|x|d:2026-10-25": "x", "a|y|w:2026-10-21": "x" })).toBe("2026-10-21");
+    expect(earliestCheckDay({})).toBe(null);
+  });
+  it("personagem criado depois da semana não aparece nela (a não ser que tenha marcações)", () => {
+    const late = { ...alt, id: "late", createdAt: "2026-11-10T00:00:00Z" };
+    expect(existedInWeek(late, {}, WEEK, "2026-11-03")).toBe(false);
+    expect(existedInWeek(late, { "late|nightmare|d:2026-10-30": "x" }, WEEK, "2026-11-03")).toBe(true);
+    expect(existedInWeek(alt, {}, WEEK, "2026-11-03")).toBe(true);
   });
 });

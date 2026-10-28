@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { AppHeader, Panel, SectionTitle, type TabItem } from "./components/ui";
+import { AppHeader, type TabItem } from "./components/ui";
 import { CharactersScreen } from "./screens/CharactersScreen";
 import { ComponentShowcase } from "./screens/ComponentShowcase";
+import { HistoryScreen } from "./screens/HistoryScreen";
 import { SettingsScreen } from "./screens/SettingsScreen";
 import { TodayScreen } from "./screens/TodayScreen";
 import { WeeklyScreen } from "./screens/WeeklyScreen";
@@ -20,11 +21,6 @@ const TABS: TabItem<TabId>[] = [
   { id: "configuracoes", label: "Configurações" },
   { id: "componentes", label: "Componentes" },
 ];
-
-// Em qual etapa do plano cada tela será construída
-const COMING: Record<Exclude<TabId, "componentes" | "configuracoes" | "personagens" | "semana" | "hoje">, string> = {
-  historico: "Etapa 11 — Histórico",
-};
 
 function App() {
   const [tab, setTab] = useState<TabId>("semana");
@@ -51,12 +47,7 @@ function App() {
       ) : tab === "personagens" ? (
         <CharactersScreen />
       ) : (
-        <div className="page">
-          <Panel>
-            <SectionTitle>Em construção</SectionTitle>
-            <p style={{ margin: 0, color: "var(--text-soft)" }}>Esta tela chega na {COMING[tab]}.</p>
-          </Panel>
-        </div>
+        <HistoryScreen clock={clock} />
       )}
       <VersionFooter version={updater.currentVersion} state={updater.state} onCheck={updater.checkNow} />
     </div>

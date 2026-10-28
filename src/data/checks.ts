@@ -52,6 +52,9 @@ export interface WeekProgress {
   missed: number;
   weeklyDone: number;
   weeklyTotal: number;
+  /** Diárias (até hoje) feitas e devidas. */
+  dailyDone: number;
+  dailyTotal: number;
 }
 
 export function weekProgress(checks: Checks, tasks: TaskDef[], char: Character, days: string[], todayIndex: number, weekKey: string): WeekProgress {
@@ -85,6 +88,29 @@ export function weekProgress(checks: Checks, tasks: TaskDef[], char: Character, 
       }
     }
   }
-  return { percent: due ? Math.round((done / due) * 100) : 0, doneToday, totalToday, missed, weeklyDone, weeklyTotal };
+  return { percent: due ? Math.round((done / due) * 100) : 0, doneToday, totalToday, missed, weeklyDone, weeklyTotal, dailyDone: done - weeklyDone, dailyTotal: due - weeklyTotal };
 }
 
+
+/* ---------- Histórico ---------- */
+
+/** Dia mais antigo que aparece numa chave de marcação ("YYYY-MM-DD"), ou null. */
+export function earliestCheckDay(checks: Checks): string | null {
+  let min: string | null = null;
+  for (const k of Object.keys(checks)) {
+    const d = k.split("|")[2]?.slice(2);
+    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d) && (!min || d < min)) min = d;
+  }
+  return min;
+}
+
+/** O personagem existia (ou marcou algo) na semana que termina em weekEndKey? */
+export function existedInWeek(char: Character, checks: Checks, weekKey: string, weekEndKey: string): boolean {
+  if (char.createdAt.slice(0, 10) <= weekEndKey) return true;
+  const prefix = `${char.id}|`;
+  return Object.keys(checks).some((k) => {
+    if (!k.startsWith(prefix)) return false;
+    const d = k.split("|")[2]?.slice(2) ?? "";
+    return d >= weekKey && d <= weekEndKey;
+  });
+}

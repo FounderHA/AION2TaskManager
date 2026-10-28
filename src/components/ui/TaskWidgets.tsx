@@ -9,9 +9,17 @@ import { CheckIcon, CrossIcon } from "./icons";
    none:   sem quadrado (evento que não acontece nesse dia) */
 export type CellState = "done" | "today" | "missed" | "future" | "none";
 
-export function CheckCell({ state, label, onToggle }: { state: CellState; label: string; onToggle: () => void }) {
+export function CheckCell({ state, label, onToggle, readOnly }: { state: CellState; label: string; onToggle: () => void; readOnly?: boolean }) {
   if (state === "none") return <span className="check-cell check-cell--none" aria-hidden="true" />;
   const status = state === "done" ? "concluída" : state === "missed" ? "perdida" : state === "today" ? "pendente" : "ainda não chegou";
+  if (readOnly) {
+    return (
+      <span className={`check-cell check-cell--${state} check-cell--readonly`} role="img" aria-label={`${label}, ${status}`}>
+        {state === "done" && <CheckIcon />}
+        {state === "missed" && <CrossIcon />}
+      </span>
+    );
+  }
   return (
     <button className={`check-cell check-cell--${state}`} aria-pressed={state === "done"} aria-label={`${label}, ${status}`} disabled={state === "future"} onClick={onToggle}>
       {state === "done" && <CheckIcon />}
@@ -21,9 +29,9 @@ export function CheckCell({ state, label, onToggle }: { state: CellState; label:
 }
 
 /* ---------- Card de tarefa semanal ---------- */
-export function WeeklyCard({ name, note, done, server, expiring, onToggle }: { name: string; note: string; done: boolean; server?: boolean; expiring?: boolean; onToggle: () => void }) {
+export function WeeklyCard({ name, note, done, server, expiring, onToggle, readOnly }: { name: string; note: string; done: boolean; server?: boolean; expiring?: boolean; onToggle: () => void; readOnly?: boolean }) {
   return (
-    <button className={`weekly-card ${done ? "weekly-card--done" : ""}`} aria-pressed={done} onClick={onToggle}>
+    <button className={`weekly-card ${done ? "weekly-card--done" : ""} ${readOnly ? "weekly-card--readonly" : ""}`} aria-pressed={done} onClick={readOnly ? undefined : onToggle} aria-disabled={readOnly || undefined} tabIndex={readOnly ? -1 : undefined}>
       <div className="weekly-card__head">
         <span className="weekly-card__name">{name}</span>
         <span className="weekly-card__box">{done && <CheckIcon size={14} />}</span>

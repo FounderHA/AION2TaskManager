@@ -139,7 +139,9 @@ src/
   time/gameTime.ts              Dia/semana do jogo, próximos resets, textos (funções puras, testadas)
   time/gameTime.test.ts         Testes (vitest) da lógica de tempo
   time/useGameClock.ts          Hook que atualiza o relógio a cada 15 s
-  screens/WeeklyScreen.tsx      Aba Semana: Painel Semanal (cards, grade de diárias, semanais, progresso, alertas)
+  components/WeekView.tsx       Grade de uma semana (cards, diárias, semanais, progresso); editável ou somente leitura
+  screens/WeeklyScreen.tsx      Aba Semana: WeekView da semana atual + alertas
+  screens/HistoryScreen.tsx     Aba Histórico: navegação entre semanas encerradas, resumo e WeekView somente leitura
   screens/TodayScreen.tsx       Aba Hoje: todos os personagens, diárias de hoje + semanais, botões grandes
   data/checks.ts                Chaves das marcações, estado das células e progresso da semana (testado)
   data/checks.test.ts           Testes das marcações e do progresso
@@ -164,6 +166,15 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Histórico (desde a v0.10.0)
+
+- Mostra só semanas **encerradas**: da semana mais antiga com dados (primeira marcação ou cadastro de personagem) até a semana passada. Abre na semana passada.
+- Usa `WeekView` com `todayIndex = 7` (semana fechada: todos os dias contam) e `readOnly` (células e cards não clicáveis).
+- Resumo por personagem: progresso, diárias feitas/devidas, diárias perdidas, semanais feitas; e a média da conta.
+- Personagem cadastrado depois da semana não aparece nela, a menos que tenha marcações nela (`existedInWeek`).
+- O histórico é calculado com o catálogo e os papéis (main/alt) **atuais**.
+- `isEnabled` agora fica em `components/WeekView.tsx` e é usado por Semana, Hoje e Histórico (vira configuração na Etapa 12).
 
 ## Backup e aba Configurações (desde a v0.9.0)
 
@@ -236,8 +247,8 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 | 8 | Visão do Dia | ✅ v0.8.0 (aba Hoje) |
 | 9 | Salvamento local automático | ✅ Personagens (v0.5.0) e marcações (v0.7.0) |
 | 10 | Backup (exportar/importar `.json`) | ✅ v0.9.0 (aba Configurações) |
-| 11 | Histórico de semanas | ⏳ Próxima |
-| 12 | Configurações (horário de reset, editor de tarefas, tema) | |
+| 11 | Histórico de semanas | ✅ v0.10.0 |
+| 12 | Configurações (horário de reset, editor de tarefas, tema) | ⏳ Próxima |
 | 13 | Versão 1.0 | |
 | 14 | Extras: timers de Rift e chefes, aviso de Odyle, notificações do Windows | |
 

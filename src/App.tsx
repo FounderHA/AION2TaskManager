@@ -3,6 +3,7 @@ import { AppHeader, Panel, SectionTitle, type TabItem } from "./components/ui";
 import { CatalogScreen } from "./screens/CatalogScreen";
 import { CharactersScreen } from "./screens/CharactersScreen";
 import { ComponentShowcase } from "./screens/ComponentShowcase";
+import { TodayScreen } from "./screens/TodayScreen";
 import { WeeklyScreen } from "./screens/WeeklyScreen";
 import { formatCountdown, localResetLabel } from "./time/gameTime";
 import { useGameClock } from "./time/useGameClock";
@@ -21,8 +22,7 @@ const TABS: TabItem<TabId>[] = [
 ];
 
 // Em qual etapa do plano cada tela será construída
-const COMING: Record<Exclude<TabId, "componentes" | "catalogo" | "personagens" | "semana">, string> = {
-  hoje: "Etapa 8 — Visão do Dia",
+const COMING: Record<Exclude<TabId, "componentes" | "catalogo" | "personagens" | "semana" | "hoje">, string> = {
   historico: "Etapa 11 — Histórico",
 };
 
@@ -46,6 +46,8 @@ function App() {
         <CatalogScreen />
       ) : tab === "semana" ? (
         <WeeklyScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
+      ) : tab === "hoje" ? (
+        <TodayScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
       ) : tab === "personagens" ? (
         <CharactersScreen />
       ) : (

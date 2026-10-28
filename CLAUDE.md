@@ -139,6 +139,7 @@ src/
   time/gameTime.test.ts         Testes (vitest) da lógica de tempo
   time/useGameClock.ts          Hook que atualiza o relógio a cada 15 s
   screens/WeeklyScreen.tsx      Aba Semana: Painel Semanal (cards, grade de diárias, semanais, progresso, alertas)
+  screens/TodayScreen.tsx       Aba Hoje: todos os personagens, diárias de hoje + semanais, botões grandes
   data/checks.ts                Chaves das marcações, estado das células e progresso da semana (testado)
   data/checks.test.ts           Testes das marcações e do progresso
 src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do instalador
@@ -160,6 +161,14 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Aba Hoje (desde a v0.8.0)
+
+- Um painel por personagem (main primeiro), com **Diárias de hoje** (só as que acontecem no dia) e **Semanais** da semana atual.
+- Usa as mesmas chaves de marcação da aba Semana: marcar em uma reflete na outra.
+- "Dia completo" quando todas as diárias do personagem estão feitas; opção "Ocultar concluídas".
+- Resumo no topo: diárias que faltam hoje, semanais pendentes e contagem dos resets; alerta no último dia.
+- Componente `TaskToggleRow` (linha grande com check) em `components/ui/TaskWidgets.tsx`.
 
 ## Marcações e Painel Semanal (desde a v0.7.0)
 
@@ -213,9 +222,9 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 | 5 | Lógica de tempo (semana qua 04:00 → ter 03:59, dia vira às 04:00) | ✅ v0.6.0 (contagem no cabeçalho + prévia na aba Semana) |
 | 6 | Personagens (cadastro, main/alt, membership) | ✅ Adiantada a pedido do usuário; v0.5.0 (aba Personagens) |
 | 7 | Painel Semanal (grade qua→ter, check por dia) | ✅ v0.7.0 |
-| 8 | Visão do Dia | ⏳ Próxima |
+| 8 | Visão do Dia | ✅ v0.8.0 (aba Hoje) |
 | 9 | Salvamento local automático | ✅ Personagens (v0.5.0) e marcações (v0.7.0) |
-| 10 | Backup (exportar/importar `.json`) | |
+| 10 | Backup (exportar/importar `.json`) | ⏳ Próxima |
 | 11 | Histórico de semanas | |
 | 12 | Configurações (horário de reset, editor de tarefas, tema) | |
 | 13 | Versão 1.0 | |

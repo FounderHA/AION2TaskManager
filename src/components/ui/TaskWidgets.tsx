@@ -81,3 +81,20 @@ export function AddCharacterCard({ onClick }: { onClick: () => void }) {
     </button>
   );
 }
+
+/* ---------- Linha de tarefa grande (aba Hoje) ---------- */
+export function TaskToggleRow({ name, note, done, server, expiring, onToggle }: { name: string; note: string; done: boolean; server?: boolean; expiring?: boolean; onToggle: () => void }) {
+  return (
+    <button className={`task-row ${done ? "task-row--done" : ""}`} aria-pressed={done} onClick={onToggle}>
+      <span className="task-row__box">{done && <CheckIcon size={16} />}</span>
+      <span className="task-row__text">
+        <span className="task-row__name">{name}</span>
+        <span className="task-row__note">{note}</span>
+      </span>
+      <span className="task-row__tags">
+        {server && <Badge kind="server" />}
+        {!done && expiring && <Badge kind="expiring" />}
+      </span>
+    </button>
+  );
+}

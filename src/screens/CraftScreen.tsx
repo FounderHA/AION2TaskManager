@@ -6,6 +6,8 @@ import { GradeBadge, ItemIcon, RecipeIcon, UnknownItemIcon } from "../components
 import { formatKinah, lineTotal, NUM_MAX, gradeInfo, ITEM_IMAGE_MAX, ITEM_NAME_MAX, type CraftItem, type RecipeGrade, RECIPE_GRADES, RECIPE_ICONS, RECIPE_NAME_MAX, recipeTotal, type Recipe, type RecipeIconId } from "../data/craft";
 import { useStore } from "../data/store";
 import { pickImage } from "../components/pickImage";
+import { saveBackupFile } from "../data/backupIO";
+import { makeItemsExport } from "../data/craft";
 
 const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `r-${Date.now()}-${Math.random().toString(36).slice(2)}`);
 const blank = (): Recipe => ({ id: newId(), name: "", icon: "pauldron", grade: "common", lines: [], updatedAt: "" });
@@ -101,11 +103,22 @@ function ItemEditor({ initial, isNew, usedIn, onSave, onCancel, onDelete }: { in
   );
 }
 
-export function CraftScreen() {
+export function CraftScreen({ appVersion }: { appVersion: string }) {
   const { data, saveRecipe, deleteRecipe, saveCraftItem, deleteCraftItem } = useStore();
   const craftItems = data.craftItems;
   const itemById = (id: string) => craftItems.find((i) => i.id === id);
   const [editingItem, setEditingItem] = useState<CraftItem | null>(null);
+  const [exportMsg, setExportMsg] = useState("");
+  const exportItems = async () => {
+    setExportMsg("");
+    try {
+      const day = new Date().toISOString().slice(0, 10);
+      const path = await saveBackupFile(makeItemsExport(craftItems, appVersion), `itens-craft-${day}.json`, "Exportar lista de itens");
+      if (path) setExportMsg(`Lista exportada (${craftItems.length} itens): ${path}`);
+    } catch (e) {
+      setExportMsg(`Não foi possível exportar: ${String(e)}`);
+    }
+  };
   const recipes = useMemo(() => [...data.recipes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)), [data.recipes]);
   const [draft, setDraft] = useState<Recipe>(blank);
   const [pendingOpen, setPendingOpen] = useState<Recipe | "new" | null>(null);
@@ -321,10 +334,16 @@ export function CraftScreen() {
               }}
             />
           ) : (
-            <Button variant="secondary" onClick={() => setEditingItem({ id: newId(), name: "", rarity: "common", image: null })}>
-              + Novo item
-            </Button>
+            <div className="item-panel-actions">
+              <Button variant="secondary" onClick={() => setEditingItem({ id: newId(), name: "", rarity: "common", image: null })}>
+                + Novo item
+              </Button>
+              <Button variant="ghost" onClick={exportItems} disabled={!craftItems.length}>
+                Exportar lista
+              </Button>
+            </div>
           )}
+          {exportMsg && <p className="craft-export-msg">{exportMsg}</p>}
           <input style={{ marginTop: 12 }} className="input" placeholder="Buscar item…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Buscar item" />
           <div className="item-list">
             {items.map((it) => {

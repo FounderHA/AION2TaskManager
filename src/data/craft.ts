@@ -17,10 +17,6 @@ export interface CraftItem {
 export const ITEM_NAME_MAX = 40;
 export const ITEM_IMAGE_MAX = 300_000;
 
-export const DEFAULT_CRAFT_ITEMS: CraftItem[] = [
-  { id: "common-material", name: "Common Material", rarity: "common", image: null, icon: "common-material" },
-  { id: "refining-stone", name: "Refining Stone", rarity: "common", image: null, icon: "refining-stone" },
-];
 
 /** Tipo (grau) da receita, com as cores dos selos do jogo. */
 export type RecipeGrade = "common" | "rare" | "epic" | "unique";
@@ -87,9 +83,9 @@ export function parseRecipes(raw: unknown): Recipe[] {
 
 const ICON_IDS: ItemIconId[] = ["common-material", "refining-stone"];
 
-/** Lê a lista de itens. Arquivo sem a lista (versões antigas) começa com os itens de exemplo. */
+/** Lê uma lista de itens (do dados.json ou de um arquivo exportado). */
 export function parseCraftItems(raw: unknown): CraftItem[] {
-  if (!Array.isArray(raw)) return DEFAULT_CRAFT_ITEMS.map((i) => ({ ...i }));
+  if (!Array.isArray(raw)) return [];
   const out: CraftItem[] = [];
   for (const r of raw) {
     if (!r || typeof r !== "object") continue;
@@ -104,4 +100,29 @@ export function parseCraftItems(raw: unknown): CraftItem[] {
     });
   }
   return out;
+}
+
+/**
+ * Junta os itens do usuário com a lista padrão do app: itens padrão que o usuário ainda não tem
+ * (e não excluiu) entram no fim. Itens que ele já tem, editados ou não, ficam como estão.
+ */
+export function mergeBuiltinItems(userItems: CraftItem[], hidden: string[], builtin: CraftItem[]): CraftItem[] {
+  const have = new Set(userItems.map((i) => i.id));
+  const skip = new Set(hidden);
+  return [...userItems, ...builtin.filter((b) => !have.has(b.id) && !skip.has(b.id)).map((b) => ({ ...b }))];
+}
+
+/** Arquivo exportado com a lista de itens. */
+export function makeItemsExport(items: CraftItem[], appVersion: string): string {
+  return JSON.stringify({ app: "Aion 2 Manager", tipo: "itens-craft", exportadoEm: new Date().toISOString(), versaoApp: appVersion, itens: items }, null, 2);
+}
+
+export function readItemsExport(text: string): CraftItem[] | null {
+  try {
+    const o = JSON.parse(text);
+    if (o?.tipo !== "itens-craft") return null;
+    return parseCraftItems(o.itens);
+  } catch {
+    return null;
+  }
 }

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { backupFileName, makeBackup, readBackup, snapshotName } from "./backup";
 import type { AppData } from "./model";
 import { defaultSettings } from "./settings";
+import { BUILTIN_CRAFT_ITEMS } from "./craftCatalog";
 
 const data: AppData = {
   schemaVersion: 1,
@@ -16,7 +17,8 @@ const data: AppData = {
   },
   settings: defaultSettings(),
   recipes: [],
-  craftItems: [],
+  craftItems: BUILTIN_CRAFT_ITEMS.map((i) => ({ ...i })),
+  craftHidden: [],
 };
 
 describe("backup", () => {

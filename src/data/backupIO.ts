@@ -7,7 +7,7 @@ const isTauri = () => typeof window !== "undefined" && "__TAURI_INTERNALS__" in 
 const FILTERS = [{ name: "Backup do Aion 2 Manager", extensions: ["json"] }];
 
 /** Abre "Salvar como" e grava o backup. Retorna o caminho salvo, ou null se o usuário cancelou. */
-export async function saveBackupFile(contents: string, defaultName: string): Promise<string | null> {
+export async function saveBackupFile(contents: string, defaultName: string, title = "Exportar backup"): Promise<string | null> {
   if (!isTauri()) {
     const url = URL.createObjectURL(new Blob([contents], { type: "application/json" }));
     const a = document.createElement("a");
@@ -17,7 +17,7 @@ export async function saveBackupFile(contents: string, defaultName: string): Pro
     URL.revokeObjectURL(url);
     return defaultName;
   }
-  const path = await save({ title: "Exportar backup", defaultPath: defaultName, filters: FILTERS });
+  const path = await save({ title, defaultPath: defaultName, filters: FILTERS });
   if (!path) return null;
   await invoke("write_text_file", { path, contents });
   return path;

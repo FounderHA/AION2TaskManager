@@ -5,6 +5,7 @@ import { addCharged, reanchor, rulesFor, snapshotFromInput, spend } from "./odyl
 import { CUSTOM_PREFIX, resolveCatalog, TASK_DESC_MAX, TASK_NAME_MAX, type OdyleConfig, type ResolvedTask, type Settings, type ThemeChoice } from "./settings";
 import { loadRaw, saveRaw } from "./storage";
 import type { CraftItem, Recipe } from "./craft";
+import { BUILTIN_CRAFT_ITEMS } from "./craftCatalog";
 import type { TaskDef } from "./types";
 import type { ResetConfig } from "../time/gameTime";
 
@@ -225,7 +226,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, []);
   const deleteCraftItem = useCallback((id: string) => {
     // As receitas que usavam o item mostram "item removido" até você tirar a linha
-    setData((d) => ({ ...d, craftItems: d.craftItems.filter((i) => i.id !== id) }));
+    setData((d) => ({
+      ...d,
+      craftItems: d.craftItems.filter((i) => i.id !== id),
+      // Item da lista padrão excluído não volta na próxima atualização
+      craftHidden: BUILTIN_CRAFT_ITEMS.some((b) => b.id === id) && !d.craftHidden.includes(id) ? [...d.craftHidden, id] : d.craftHidden,
+    }));
   }, []);
 
   const setTheme = useCallback((theme: ThemeChoice) => {

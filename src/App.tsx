@@ -153,7 +153,7 @@ function App() {
       ) : tab === "odyle" ? (
         <OdyleScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
       ) : tab === "craft" ? (
-        <CraftScreen />
+        <CraftScreen appVersion={updater.currentVersion} />
       ) : tab === "guia" ? (
         <GuideScreen />
       ) : tab === "personagens" ? (

@@ -20,7 +20,11 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- **Aba Craft** (calculadora de receitas; entre Odyle e Cadastro; id `craft`): `screens/CraftScreen.tsx`, dados em `data/craft.ts`, ícones originais em `components/CraftIcons.tsx`.
+  - Lista de itens (`CRAFT_ITEMS`, catálogo fixo no código): só ícone + nome na cor da raridade. Por enquanto 1 item: **Common Material** (raridade `common`, branco `#e8ebef`, ícone de minério cinza). O usuário vai mandar os demais itens com cor e imagem.
+  - Receita: itens da lista com **quantidade (quantos faltam)** e **valor de mercado por unidade**; subtotal por linha e **total** (Kinah, separador de milhar en-US). Sem campo "quanto tenho" (decisão do usuário). Item repetido não entra duas vezes.
+  - Receitas salvas em `AppData.recipes` (`{id, name, icon, lines:[{itemId, qty, price}], updatedAt}`; `parseRecipes` tolerante; vão no backup). Salvar exige nome; editar uma salva mostra "Alterações não salvas" e trocar de receita com alterações pede confirmação. Excluir em dois cliques.
+  - Ícone da receita (`RECIPE_ICONS`): por enquanto só **ombreira** (`pauldron`, desenho original inspirado no print do usuário). Ideia combinada: conjunto de ícones genéricos (armas, armaduras, acessórios, materiais) para receitas e itens.
 
 ## Decisões de produto (já tomadas)
 
@@ -138,6 +142,7 @@ src/
   screens/TaskEditorSection.tsx Editor de tarefas: ligar/desligar, editar descrição, criar/excluir tarefas próprias
   screens/ResetSection.tsx      Horário do reset diário (hora local do PC) e dia do reset semanal
   data/settings.ts              Settings (reset, ajustes por tarefa, tarefas próprias), parseSettings, resolveCatalog (testado)
+  screens/CraftScreen.tsx       Aba Craft (calculadora de receitas; data/craft.ts, components/CraftIcons.tsx)
   screens/GuideScreen.tsx       Aba Guia (prioridade de status; dados em data/guide/)
   screens/CharactersScreen.tsx  Aba Personagens: cadastro, edição, exclusão, Main/Alt, GS/CP e Odyle inicial
   screens/OdyleScreen.tsx       Aba Odyle: Basic/Charged por personagem, gastar −40/−80, Charged +40/+10, desfazer, corrigir

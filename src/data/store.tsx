@@ -4,6 +4,7 @@ import { emptyData, ensureSingleMain, NAME_MAX, parseData, sortCharacters, type 
 import { addCharged, reanchor, rulesFor, snapshotFromInput, spend } from "./odyle";
 import { CUSTOM_PREFIX, resolveCatalog, TASK_DESC_MAX, TASK_NAME_MAX, type OdyleConfig, type ResolvedTask, type Settings, type ThemeChoice } from "./settings";
 import { loadRaw, saveRaw } from "./storage";
+import type { Recipe } from "./craft";
 import type { TaskDef } from "./types";
 import type { ResetConfig } from "../time/gameTime";
 
@@ -37,6 +38,9 @@ interface StoreValue {
   /** Membership da conta (vale para todos os personagens). */
   setMembership: (on: boolean) => void;
   setTheme: (theme: ThemeChoice) => void;
+  /** Cria ou atualiza uma receita (pelo id). */
+  saveRecipe: (recipe: Recipe) => void;
+  deleteRecipe: (id: string) => void;
   setOdyleConfig: (cfg: OdyleConfig) => void;
   /** Corrige os valores atuais de Odyle Energy (null = parar de controlar). */
   setOdyle: (id: string, values: { basic: number; charged: number } | null) => void;
@@ -199,6 +203,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setData((d) => (d.settings.membership === on ? d : { ...d, characters: reanchorAll(d, new Date()), settings: { ...d.settings, membership: on } }));
   }, []);
 
+  const saveRecipe = useCallback((recipe: Recipe) => {
+    setData((d) => {
+      const rec = { ...recipe, updatedAt: new Date().toISOString() };
+      const exists = d.recipes.some((r) => r.id === rec.id);
+      return { ...d, recipes: exists ? d.recipes.map((r) => (r.id === rec.id ? rec : r)) : [...d.recipes, rec] };
+    });
+  }, []);
+  const deleteRecipe = useCallback((id: string) => {
+    setData((d) => ({ ...d, recipes: d.recipes.filter((r) => r.id !== id) }));
+  }, []);
+
   const setTheme = useCallback((theme: ThemeChoice) => {
     setData((d) => ({ ...d, settings: { ...d.settings, theme } }));
   }, []);
@@ -254,12 +269,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setStatIcon,
       setMembership,
       setTheme,
+      saveRecipe,
+      deleteRecipe,
       setOdyleConfig,
       setOdyle,
       spendOdyle,
       addChargedOdyle,
     };
-  }, [setMembership, setTheme, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
+  }, [saveRecipe, deleteRecipe, setMembership, setTheme, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

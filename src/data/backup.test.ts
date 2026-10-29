@@ -15,6 +15,7 @@ const data: AppData = {
     "m1|ascension-trial|w:2026-10-21": "2026-10-22T20:00:00Z",
   },
   settings: defaultSettings(),
+  recipes: [],
 };
 
 describe("backup", () => {

@@ -4,6 +4,7 @@ import { CharactersScreen } from "./screens/CharactersScreen";
 import { HistoryScreen } from "./screens/HistoryScreen";
 import { OdyleScreen } from "./screens/OdyleScreen";
 import { GuideScreen } from "./screens/GuideScreen";
+import { CraftScreen } from "./screens/CraftScreen";
 import { RuneBackdrop } from "./components/RuneBackdrop";
 import { CompactView } from "./screens/CompactView";
 import { DayCompleteFx } from "./components/DayCompleteFx";
@@ -18,12 +19,13 @@ import { currentOdyle, rulesFor } from "./data/odyle";
 import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
 import { useUpdater } from "./updater/useUpdater";
 
-type TabId = "personagem" | "progresso" | "odyle" | "guia" | "personagens" | "historico" | "configuracoes";
+type TabId = "personagem" | "progresso" | "odyle" | "guia" | "craft" | "personagens" | "historico" | "configuracoes";
 
 const BASE_TABS: TabItem<TabId>[] = [
   { id: "progresso", label: "Progresso" },
   { id: "personagem", label: "Personagem" },
   { id: "odyle", label: "Odyle" },
+  { id: "craft", label: "Craft" },
   { id: "personagens", label: "Cadastro" },
   { id: "historico", label: "Histórico" },
   { id: "guia", label: "Guia" },
@@ -150,6 +152,8 @@ function App() {
         />
       ) : tab === "odyle" ? (
         <OdyleScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
+      ) : tab === "craft" ? (
+        <CraftScreen />
       ) : tab === "guia" ? (
         <GuideScreen />
       ) : tab === "personagens" ? (

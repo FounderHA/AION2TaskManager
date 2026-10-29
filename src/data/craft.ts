@@ -6,7 +6,7 @@ export const RARITY: Record<Rarity, { label: string; color: string }> = {
   common: { label: "Comum", color: "#e8ebef" },
 };
 
-export type ItemIconId = "common-material";
+export type ItemIconId = "common-material" | "refining-stone";
 export type RecipeIconId = "pauldron";
 
 export interface CraftItem {
@@ -17,7 +17,20 @@ export interface CraftItem {
 }
 
 /** Itens disponíveis para as receitas. */
-export const CRAFT_ITEMS: CraftItem[] = [{ id: "common-material", name: "Common Material", rarity: "common", icon: "common-material" }];
+export const CRAFT_ITEMS: CraftItem[] = [
+  { id: "common-material", name: "Common Material", rarity: "common", icon: "common-material" },
+  { id: "refining-stone", name: "Refining Stone", rarity: "common", icon: "refining-stone" },
+];
+
+/** Tipo (grau) da receita, com as cores dos selos do jogo. */
+export type RecipeGrade = "common" | "rare" | "epic" | "unique";
+export const RECIPE_GRADES: { id: RecipeGrade; label: string; bg: string; fg: string }[] = [
+  { id: "common", label: "Common", bg: "#353535", fg: "#c3c3c3" },
+  { id: "rare", label: "Rare", bg: "#29501d", fg: "#19e048" },
+  { id: "epic", label: "Epic", bg: "#0e5171", fg: "#379aff" },
+  { id: "unique", label: "Unique", bg: "#785408", fg: "#ffd02b" },
+];
+export const gradeInfo = (g: RecipeGrade) => RECIPE_GRADES.find((x) => x.id === g) ?? RECIPE_GRADES[0];
 
 export const RECIPE_ICONS: { id: RecipeIconId; label: string }[] = [{ id: "pauldron", label: "Ombreira" }];
 
@@ -33,6 +46,7 @@ export interface Recipe {
   id: string;
   name: string;
   icon: RecipeIconId;
+  grade: RecipeGrade;
   lines: RecipeLine[];
   updatedAt: string;
 }
@@ -64,6 +78,7 @@ export function parseRecipes(raw: unknown): Recipe[] {
       id: o.id,
       name: o.name.slice(0, RECIPE_NAME_MAX) || "Receita",
       icon: RECIPE_ICONS.some((i) => i.id === o.icon) ? (o.icon as RecipeIconId) : "pauldron",
+      grade: RECIPE_GRADES.some((g) => g.id === o.grade) ? (o.grade as RecipeGrade) : "common",
       lines,
       updatedAt: typeof o.updatedAt === "string" ? o.updatedAt : new Date().toISOString(),
     });

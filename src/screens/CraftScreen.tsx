@@ -2,13 +2,13 @@
 // informa quantos faltam e o valor de mercado de cada um, e o app soma o total.
 import { useMemo, useState } from "react";
 import { Alert, Button, Panel, SectionTitle } from "../components/ui";
-import { ItemIcon, RecipeIcon, UnknownItemIcon } from "../components/CraftIcons";
-import { CRAFT_ITEMS, formatKinah, itemById, lineTotal, NUM_MAX, RARITY, RECIPE_ICONS, RECIPE_NAME_MAX, recipeTotal, type Recipe, type RecipeIconId } from "../data/craft";
+import { GradeBadge, ItemIcon, RecipeIcon, UnknownItemIcon } from "../components/CraftIcons";
+import { CRAFT_ITEMS, formatKinah, itemById, lineTotal, NUM_MAX, RARITY, gradeInfo, RECIPE_GRADES, RECIPE_ICONS, RECIPE_NAME_MAX, recipeTotal, type Recipe, type RecipeIconId } from "../data/craft";
 import { useStore } from "../data/store";
 
 const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `r-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-const blank = (): Recipe => ({ id: newId(), name: "", icon: "pauldron", lines: [], updatedAt: "" });
-const sameRecipe = (a: Recipe, b: Recipe) => a.name === b.name && a.icon === b.icon && JSON.stringify(a.lines) === JSON.stringify(b.lines);
+const blank = (): Recipe => ({ id: newId(), name: "", icon: "pauldron", grade: "common", lines: [], updatedAt: "" });
+const sameRecipe = (a: Recipe, b: Recipe) => a.name === b.name && a.icon === b.icon && a.grade === b.grade && JSON.stringify(a.lines) === JSON.stringify(b.lines);
 
 /** Campo numérico com separador de milhar. */
 function NumberField({ value, onChange, label, placeholder }: { value: number; onChange: (n: number) => void; label: string; placeholder?: string }) {
@@ -101,8 +101,13 @@ export function CraftScreen() {
               <button key={r.id} type="button" className={`recipe-item ${r.id === draft.id ? "recipe-item--active" : ""}`} onClick={() => requestOpen(r)}>
                 <RecipeIcon icon={r.icon} size={42} />
                 <span className="recipe-item__text">
-                  <span className="recipe-item__name">{r.name}</span>
-                  <span className="recipe-item__total">{formatKinah(recipeTotal(r.lines))} Kinah</span>
+                  <span className="recipe-item__name" style={{ color: gradeInfo(r.grade).fg }}>
+                    {r.name}
+                  </span>
+                  <span className="recipe-item__meta">
+                    <GradeBadge grade={r.grade} small />
+                    <span className="recipe-item__total">{formatKinah(recipeTotal(r.lines))} Kinah</span>
+                  </span>
                 </span>
               </button>
             ))}
@@ -153,6 +158,14 @@ export function CraftScreen() {
                   setDraft((d) => ({ ...d, name: e.target.value }));
                 }}
               />
+              <div className="grade-picker" role="radiogroup" aria-label="Tipo da receita">
+                <span className="grade-picker__label">Tipo</span>
+                {RECIPE_GRADES.map((g) => (
+                  <button key={g.id} type="button" role="radio" aria-checked={draft.grade === g.id} className={`grade-picker__opt ${draft.grade === g.id ? "grade-picker__opt--on" : ""}`} onClick={() => setDraft((d) => ({ ...d, grade: g.id }))}>
+                    <GradeBadge grade={g.id} />
+                  </button>
+                ))}
+              </div>
               {nameError ? <span className="field__error">Dê um nome para salvar a receita.</span> : <span className="field__hint">{saved ? (dirty ? "Alterações não salvas" : "Salva") : "Receita nova (ainda não salva)"}</span>}
             </div>
           </div>

@@ -24,6 +24,9 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
   - Lista de itens (`CRAFT_ITEMS`, catálogo fixo no código): só ícone + nome na cor da raridade. Por enquanto 1 item: **Common Material** (raridade `common`, branco `#e8ebef`, ícone de minério cinza). O usuário vai mandar os demais itens com cor e imagem.
   - Receita: itens da lista com **quantidade (quantos faltam)** e **valor de mercado por unidade**; subtotal por linha e **total** (Kinah, separador de milhar en-US). Sem campo "quanto tenho" (decisão do usuário). Item repetido não entra duas vezes.
   - Receitas salvas em `AppData.recipes` (`{id, name, icon, lines:[{itemId, qty, price}], updatedAt}`; `parseRecipes` tolerante; vão no backup). Salvar exige nome; editar uma salva mostra "Alterações não salvas" e trocar de receita com alterações pede confirmação. Excluir em dois cliques.
+  - **Tipo da receita** (`grade`: `common` | `rare` | `epic` | `unique`, `RECIPE_GRADES` com as cores dos selos do jogo: Common cinza, Rare verde, Epic azul, Unique dourado). Selo `GradeBadge`; o nome da receita na lista usa a cor do tipo. Receitas antigas viram `common`.
+  - Itens: Common Material e **Refining Stone** (common, ícone de esfera de vidro com aro metálico e redemoinho).
+  - **Versão de teste no navegador** (artifact privado do usuário): https://claude.ai/artifact/PKX6ETbgmuKiAfhAeB6Zsr — gerar com `npx vite build --base ./ --outDir <pasta>` e publicar `pagina.html` (title + link CSS + script module + `<div id="root">`) com os arquivos de `assets/` (só fontes latin/latin-ext). Dados do teste ficam no localStorage do navegador.
   - Ícone da receita (`RECIPE_ICONS`): por enquanto só **ombreira** (`pauldron`, desenho original inspirado no print do usuário). Ideia combinada: conjunto de ícones genéricos (armas, armaduras, acessórios, materiais) para receitas e itens.
 
 ## Decisões de produto (já tomadas)

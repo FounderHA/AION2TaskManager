@@ -1,6 +1,6 @@
 // Ícones originais da calculadora de craft (desenhados em SVG, sem arte do jogo).
 import { useId } from "react";
-import { RARITY, type ItemIconId, type Rarity, type RecipeIconId } from "../data/craft";
+import { gradeInfo, RARITY, type ItemIconId, type Rarity, type RecipeGrade, type RecipeIconId } from "../data/craft";
 
 /** Material comum: pedaço de minério cinza com facetas. */
 function CommonMaterialArt({ uid }: { uid: string }) {
@@ -85,6 +85,38 @@ function PauldronArt({ uid }: { uid: string }) {
   );
 }
 
+/** Pedra de refino: esfera de vidro com redemoinho prateado. */
+function RefiningStoneArt({ uid }: { uid: string }) {
+  return (
+    <g>
+      <defs>
+        <radialGradient id={`${uid}-g`} cx=".38" cy=".32" r=".75">
+          <stop offset="0" stopColor="#ffffff" />
+          <stop offset=".35" stopColor="#d6d9dc" />
+          <stop offset=".75" stopColor="#8d949b" />
+          <stop offset="1" stopColor="#4b5056" />
+        </radialGradient>
+        <linearGradient id={`${uid}-r`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#f4f5f6" />
+          <stop offset="1" stopColor="#6c737a" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="32" cy="56" rx="16" ry="3" fill="rgba(0,0,0,.5)" />
+      {/* aro metálico */}
+      <circle cx="32" cy="32" r="22" fill="none" stroke={`url(#${uid}-r)`} strokeWidth="3" />
+      <circle cx="32" cy="32" r="23.6" fill="none" stroke="#2a2e33" strokeWidth=".8" />
+      {/* esfera */}
+      <circle cx="32" cy="32" r="19.5" fill={`url(#${uid}-g)`} stroke="#3a3f45" strokeWidth=".8" />
+      {/* redemoinho interno */}
+      <path d="M20 38 C 24 28, 36 26, 42 31 C 46 35, 41 42, 34 41 C 28 40, 28 34, 33 33" fill="none" stroke="#5d646b" strokeOpacity=".7" strokeWidth="2.2" strokeLinecap="round" />
+      <path d="M22 38 C 26 30, 35 29, 40 32" fill="none" stroke="#ffffff" strokeOpacity=".55" strokeWidth="1" strokeLinecap="round" />
+      {/* reflexos */}
+      <ellipse cx="25" cy="22" rx="6" ry="3.5" transform="rotate(-30 25 22)" fill="#ffffff" fillOpacity=".85" />
+      <circle cx="40" cy="44" r="1.6" fill="#ffffff" fillOpacity=".6" />
+    </g>
+  );
+}
+
 function Frame({ size, border, glow, children, title }: { size: number; border: string; glow: string; children: React.ReactNode; title?: string }) {
   return (
     <span className="craft-icon" style={{ width: size, height: size, borderColor: border, boxShadow: `inset 0 0 ${size / 4}px ${glow}` }} title={title}>
@@ -101,6 +133,7 @@ export function ItemIcon({ icon, rarity, size = 48, title }: { icon: ItemIconId;
   return (
     <Frame size={size} border={`${color}66`} glow={`${color}22`} title={title}>
       {icon === "common-material" && <CommonMaterialArt uid={uid} />}
+      {icon === "refining-stone" && <RefiningStoneArt uid={uid} />}
     </Frame>
   );
 }
@@ -122,5 +155,15 @@ export function UnknownItemIcon({ size = 48 }: { size?: number }) {
         ?
       </text>
     </Frame>
+  );
+}
+
+/** Selo do tipo da receita (Common, Rare, Epic, Unique) com as cores do jogo. */
+export function GradeBadge({ grade, small }: { grade: RecipeGrade; small?: boolean }) {
+  const g = gradeInfo(grade);
+  return (
+    <span className={`grade-badge ${small ? "grade-badge--small" : ""}`} style={{ background: g.bg, color: g.fg }}>
+      {g.label}
+    </span>
   );
 }

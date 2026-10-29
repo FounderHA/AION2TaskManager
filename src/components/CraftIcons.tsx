@@ -1,6 +1,6 @@
 // Ícones originais da calculadora de craft (desenhados em SVG, sem arte do jogo).
 import { useId } from "react";
-import { gradeInfo, RARITY, type ItemIconId, type Rarity, type RecipeGrade, type RecipeIconId } from "../data/craft";
+import { gradeInfo, type CraftItem, type RecipeGrade, type RecipeIconId } from "../data/craft";
 
 /** Material comum: pedaço de minério cinza com facetas. */
 function CommonMaterialArt({ uid }: { uid: string }) {
@@ -127,14 +127,25 @@ function Frame({ size, border, glow, children, title }: { size: number; border: 
   );
 }
 
-export function ItemIcon({ icon, rarity, size = 48, title }: { icon: ItemIconId; rarity: Rarity; size?: number; title?: string }) {
+export function ItemIcon({ item, size = 48, title }: { item: Pick<CraftItem, "rarity" | "image" | "icon">; size?: number; title?: string }) {
   const uid = useId().replace(/:/g, "");
-  const color = RARITY[rarity].color;
+  const color = gradeInfo(item.rarity).fg;
   return (
-    <Frame size={size} border={`${color}66`} glow={`${color}22`} title={title}>
-      {icon === "common-material" && <CommonMaterialArt uid={uid} />}
-      {icon === "refining-stone" && <RefiningStoneArt uid={uid} />}
-    </Frame>
+    <span className="craft-icon" style={{ width: size, height: size, borderColor: `${color}88`, boxShadow: `inset 0 0 ${size / 4}px ${color}22` }} title={title}>
+      {item.image ? (
+        <img src={item.image} alt="" width={size} height={size} />
+      ) : (
+        <svg viewBox="0 0 64 64" width={size} height={size} aria-hidden="true">
+          {item.icon === "common-material" && <CommonMaterialArt uid={uid} />}
+          {item.icon === "refining-stone" && <RefiningStoneArt uid={uid} />}
+          {!item.icon && (
+            <text x="32" y="41" textAnchor="middle" fontSize="24" fill="#5a6b85" fontFamily="Noto Sans, sans-serif">
+              ?
+            </text>
+          )}
+        </svg>
+      )}
+    </span>
   );
 }
 

@@ -16,6 +16,7 @@ const data: AppData = {
   },
   settings: defaultSettings(),
   recipes: [],
+  craftItems: [],
 };
 
 describe("backup", () => {

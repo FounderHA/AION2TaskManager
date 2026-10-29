@@ -4,7 +4,7 @@ import { emptyData, ensureSingleMain, NAME_MAX, parseData, sortCharacters, type 
 import { addCharged, reanchor, rulesFor, snapshotFromInput, spend } from "./odyle";
 import { CUSTOM_PREFIX, resolveCatalog, TASK_DESC_MAX, TASK_NAME_MAX, type OdyleConfig, type ResolvedTask, type Settings, type ThemeChoice } from "./settings";
 import { loadRaw, saveRaw } from "./storage";
-import type { Recipe } from "./craft";
+import type { CraftItem, Recipe } from "./craft";
 import type { TaskDef } from "./types";
 import type { ResetConfig } from "../time/gameTime";
 
@@ -41,6 +41,9 @@ interface StoreValue {
   /** Cria ou atualiza uma receita (pelo id). */
   saveRecipe: (recipe: Recipe) => void;
   deleteRecipe: (id: string) => void;
+  /** Cria ou atualiza um item da lista da calculadora. */
+  saveCraftItem: (item: CraftItem) => void;
+  deleteCraftItem: (id: string) => void;
   setOdyleConfig: (cfg: OdyleConfig) => void;
   /** Corrige os valores atuais de Odyle Energy (null = parar de controlar). */
   setOdyle: (id: string, values: { basic: number; charged: number } | null) => void;
@@ -214,6 +217,17 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setData((d) => ({ ...d, recipes: d.recipes.filter((r) => r.id !== id) }));
   }, []);
 
+  const saveCraftItem = useCallback((item: CraftItem) => {
+    setData((d) => {
+      const exists = d.craftItems.some((i) => i.id === item.id);
+      return { ...d, craftItems: exists ? d.craftItems.map((i) => (i.id === item.id ? item : i)) : [...d.craftItems, item] };
+    });
+  }, []);
+  const deleteCraftItem = useCallback((id: string) => {
+    // As receitas que usavam o item mostram "item removido" até você tirar a linha
+    setData((d) => ({ ...d, craftItems: d.craftItems.filter((i) => i.id !== id) }));
+  }, []);
+
   const setTheme = useCallback((theme: ThemeChoice) => {
     setData((d) => ({ ...d, settings: { ...d.settings, theme } }));
   }, []);
@@ -271,12 +285,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setTheme,
       saveRecipe,
       deleteRecipe,
+      saveCraftItem,
+      deleteCraftItem,
       setOdyleConfig,
       setOdyle,
       spendOdyle,
       addChargedOdyle,
     };
-  }, [saveRecipe, deleteRecipe, setMembership, setTheme, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
+  }, [saveCraftItem, deleteCraftItem, saveRecipe, deleteRecipe, setMembership, setTheme, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

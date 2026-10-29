@@ -1,25 +1,25 @@
 // Calculadora de craft: lista de itens (catálogo fixo) e receitas salvas pelo usuário.
 
-export type Rarity = "common";
-
-export const RARITY: Record<Rarity, { label: string; color: string }> = {
-  common: { label: "Comum", color: "#e8ebef" },
-};
-
 export type ItemIconId = "common-material" | "refining-stone";
 export type RecipeIconId = "pauldron";
 
+/** Item da lista, criado pelo usuário (os dois primeiros vêm de exemplo e podem ser editados ou excluídos). */
 export interface CraftItem {
   id: string;
   name: string;
-  rarity: Rarity;
-  icon: ItemIconId;
+  rarity: RecipeGrade;
+  /** Imagem escolhida pelo usuário (data URL 96×96). */
+  image: string | null;
+  /** Ícone desenhado no app (usado quando não há imagem). */
+  icon?: ItemIconId;
 }
 
-/** Itens disponíveis para as receitas. */
-export const CRAFT_ITEMS: CraftItem[] = [
-  { id: "common-material", name: "Common Material", rarity: "common", icon: "common-material" },
-  { id: "refining-stone", name: "Refining Stone", rarity: "common", icon: "refining-stone" },
+export const ITEM_NAME_MAX = 40;
+export const ITEM_IMAGE_MAX = 300_000;
+
+export const DEFAULT_CRAFT_ITEMS: CraftItem[] = [
+  { id: "common-material", name: "Common Material", rarity: "common", image: null, icon: "common-material" },
+  { id: "refining-stone", name: "Refining Stone", rarity: "common", image: null, icon: "refining-stone" },
 ];
 
 /** Tipo (grau) da receita, com as cores dos selos do jogo. */
@@ -57,7 +57,6 @@ export const NUM_MAX = 999_999_999_999;
 export const lineTotal = (l: RecipeLine) => l.qty * l.price;
 export const recipeTotal = (lines: RecipeLine[]) => lines.reduce((n, l) => n + lineTotal(l), 0);
 export const formatKinah = (n: number) => Math.round(n).toLocaleString("en-US");
-export const itemById = (id: string) => CRAFT_ITEMS.find((i) => i.id === id);
 
 const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.min(NUM_MAX, Math.round(v)) : 0);
 
@@ -81,6 +80,27 @@ export function parseRecipes(raw: unknown): Recipe[] {
       grade: RECIPE_GRADES.some((g) => g.id === o.grade) ? (o.grade as RecipeGrade) : "common",
       lines,
       updatedAt: typeof o.updatedAt === "string" ? o.updatedAt : new Date().toISOString(),
+    });
+  }
+  return out;
+}
+
+const ICON_IDS: ItemIconId[] = ["common-material", "refining-stone"];
+
+/** Lê a lista de itens. Arquivo sem a lista (versões antigas) começa com os itens de exemplo. */
+export function parseCraftItems(raw: unknown): CraftItem[] {
+  if (!Array.isArray(raw)) return DEFAULT_CRAFT_ITEMS.map((i) => ({ ...i }));
+  const out: CraftItem[] = [];
+  for (const r of raw) {
+    if (!r || typeof r !== "object") continue;
+    const o = r as Record<string, unknown>;
+    if (typeof o.id !== "string" || typeof o.name !== "string" || !o.name.trim()) continue;
+    out.push({
+      id: o.id,
+      name: o.name.slice(0, ITEM_NAME_MAX),
+      rarity: RECIPE_GRADES.some((g) => g.id === o.rarity) ? (o.rarity as RecipeGrade) : "common",
+      image: typeof o.image === "string" && o.image.startsWith("data:image/") && o.image.length < ITEM_IMAGE_MAX ? o.image : null,
+      icon: ICON_IDS.includes(o.icon as ItemIconId) ? (o.icon as ItemIconId) : undefined,
     });
   }
   return out;

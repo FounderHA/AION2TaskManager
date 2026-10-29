@@ -20,7 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- Craft: removida a opção "Ordem de cadastro" da ordenação (pedido do usuário). Padrão agora é Raridade: Unique → Common; quem tinha "cadastro" salvo cai no padrão.
+- (nenhuma)
 
 ## Decisões de produto (já tomadas)
 
@@ -177,6 +177,9 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Ajustes da v2.0.1
+- Craft: removida a opção "Ordem de cadastro" da ordenação (pedido do usuário). Padrão agora é Raridade: Unique → Common; quem tinha "cadastro" salvo cai no padrão.
 
 ## Ajustes da v2.0.0
 - Craft: **ordenar a lista de itens** (seletor abaixo da busca): ordem de cadastro, raridade Unique → Common, raridade Common → Unique, nome A → Z, nome Z → A (empate por nome). A escolha fica lembrada no localStorage (`aion2tm-craft-ordem`).

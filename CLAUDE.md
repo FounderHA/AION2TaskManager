@@ -20,9 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- **Aba Guia** (nova, entre Histórico e Configurações; id `guia`): `screens/GuideScreen.tsx` + dados em `data/guide/statPriorities.ts`. Primeira seção: **Prioridade de status** transcrita (por prints do usuário em 28/10/2026) da aba "Stat Priorities" da planilha comunitária "Screamheart's Aion 2 Content Guide". Soul Binding por equipamento (Arma, Guarda, Elmo, Ombreiras, Peitoral, Grevas, Luvas, Capa, Botas, Brincos, Colar, Anéis; Cinto, Amuleto e Braceletes ainda sem dados na planilha), com ordem, Alvo/Opcional e chance aproximada (~%); Manastone/Soulstone; notas (breakpoint de Critical Hit/Accuracy, Precision vs Multi-hit). "Onde buscar cada status": chips que destacam os slots em que o status é alvo. Nomes de status em inglês (cliente). O resto da planilha (Checklist, Content Guide, Shops Guide, Gear Enhancement, Crafting…) fica para depois, uma aba de cada vez, a pedido do usuário.
-- Botão do modo compacto no cabeçalho virou só ícone (com dica ao passar o mouse) para caber a 7ª aba; abas com padding menor abaixo de 1560 px.
-- Neste ambiente o Google Sheets não abre (shell bloqueado, WebFetch só resume): pedir ao usuário CSV ou prints de cada aba.
+- (nenhuma)
 
 ## Decisões de produto (já tomadas)
 
@@ -178,6 +176,11 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Ajustes da v1.8.0
+- **Aba Guia** (nova, entre Histórico e Configurações; id `guia`): `screens/GuideScreen.tsx` + dados em `data/guide/statPriorities.ts`. Primeira seção: **Prioridade de status** transcrita (por prints do usuário em 28/10/2026) da aba "Stat Priorities" da planilha comunitária "Screamheart's Aion 2 Content Guide". Soul Binding por equipamento (Arma, Guarda, Elmo, Ombreiras, Peitoral, Grevas, Luvas, Capa, Botas, Brincos, Colar, Anéis; Cinto, Amuleto e Braceletes ainda sem dados na planilha), com ordem, Alvo/Opcional e chance aproximada (~%); Manastone/Soulstone; notas (breakpoint de Critical Hit/Accuracy, Precision vs Multi-hit). "Onde buscar cada status": chips que destacam os slots em que o status é alvo. Nomes de status em inglês (cliente). O resto da planilha (Checklist, Content Guide, Shops Guide, Gear Enhancement, Crafting…) fica para depois, uma aba de cada vez, a pedido do usuário.
+- Botão do modo compacto no cabeçalho virou só ícone (com dica ao passar o mouse) para caber a 7ª aba; abas com padding menor abaixo de 1560 px.
+- Neste ambiente o Google Sheets não abre (shell bloqueado, WebFetch só resume): pedir ao usuário CSV ou prints de cada aba.
 
 ## Ajustes da v1.7.0
 - **Daily Dungeon virou semanal** ("14 entradas por semana", cadência `semanal`, mesmo id). Marcações antigas por dia ficam guardadas mas não aparecem mais.

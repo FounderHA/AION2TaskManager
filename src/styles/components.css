@@ -2875,3 +2875,13 @@
   color: var(--text-soft);
   word-break: break-all;
 }
+.item-filters {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  margin-top: 12px;
+}
+.item-filters .input,
+.item-filters .select {
+  width: 100%;
+}

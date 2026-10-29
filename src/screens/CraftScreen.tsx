@@ -30,6 +30,27 @@ function NumberField({ value, onChange, label, placeholder }: { value: number; o
   );
 }
 
+type ItemSort = "cadastro" | "raridade-desc" | "raridade-asc" | "az" | "za";
+const SORT_KEY = "aion2tm-craft-ordem";
+const SORT_LABELS: Record<ItemSort, string> = {
+  cadastro: "Ordem de cadastro",
+  "raridade-desc": "Raridade: Unique → Common",
+  "raridade-asc": "Raridade: Common → Unique",
+  az: "Nome: A → Z",
+  za: "Nome: Z → A",
+};
+const RANK: Record<RecipeGrade, number> = { common: 0, rare: 1, epic: 2, unique: 3 };
+const byName = (a: CraftItem, b: CraftItem) => a.name.localeCompare(b.name, "pt-BR", { sensitivity: "base" });
+
+function sortItems(list: CraftItem[], sort: ItemSort): CraftItem[] {
+  const out = [...list];
+  if (sort === "az") out.sort(byName);
+  else if (sort === "za") out.sort((a, b) => byName(b, a));
+  else if (sort === "raridade-desc") out.sort((a, b) => RANK[b.rarity] - RANK[a.rarity] || byName(a, b));
+  else if (sort === "raridade-asc") out.sort((a, b) => RANK[a.rarity] - RANK[b.rarity] || byName(a, b));
+  return out;
+}
+
 /** Formulário de item: nome, raridade (cor padrão) e imagem do ícone. */
 function ItemEditor({ initial, isNew, usedIn, onSave, onCancel, onDelete }: { initial: CraftItem; isNew: boolean; usedIn: number; onSave: (item: CraftItem) => void; onCancel: () => void; onDelete: () => void }) {
   const [item, setItem] = useState<CraftItem>(initial);
@@ -126,11 +147,27 @@ export function CraftScreen({ appVersion }: { appVersion: string }) {
   const [message, setMessage] = useState("");
   const [nameError, setNameError] = useState(false);
   const [search, setSearch] = useState("");
+  const [sort, setSortState] = useState<ItemSort>(() => {
+    try {
+      const v = localStorage.getItem(SORT_KEY);
+      return v && v in SORT_LABELS ? (v as ItemSort) : "cadastro";
+    } catch {
+      return "cadastro";
+    }
+  });
+  const setSort = (v: ItemSort) => {
+    setSortState(v);
+    try {
+      localStorage.setItem(SORT_KEY, v);
+    } catch {
+      /* sem armazenamento */
+    }
+  };
 
   const saved = recipes.find((r) => r.id === draft.id);
   const dirty = saved ? !sameRecipe(saved, draft) : draft.name !== "" || draft.lines.length > 0;
   const total = recipeTotal(draft.lines);
-  const items = craftItems.filter((i) => i.name.toLowerCase().includes(search.trim().toLowerCase()));
+  const items = sortItems(craftItems.filter((i) => i.name.toLowerCase().includes(search.trim().toLowerCase())), sort);
 
   const open = (target: Recipe | "new") => {
     setConfirmDelete(false);
@@ -344,7 +381,16 @@ export function CraftScreen({ appVersion }: { appVersion: string }) {
             </div>
           )}
           {exportMsg && <p className="craft-export-msg">{exportMsg}</p>}
-          <input style={{ marginTop: 12 }} className="input" placeholder="Buscar item…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Buscar item" />
+          <div className="item-filters">
+            <input className="input" placeholder="Buscar item…" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Buscar item" />
+            <select className="select" value={sort} onChange={(e) => setSort(e.target.value as ItemSort)} aria-label="Ordenar lista" title="Ordenar lista">
+              {(Object.keys(SORT_LABELS) as ItemSort[]).map((k) => (
+                <option key={k} value={k}>
+                  {SORT_LABELS[k]}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="item-list">
             {items.map((it) => {
               const inRecipe = draft.lines.some((l) => l.itemId === it.id);

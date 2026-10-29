@@ -3,6 +3,7 @@ import { Alert, AppHeader, type TabItem } from "./components/ui";
 import { CharactersScreen } from "./screens/CharactersScreen";
 import { HistoryScreen } from "./screens/HistoryScreen";
 import { OdyleScreen } from "./screens/OdyleScreen";
+import { GuideScreen } from "./screens/GuideScreen";
 import { RuneBackdrop } from "./components/RuneBackdrop";
 import { CompactView } from "./screens/CompactView";
 import { DayCompleteFx } from "./components/DayCompleteFx";
@@ -17,7 +18,7 @@ import { currentOdyle, rulesFor } from "./data/odyle";
 import { UpdateBanner, VersionFooter } from "./updater/UpdateBanner";
 import { useUpdater } from "./updater/useUpdater";
 
-type TabId = "personagem" | "progresso" | "odyle" | "personagens" | "historico" | "configuracoes";
+type TabId = "personagem" | "progresso" | "odyle" | "guia" | "personagens" | "historico" | "configuracoes";
 
 const BASE_TABS: TabItem<TabId>[] = [
   { id: "progresso", label: "Progresso" },
@@ -25,6 +26,7 @@ const BASE_TABS: TabItem<TabId>[] = [
   { id: "odyle", label: "Odyle" },
   { id: "personagens", label: "Cadastro" },
   { id: "historico", label: "Histórico" },
+  { id: "guia", label: "Guia" },
   { id: "configuracoes", label: "Configurações" },
 ];
 
@@ -120,11 +122,10 @@ function App() {
         onTabChange={setTab}
         resets={resets}
         actions={
-          <button type="button" className="header-btn" onClick={goCompact} title="Modo compacto: janela pequena, sempre por cima do jogo">
+          <button type="button" className="header-btn" onClick={goCompact} title="Modo compacto: janela pequena, sempre por cima do jogo" aria-label="Modo compacto">
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
               <path d="M6 2v4H2M10 2v4h4M6 14v-4H2M10 14v-4h4" fill="none" stroke="currentColor" strokeWidth="1.4" />
             </svg>
-            Compacto
           </button>
         }
       />
@@ -149,6 +150,8 @@ function App() {
         />
       ) : tab === "odyle" ? (
         <OdyleScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
+      ) : tab === "guia" ? (
+        <GuideScreen />
       ) : tab === "personagens" ? (
         <CharactersScreen />
       ) : (

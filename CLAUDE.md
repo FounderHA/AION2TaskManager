@@ -20,7 +20,9 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- **Aba Guia** (nova, entre Histórico e Configurações; id `guia`): `screens/GuideScreen.tsx` + dados em `data/guide/statPriorities.ts`. Primeira seção: **Prioridade de status** transcrita (por prints do usuário em 28/10/2026) da aba "Stat Priorities" da planilha comunitária "Screamheart's Aion 2 Content Guide". Soul Binding por equipamento (Arma, Guarda, Elmo, Ombreiras, Peitoral, Grevas, Luvas, Capa, Botas, Brincos, Colar, Anéis; Cinto, Amuleto e Braceletes ainda sem dados na planilha), com ordem, Alvo/Opcional e chance aproximada (~%); Manastone/Soulstone; notas (breakpoint de Critical Hit/Accuracy, Precision vs Multi-hit). "Onde buscar cada status": chips que destacam os slots em que o status é alvo. Nomes de status em inglês (cliente). O resto da planilha (Checklist, Content Guide, Shops Guide, Gear Enhancement, Crafting…) fica para depois, uma aba de cada vez, a pedido do usuário.
+- Botão do modo compacto no cabeçalho virou só ícone (com dica ao passar o mouse) para caber a 7ª aba; abas com padding menor abaixo de 1560 px.
+- Neste ambiente o Google Sheets não abre (shell bloqueado, WebFetch só resume): pedir ao usuário CSV ou prints de cada aba.
 
 ## Decisões de produto (já tomadas)
 
@@ -138,6 +140,7 @@ src/
   screens/TaskEditorSection.tsx Editor de tarefas: ligar/desligar, editar descrição, criar/excluir tarefas próprias
   screens/ResetSection.tsx      Horário do reset diário (hora local do PC) e dia do reset semanal
   data/settings.ts              Settings (reset, ajustes por tarefa, tarefas próprias), parseSettings, resolveCatalog (testado)
+  screens/GuideScreen.tsx       Aba Guia (prioridade de status; dados em data/guide/)
   screens/CharactersScreen.tsx  Aba Personagens: cadastro, edição, exclusão, Main/Alt, GS/CP e Odyle inicial
   screens/OdyleScreen.tsx       Aba Odyle: Basic/Charged por personagem, gastar −40/−80, Charged +40/+10, desfazer, corrigir
   screens/AccountSection.tsx    Configurações → Conta: Membership da conta e números da Odyle

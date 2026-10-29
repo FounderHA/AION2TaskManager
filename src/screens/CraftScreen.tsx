@@ -30,10 +30,9 @@ function NumberField({ value, onChange, label, placeholder }: { value: number; o
   );
 }
 
-type ItemSort = "cadastro" | "raridade-desc" | "raridade-asc" | "az" | "za";
+type ItemSort = "raridade-desc" | "raridade-asc" | "az" | "za";
 const SORT_KEY = "aion2tm-craft-ordem";
 const SORT_LABELS: Record<ItemSort, string> = {
-  cadastro: "Ordem de cadastro",
   "raridade-desc": "Raridade: Unique → Common",
   "raridade-asc": "Raridade: Common → Unique",
   az: "Nome: A → Z",
@@ -47,7 +46,7 @@ function sortItems(list: CraftItem[], sort: ItemSort): CraftItem[] {
   if (sort === "az") out.sort(byName);
   else if (sort === "za") out.sort((a, b) => byName(b, a));
   else if (sort === "raridade-desc") out.sort((a, b) => RANK[b.rarity] - RANK[a.rarity] || byName(a, b));
-  else if (sort === "raridade-asc") out.sort((a, b) => RANK[a.rarity] - RANK[b.rarity] || byName(a, b));
+  else out.sort((a, b) => RANK[a.rarity] - RANK[b.rarity] || byName(a, b));
   return out;
 }
 
@@ -150,9 +149,9 @@ export function CraftScreen({ appVersion }: { appVersion: string }) {
   const [sort, setSortState] = useState<ItemSort>(() => {
     try {
       const v = localStorage.getItem(SORT_KEY);
-      return v && v in SORT_LABELS ? (v as ItemSort) : "cadastro";
+      return v && v in SORT_LABELS ? (v as ItemSort) : "raridade-desc";
     } catch {
-      return "cadastro";
+      return "raridade-desc";
     }
   });
   const setSort = (v: ItemSort) => {

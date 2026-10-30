@@ -1,7 +1,15 @@
 // Calculadora de craft: lista de itens (catálogo fixo) e receitas salvas pelo usuário.
 
 export type ItemIconId = "common-material" | "refining-stone";
-export type RecipeIconId = "pauldron";
+export type RecipeArtId = "pauldron";
+
+/** Ícone de receita: imagem escolhida pelo usuário ou desenho do app. */
+export interface RecipeIconDef {
+  id: string;
+  name: string;
+  image: string | null;
+  art?: RecipeArtId;
+}
 
 /** Item da lista, criado pelo usuário (os dois primeiros vêm de exemplo e podem ser editados ou excluídos). */
 export interface CraftItem {
@@ -28,7 +36,6 @@ export const RECIPE_GRADES: { id: RecipeGrade; label: string; bg: string; fg: st
 ];
 export const gradeInfo = (g: RecipeGrade) => RECIPE_GRADES.find((x) => x.id === g) ?? RECIPE_GRADES[0];
 
-export const RECIPE_ICONS: { id: RecipeIconId; label: string }[] = [{ id: "pauldron", label: "Ombreira" }];
 
 export interface RecipeLine {
   itemId: string;
@@ -41,7 +48,8 @@ export interface RecipeLine {
 export interface Recipe {
   id: string;
   name: string;
-  icon: RecipeIconId;
+  /** Id do ícone (RecipeIconDef). */
+  icon: string;
   grade: RecipeGrade;
   lines: RecipeLine[];
   updatedAt: string;
@@ -72,7 +80,7 @@ export function parseRecipes(raw: unknown): Recipe[] {
     out.push({
       id: o.id,
       name: o.name.slice(0, RECIPE_NAME_MAX) || "Receita",
-      icon: RECIPE_ICONS.some((i) => i.id === o.icon) ? (o.icon as RecipeIconId) : "pauldron",
+      icon: typeof o.icon === "string" && o.icon ? o.icon : "pauldron",
       grade: RECIPE_GRADES.some((g) => g.id === o.grade) ? (o.grade as RecipeGrade) : "common",
       lines,
       updatedAt: typeof o.updatedAt === "string" ? o.updatedAt : new Date().toISOString(),
@@ -106,22 +114,41 @@ export function parseCraftItems(raw: unknown): CraftItem[] {
  * Junta os itens do usuário com a lista padrão do app: itens padrão que o usuário ainda não tem
  * (e não excluiu) entram no fim. Itens que ele já tem, editados ou não, ficam como estão.
  */
-export function mergeBuiltinItems(userItems: CraftItem[], hidden: string[], builtin: CraftItem[]): CraftItem[] {
+export function mergeBuiltinItems<T extends { id: string }>(userItems: T[], hidden: string[], builtin: T[]): T[] {
   const have = new Set(userItems.map((i) => i.id));
   const skip = new Set(hidden);
   return [...userItems, ...builtin.filter((b) => !have.has(b.id) && !skip.has(b.id)).map((b) => ({ ...b }))];
 }
 
-/** Arquivo exportado com a lista de itens. */
-export function makeItemsExport(items: CraftItem[], appVersion: string): string {
-  return JSON.stringify({ app: "Aion 2 Manager", tipo: "itens-craft", exportadoEm: new Date().toISOString(), versaoApp: appVersion, itens: items }, null, 2);
+const ART_IDS: RecipeArtId[] = ["pauldron"];
+
+/** Lê a lista de ícones de receita. */
+export function parseRecipeIcons(raw: unknown): RecipeIconDef[] {
+  if (!Array.isArray(raw)) return [];
+  const out: RecipeIconDef[] = [];
+  for (const r of raw) {
+    if (!r || typeof r !== "object") continue;
+    const o = r as Record<string, unknown>;
+    if (typeof o.id !== "string" || typeof o.name !== "string" || !o.name.trim()) continue;
+    const image = typeof o.image === "string" && o.image.startsWith("data:image/") && o.image.length < ITEM_IMAGE_MAX ? o.image : null;
+    const art = ART_IDS.includes(o.art as RecipeArtId) ? (o.art as RecipeArtId) : undefined;
+    if (!image && !art) continue;
+    out.push({ id: o.id, name: o.name.slice(0, ITEM_NAME_MAX), image, art });
+  }
+  return out;
 }
 
-export function readItemsExport(text: string): CraftItem[] | null {
+/** Arquivo exportado com a lista de itens e os ícones de receita (para virar lista padrão do app). */
+export function makeCraftExport(items: CraftItem[], icons: RecipeIconDef[], appVersion: string): string {
+  return JSON.stringify({ app: "Aion 2 Manager", tipo: "listas-calc-craft", exportadoEm: new Date().toISOString(), versaoApp: appVersion, itens: items, icones: icons }, null, 2);
+}
+
+/** Lê um arquivo exportado (aceita também o formato antigo só com itens). */
+export function readCraftExport(text: string): { items: CraftItem[]; icons: RecipeIconDef[] } | null {
   try {
     const o = JSON.parse(text);
-    if (o?.tipo !== "itens-craft") return null;
-    return parseCraftItems(o.itens);
+    if (o?.tipo !== "listas-calc-craft" && o?.tipo !== "itens-craft") return null;
+    return { items: parseCraftItems(o.itens), icons: parseRecipeIcons(o.icones) };
   } catch {
     return null;
   }

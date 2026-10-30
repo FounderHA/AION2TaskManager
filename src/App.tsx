@@ -25,7 +25,7 @@ const BASE_TABS: TabItem<TabId>[] = [
   { id: "progresso", label: "Progresso" },
   { id: "personagem", label: "Personagem" },
   { id: "odyle", label: "Odyle" },
-  { id: "craft", label: "Craft" },
+  { id: "craft", label: "Calc Craft" },
   { id: "personagens", label: "Cadastro" },
   { id: "historico", label: "Histórico" },
   { id: "guia", label: "Guia" },
@@ -153,7 +153,7 @@ function App() {
       ) : tab === "odyle" ? (
         <OdyleScreen clock={clock} onGoToCharacters={() => setTab("personagens")} />
       ) : tab === "craft" ? (
-        <CraftScreen appVersion={updater.currentVersion} />
+        <CraftScreen />
       ) : tab === "guia" ? (
         <GuideScreen />
       ) : tab === "personagens" ? (

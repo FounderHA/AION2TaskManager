@@ -4,8 +4,8 @@ import { emptyData, ensureSingleMain, NAME_MAX, parseData, sortCharacters, type 
 import { addCharged, reanchor, rulesFor, snapshotFromInput, spend } from "./odyle";
 import { CUSTOM_PREFIX, resolveCatalog, TASK_DESC_MAX, TASK_NAME_MAX, type OdyleConfig, type ResolvedTask, type Settings, type ThemeChoice } from "./settings";
 import { loadRaw, saveRaw } from "./storage";
-import type { CraftItem, Recipe } from "./craft";
-import { BUILTIN_CRAFT_ITEMS } from "./craftCatalog";
+import type { CraftItem, Recipe, RecipeIconDef } from "./craft";
+import { BUILTIN_CRAFT_ITEMS, BUILTIN_RECIPE_ICONS } from "./craftCatalog";
 import type { TaskDef } from "./types";
 import type { ResetConfig } from "../time/gameTime";
 
@@ -45,6 +45,8 @@ interface StoreValue {
   /** Cria ou atualiza um item da lista da calculadora. */
   saveCraftItem: (item: CraftItem) => void;
   deleteCraftItem: (id: string) => void;
+  saveRecipeIcon: (icon: RecipeIconDef) => void;
+  deleteRecipeIcon: (id: string) => void;
   setOdyleConfig: (cfg: OdyleConfig) => void;
   /** Corrige os valores atuais de Odyle Energy (null = parar de controlar). */
   setOdyle: (id: string, values: { basic: number; charged: number } | null) => void;
@@ -234,6 +236,20 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const saveRecipeIcon = useCallback((icon: RecipeIconDef) => {
+    setData((d) => {
+      const exists = d.recipeIcons.some((i) => i.id === icon.id);
+      return { ...d, recipeIcons: exists ? d.recipeIcons.map((i) => (i.id === icon.id ? icon : i)) : [...d.recipeIcons, icon] };
+    });
+  }, []);
+  const deleteRecipeIcon = useCallback((id: string) => {
+    setData((d) => ({
+      ...d,
+      recipeIcons: d.recipeIcons.filter((i) => i.id !== id),
+      recipeIconsHidden: BUILTIN_RECIPE_ICONS.some((b) => b.id === id) && !d.recipeIconsHidden.includes(id) ? [...d.recipeIconsHidden, id] : d.recipeIconsHidden,
+    }));
+  }, []);
+
   const setTheme = useCallback((theme: ThemeChoice) => {
     setData((d) => ({ ...d, settings: { ...d.settings, theme } }));
   }, []);
@@ -293,12 +309,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       deleteRecipe,
       saveCraftItem,
       deleteCraftItem,
+      saveRecipeIcon,
+      deleteRecipeIcon,
       setOdyleConfig,
       setOdyle,
       spendOdyle,
       addChargedOdyle,
     };
-  }, [saveCraftItem, deleteCraftItem, saveRecipe, deleteRecipe, setMembership, setTheme, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
+  }, [saveRecipeIcon, deleteRecipeIcon, saveCraftItem, deleteCraftItem, saveRecipe, deleteRecipe, setMembership, setTheme, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

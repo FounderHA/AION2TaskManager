@@ -20,7 +20,9 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- Aba **Craft renomeada para "Calc Craft"** (id interno continua `craft`). Abas com padding/fonte menores abaixo de 1640 px e 1280 px para as 8 abas caberem numa linha (conferido de 1100 a 1920 px).
+- **Ícones de receita cadastráveis** (igual aos itens): `AppData.recipeIcons` (`RecipeIconDef {id, name, image, art?}`, `parseRecipeIcons`) + `recipeIconsHidden`; lista padrão `BUILTIN_RECIPE_ICONS` em `data/craftCatalog.ts` (por enquanto só a Ombreira desenhada, `art: "pauldron"`), juntada com `mergeBuiltinItems` (genérico). Na receita, linha "Ícone" com a grade de ícones + botão "+" (nome + imagem do PC, 96×96); "Editar ícone" no selecionado (duplo clique também), excluir em dois cliques (receitas que usavam mostram "?"). `Recipe.icon` agora é o id de um ícone (string).
+- **Exportar saiu da aba e foi para Configurações → Calc Craft** (`screens/CalcCraftSection.tsx`): um botão "Exportar itens e ícones" gera `calc-craft-AAAA-MM-DD.json` (`tipo: "listas-calc-craft"`, `itens` + `icones`; `makeCraftExport`/`readCraftExport`, que também lê o formato antigo `itens-craft`). Quando o usuário mandar o arquivo: itens → `BUILTIN_CRAFT_ITEMS`, ícones → `BUILTIN_RECIPE_ICONS` (mantendo os ids; imagens como arquivos em `src/assets/craft/`).
 
 ## Decisões de produto (já tomadas)
 
@@ -138,7 +140,8 @@ src/
   screens/TaskEditorSection.tsx Editor de tarefas: ligar/desligar, editar descrição, criar/excluir tarefas próprias
   screens/ResetSection.tsx      Horário do reset diário (hora local do PC) e dia do reset semanal
   data/settings.ts              Settings (reset, ajustes por tarefa, tarefas próprias), parseSettings, resolveCatalog (testado)
-  screens/CraftScreen.tsx       Aba Craft (calculadora de receitas; data/craft.ts, components/CraftIcons.tsx)
+  screens/CraftScreen.tsx       Aba Calc Craft (calculadora de receitas; data/craft.ts, data/craftCatalog.ts, components/CraftIcons.tsx)
+  screens/CalcCraftSection.tsx  Configurações → Calc Craft: exportar itens e ícones de receita
   screens/GuideScreen.tsx       Aba Guia (prioridade de status; dados em data/guide/)
   screens/CharactersScreen.tsx  Aba Personagens: cadastro, edição, exclusão, Main/Alt, GS/CP e Odyle inicial
   screens/OdyleScreen.tsx       Aba Odyle: Basic/Charged por personagem, gastar −40/−80, Charged +40/+10, desfazer, corrigir

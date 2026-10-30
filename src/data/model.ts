@@ -1,8 +1,8 @@
 // Modelo dos dados salvos em dados.json (e no backup da Etapa 10).
 import type { CharacterRole } from "./types";
 import { defaultSettings, parseSettings, type Settings } from "./settings";
-import { mergeBuiltinItems, parseCraftItems, parseRecipes, type CraftItem, type Recipe } from "./craft";
-import { BUILTIN_CRAFT_ITEMS } from "./craftCatalog";
+import { mergeBuiltinItems, parseCraftItems, parseRecipeIcons, parseRecipes, type CraftItem, type Recipe, type RecipeIconDef } from "./craft";
+import { BUILTIN_CRAFT_ITEMS, BUILTIN_RECIPE_ICONS } from "./craftCatalog";
 
 /** Tamanho máximo do texto da foto (data URL). */
 export const PHOTO_MAX = 250_000;
@@ -77,13 +77,17 @@ export interface AppData {
   craftItems: CraftItem[];
   /** Ids de itens da lista padrão que o usuário excluiu (não voltam ao atualizar). */
   craftHidden: string[];
+  /** Ícones disponíveis para as receitas (lista padrão + os do usuário). */
+  recipeIcons: RecipeIconDef[];
+  /** Ids de ícones da lista padrão que o usuário excluiu. */
+  recipeIconsHidden: string[];
 }
 
 export const SCHEMA_VERSION = 1 as const;
 export const NAME_MAX = 24;
 
 export function emptyData(): AppData {
-  return { schemaVersion: SCHEMA_VERSION, characters: [], checks: {}, settings: defaultSettings(), recipes: [], craftItems: mergeBuiltinItems([], [], BUILTIN_CRAFT_ITEMS), craftHidden: [] };
+  return { schemaVersion: SCHEMA_VERSION, characters: [], checks: {}, settings: defaultSettings(), recipes: [], craftItems: mergeBuiltinItems([], [], BUILTIN_CRAFT_ITEMS), craftHidden: [], recipeIcons: mergeBuiltinItems([], [], BUILTIN_RECIPE_ICONS), recipeIconsHidden: [] };
 }
 
 /** Lê o JSON salvo com tolerância: campos estranhos são ignorados, faltantes recebem padrão. */
@@ -115,7 +119,8 @@ export function parseData(raw: string | null | undefined): AppData {
       }
     }
     const craftHidden: string[] = Array.isArray(obj?.craftHidden) ? obj.craftHidden.filter((x: unknown) => typeof x === "string") : [];
-    return { schemaVersion: SCHEMA_VERSION, characters: ensureSingleMain(characters), checks, settings: parseSettings(obj?.settings, { membership: legacyMember }), recipes: parseRecipes(obj?.recipes), craftItems: mergeBuiltinItems(parseCraftItems(obj?.craftItems), craftHidden, BUILTIN_CRAFT_ITEMS), craftHidden };
+    const recipeIconsHidden: string[] = Array.isArray(obj?.recipeIconsHidden) ? obj.recipeIconsHidden.filter((x: unknown) => typeof x === "string") : [];
+    return { schemaVersion: SCHEMA_VERSION, characters: ensureSingleMain(characters), checks, settings: parseSettings(obj?.settings, { membership: legacyMember }), recipes: parseRecipes(obj?.recipes), craftItems: mergeBuiltinItems(parseCraftItems(obj?.craftItems), craftHidden, BUILTIN_CRAFT_ITEMS), craftHidden, recipeIcons: mergeBuiltinItems(parseRecipeIcons(obj?.recipeIcons), recipeIconsHidden, BUILTIN_RECIPE_ICONS), recipeIconsHidden };
   } catch {
     return emptyData();
   }

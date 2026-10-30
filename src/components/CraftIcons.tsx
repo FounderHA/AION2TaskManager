@@ -1,6 +1,6 @@
 // Ícones originais da calculadora de craft (desenhados em SVG, sem arte do jogo).
 import { useId } from "react";
-import { gradeInfo, type CraftItem, type RecipeGrade, type RecipeIconId } from "../data/craft";
+import { gradeInfo, type CraftItem, type RecipeGrade, type RecipeIconDef } from "../data/craft";
 
 /** Material comum: pedaço de minério cinza com facetas. */
 function CommonMaterialArt({ uid }: { uid: string }) {
@@ -149,11 +149,25 @@ export function ItemIcon({ item, size = 48, title }: { item: Pick<CraftItem, "ra
   );
 }
 
-export function RecipeIcon({ icon, size = 48 }: { icon: RecipeIconId; size?: number }) {
+/** Ícone de receita: imagem do usuário, desenho do app, ou "?" se o ícone foi excluído. */
+export function RecipeIcon({ icon, size = 48 }: { icon: RecipeIconDef | undefined; size?: number }) {
   const uid = useId().replace(/:/g, "");
+  if (icon?.image) {
+    return (
+      <span className="craft-icon" style={{ width: size, height: size, borderColor: "rgba(224,180,82,.6)", boxShadow: `inset 0 0 ${size / 4}px rgba(224,180,82,.18)` }} title={icon.name}>
+        <img src={icon.image} alt="" width={size} height={size} />
+      </span>
+    );
+  }
   return (
-    <Frame size={size} border="rgba(224,180,82,.6)" glow="rgba(224,180,82,.18)">
-      {icon === "pauldron" && <PauldronArt uid={uid} />}
+    <Frame size={size} border="rgba(224,180,82,.6)" glow="rgba(224,180,82,.18)" title={icon?.name}>
+      {icon?.art === "pauldron" ? (
+        <PauldronArt uid={uid} />
+      ) : (
+        <text x="32" y="41" textAnchor="middle" fontSize="24" fill="#5a6b85" fontFamily="Noto Sans, sans-serif">
+          ?
+        </text>
+      )}
     </Frame>
   );
 }

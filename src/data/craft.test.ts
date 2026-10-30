@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeItemsExport, mergeBuiltinItems, readItemsExport, type CraftItem } from "./craft";
+import { makeCraftExport, mergeBuiltinItems, readCraftExport, type CraftItem, type RecipeIconDef } from "./craft";
 
 const builtin: CraftItem[] = [
   { id: "a", name: "A", rarity: "common", image: null },
@@ -28,10 +28,11 @@ describe("lista padrão de itens", () => {
 describe("exportar lista", () => {
   it("ida e volta", () => {
     const items: CraftItem[] = [{ id: "x", name: "Radiant Odyle", rarity: "unique", image: "data:image/png;base64,AAA" }];
-    expect(readItemsExport(makeItemsExport(items, "1.9.0"))).toEqual(items);
+    const icons: RecipeIconDef[] = [{ id: "i1", name: "Maça", image: "data:image/png;base64,BBB" }];
+    expect(readCraftExport(makeCraftExport(items, icons, "2.1.0"))).toEqual({ items, icons });
   });
   it("recusa arquivo de outro tipo", () => {
-    expect(readItemsExport('{"tipo":"backup"}')).toBeNull();
-    expect(readItemsExport("não é json")).toBeNull();
+    expect(readCraftExport('{"tipo":"backup"}')).toBeNull();
+    expect(readCraftExport("não é json")).toBeNull();
   });
 });

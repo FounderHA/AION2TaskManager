@@ -9,6 +9,7 @@ import { useStore } from "../data/store";
 import { dayLabel } from "../time/gameTime";
 import { AccountSection } from "./AccountSection";
 import { AppearanceSection } from "./AppearanceSection";
+import { CalcCraftSection } from "./CalcCraftSection";
 import { ResetSection } from "./ResetSection";
 import { StatIconsSection } from "./StatIconsSection";
 import { TaskEditorSection } from "./TaskEditorSection";
@@ -167,6 +168,8 @@ export function SettingsScreen({ appVersion }: { appVersion: string }) {
       <StatIconsSection />
 
       <ResetSection />
+
+      <CalcCraftSection appVersion={appVersion} />
 
       <Panel label="Local dos dados">
         <SectionTitle>Local dos dados</SectionTitle>

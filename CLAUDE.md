@@ -20,7 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- **Lista padrão do Calc Craft preenchida** com o arquivo do usuário `calc-craft-2026-10-30.json`: **34 itens** e **18 ícones de receita** (SpellBook, Guard, Staff, Necklace, Earrings, Ring — 3 de cada). Imagens salvas em `src/assets/craft/itens/<id>.png` e `src/assets/craft/icones/<id>.png`, importadas com `?inline` (viram data URL, então continuam válidas quando a pessoa salva e o app relê o dados.json). Ids mantidos (os mesmos do app do usuário, sem duplicar). Os exemplos antigos (Common Material/Refining Stone desenhados) saíram da lista padrão. Corrigido o nome "Enhanced Duranble Balaur Scale" → "Enhanced Durable Balaur Scale" na lista padrão (a cópia salva no app do usuário mantém o nome que ele tinha). O JS do app passou de ~0,4 MB para ~2 MB por causa das imagens.
 
 ## Decisões de produto (já tomadas)
 

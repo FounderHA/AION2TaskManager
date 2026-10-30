@@ -20,7 +20,8 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- Calc Craft: **escolha de ícone recolhida**. A grade de ícones não fica mais à mostra: clicar no quadrado do ícone da receita ("Escolher ícone"/"Trocar ícone") abre a lista; escolher um fecha. Cada ícone tem lápis para editar (aparece ao passar o mouse), "+" para novo e "Deixar a receita sem ícone".
+- **Sem ícone padrão**: a Ombreira desenhada foi removida (`BUILTIN_RECIPE_ICONS = []`, `PauldronArt` apagado). `RecipeIconDef` agora é só `{id, name, image}`; ícones salvos sem imagem são descartados ao ler. Receita nova começa sem ícone (moldura tracejada vazia); receitas que usavam a Ombreira ficam sem ícone.
 
 ## Decisões de produto (já tomadas)
 

@@ -10,4 +10,4 @@ export const BUILTIN_CRAFT_ITEMS: CraftItem[] = [
 ];
 
 /** Ícones de receita que vêm com o app. */
-export const BUILTIN_RECIPE_ICONS: RecipeIconDef[] = [{ id: "pauldron", name: "Ombreira", image: null, art: "pauldron" }];
+export const BUILTIN_RECIPE_ICONS: RecipeIconDef[] = [];

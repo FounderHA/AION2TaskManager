@@ -8,7 +8,7 @@ import { useStore } from "../data/store";
 import { pickImage } from "../components/pickImage";
 
 const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : `r-${Date.now()}-${Math.random().toString(36).slice(2)}`);
-const blank = (): Recipe => ({ id: newId(), name: "", icon: "pauldron", grade: "common", lines: [], updatedAt: "" });
+const blank = (): Recipe => ({ id: newId(), name: "", icon: "", grade: "common", lines: [], updatedAt: "" });
 const sameRecipe = (a: Recipe, b: Recipe) => a.name === b.name && a.icon === b.icon && a.grade === b.grade && JSON.stringify(a.lines) === JSON.stringify(b.lines);
 
 /** Campo numérico com separador de milhar. */
@@ -49,8 +49,8 @@ function sortItems(list: CraftItem[], sort: ItemSort): CraftItem[] {
 }
 
 /** Formulário de ícone de receita: nome + imagem. */
-function IconEditor({ initial, isNew, usedIn, onSave, onCancel, onDelete }: { initial: RecipeIconDef; isNew: boolean; usedIn: number; onSave: (icon: RecipeIconDef) => void; onCancel: () => void; onDelete: () => void }) {
-  const [icon, setIcon] = useState<RecipeIconDef>(initial);
+function IconEditor({ initial, isNew, usedIn, onSave, onCancel, onDelete }: { initial: { id: string; name: string; image: string | null }; isNew: boolean; usedIn: number; onSave: (icon: RecipeIconDef) => void; onCancel: () => void; onDelete: () => void }) {
+  const [icon, setIcon] = useState<{ id: string; name: string; image: string | null }>(initial);
   const [error, setError] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
   const choose = async () => {
@@ -59,7 +59,7 @@ function IconEditor({ initial, isNew, usedIn, onSave, onCancel, onDelete }: { in
       const url = await pickImage({ size: 96, fit: "contain" });
       if (!url) return;
       if (url.length >= ITEM_IMAGE_MAX) setError("Imagem grande demais, tente outra.");
-      else setIcon((i) => ({ ...i, image: url, art: undefined }));
+      else setIcon((i) => ({ ...i, image: url }));
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     }
@@ -67,15 +67,15 @@ function IconEditor({ initial, isNew, usedIn, onSave, onCancel, onDelete }: { in
   const save = () => {
     const name = icon.name.trim();
     if (!name) return setError("Dê um nome para o ícone (ex.: Maça, Ombreira).");
-    if (!icon.image && !icon.art) return setError("Escolha uma imagem para o ícone.");
-    onSave({ ...icon, name });
+    if (!icon.image) return setError("Escolha uma imagem para o ícone.");
+    onSave({ id: icon.id, name, image: icon.image });
   };
   return (
     <div className="item-editor" style={{ marginTop: 10 }}>
       <div className="item-editor__top">
         <button type="button" className="item-editor__image" onClick={choose} title="Escolher imagem do ícone">
-          <RecipeIcon icon={icon.image || icon.art ? icon : undefined} size={64} />
-          <span>{icon.image || icon.art ? "Trocar" : "Imagem"}</span>
+          <RecipeIcon icon={icon.image ? { id: icon.id, name: icon.name, image: icon.image } : undefined} size={64} />
+          <span>{icon.image ? "Trocar" : "Imagem"}</span>
         </button>
         <div className="field" style={{ flex: 1, minWidth: 0 }}>
           <label className="field__label" htmlFor="icon-name">
@@ -186,7 +186,8 @@ export function CraftScreen() {
   const [editingItem, setEditingItem] = useState<CraftItem | null>(null);
   const recipeIcons = data.recipeIcons;
   const iconById = (id: string) => recipeIcons.find((i) => i.id === id);
-  const [editingIcon, setEditingIcon] = useState<RecipeIconDef | null>(null);
+  const [editingIcon, setEditingIcon] = useState<{ id: string; name: string; image: string | null } | null>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const recipes = useMemo(() => [...data.recipes].sort((a, b) => b.updatedAt.localeCompare(a.updatedAt)), [data.recipes]);
   const [draft, setDraft] = useState<Recipe>(blank);
   const [pendingOpen, setPendingOpen] = useState<Recipe | "new" | null>(null);
@@ -222,6 +223,8 @@ export function CraftScreen() {
     setNameError(false);
     setPendingOpen(null);
     setDraft(target === "new" ? blank() : { ...target, lines: target.lines.map((l) => ({ ...l })) });
+    setPickerOpen(false);
+    setEditingIcon(null);
   };
   const requestOpen = (target: Recipe | "new") => {
     if (dirty && !(target !== "new" && target.id === draft.id)) setPendingOpen(target);
@@ -308,7 +311,10 @@ export function CraftScreen() {
 
           <div className="recipe-head">
             <div className="recipe-head__icon">
-              <RecipeIcon icon={iconById(draft.icon)} size={64} />
+              <button type="button" className={`recipe-icon-btn ${pickerOpen ? "recipe-icon-btn--open" : ""}`} onClick={() => setPickerOpen((o) => !o)} title="Escolher ícone da receita" aria-expanded={pickerOpen} aria-label="Escolher ícone da receita">
+                <RecipeIcon icon={iconById(draft.icon)} size={64} />
+                <span>{iconById(draft.icon) ? "Trocar ícone" : "Escolher ícone"}</span>
+              </button>
             </div>
             <div className="field" style={{ flex: 1 }}>
               <label className="field__label" htmlFor="recipe-name">
@@ -337,51 +343,69 @@ export function CraftScreen() {
             </div>
           </div>
 
-          <div className="recipe-icons">
-            <span className="grade-picker__label">Ícone</span>
-            <div className="recipe-icons__grid" role="radiogroup" aria-label="Ícone da receita">
-              {recipeIcons.map((ic) => (
-                <button
-                  key={ic.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={draft.icon === ic.id}
-                  title={ic.name}
-                  className={`recipe-icons__opt ${draft.icon === ic.id ? "recipe-icons__opt--on" : ""}`}
-                  onClick={() => setDraft((d) => ({ ...d, icon: ic.id }))}
-                  onDoubleClick={() => setEditingIcon({ ...ic })}
-                >
-                  <RecipeIcon icon={ic} size={36} />
-                </button>
-              ))}
-              <button type="button" className="recipe-icons__add" onClick={() => setEditingIcon({ id: newId(), name: "", image: null })} title="Novo ícone de receita" aria-label="Novo ícone de receita">
-                +
-              </button>
+          {(pickerOpen || editingIcon) && (
+            <div className="recipe-icons">
+              {pickerOpen && (
+                <>
+                  <span className="grade-picker__label">Ícones de receita</span>
+                  {recipeIcons.length === 0 && <p className="craft-empty">Nenhum ícone ainda. Use + para adicionar o primeiro.</p>}
+                  <div className="recipe-icons__grid" role="radiogroup" aria-label="Ícone da receita">
+                    {recipeIcons.map((ic) => (
+                      <div key={ic.id} className={`recipe-icons__cell ${draft.icon === ic.id ? "recipe-icons__cell--on" : ""}`}>
+                        <button
+                          type="button"
+                          role="radio"
+                          aria-checked={draft.icon === ic.id}
+                          title={ic.name}
+                          className="recipe-icons__opt"
+                          onClick={() => {
+                            setDraft((d) => ({ ...d, icon: ic.id }));
+                            setPickerOpen(false);
+                          }}
+                        >
+                          <RecipeIcon icon={ic} size={44} />
+                          <span className="recipe-icons__name">{ic.name}</span>
+                        </button>
+                        <button type="button" className="recipe-icons__edit" onClick={() => setEditingIcon({ ...ic })} title={`Editar ${ic.name}`} aria-label={`Editar ícone ${ic.name}`}>
+                          <svg width="12" height="12" viewBox="0 0 16 16" aria-hidden="true">
+                            <path d="M11 2l3 3-8 8H3v-3z" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                      </div>
+                    ))}
+                    <button type="button" className="recipe-icons__add" onClick={() => setEditingIcon({ id: newId(), name: "", image: null })} title="Novo ícone de receita" aria-label="Novo ícone de receita">
+                      +
+                    </button>
+                  </div>
+                  {draft.icon && (
+                    <button type="button" className="item-editor__link" onClick={() => setDraft((d) => ({ ...d, icon: "" }))}>
+                      Deixar a receita sem ícone
+                    </button>
+                  )}
+                </>
+              )}
+              {editingIcon && (
+                <IconEditor
+                  key={editingIcon.id}
+                  initial={editingIcon}
+                  isNew={!recipeIcons.some((i) => i.id === editingIcon.id)}
+                  usedIn={recipes.filter((r) => r.icon === editingIcon.id).length}
+                  onCancel={() => setEditingIcon(null)}
+                  onSave={(ic) => {
+                    saveRecipeIcon(ic);
+                    setDraft((d) => ({ ...d, icon: ic.id }));
+                    setEditingIcon(null);
+                    setPickerOpen(false);
+                  }}
+                  onDelete={() => {
+                    deleteRecipeIcon(editingIcon.id);
+                    if (draft.icon === editingIcon.id) setDraft((d) => ({ ...d, icon: "" }));
+                    setEditingIcon(null);
+                  }}
+                />
+              )}
             </div>
-            {iconById(draft.icon) && !editingIcon && (
-              <button type="button" className="item-editor__link" onClick={() => setEditingIcon({ ...iconById(draft.icon)! })}>
-                Editar ícone "{iconById(draft.icon)!.name}"
-              </button>
-            )}
-            {editingIcon && (
-              <IconEditor
-                key={editingIcon.id}
-                initial={editingIcon}
-                isNew={!recipeIcons.some((i) => i.id === editingIcon.id)}
-                usedIn={recipes.filter((r) => r.icon === editingIcon.id).length}
-                onCancel={() => setEditingIcon(null)}
-                onSave={(ic) => {
-                  saveRecipeIcon(ic);
-                  setDraft((d) => ({ ...d, icon: ic.id }));
-                  setEditingIcon(null);
-                }}
-                onDelete={() => {
-                  deleteRecipeIcon(editingIcon.id);
-                  setEditingIcon(null);
-                }}
-              />
-            )}
-          </div>
+          )}
 
           <div className="recipe-lines">
             <div className="recipe-line recipe-line--head">

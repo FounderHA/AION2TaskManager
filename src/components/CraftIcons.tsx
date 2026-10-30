@@ -35,56 +35,6 @@ function CommonMaterialArt({ uid }: { uid: string }) {
   );
 }
 
-/** Ombreira de metal com placas sobrepostas (representação original). */
-function PauldronArt({ uid }: { uid: string }) {
-  return (
-    <g>
-      <defs>
-        <linearGradient id={`${uid}-m`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#e3e4e2" />
-          <stop offset=".55" stopColor="#9c9f9f" />
-          <stop offset="1" stopColor="#55595c" />
-        </linearGradient>
-        <linearGradient id={`${uid}-d`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#8b8f90" />
-          <stop offset="1" stopColor="#3f4346" />
-        </linearGradient>
-      </defs>
-      <ellipse cx="33" cy="58" rx="20" ry="3" fill="rgba(0,0,0,.45)" />
-      <g transform="translate(1 3) rotate(-24 32 34) scale(1.12 0.92) translate(-3 2)">
-      {/* espinhos ao longo da borda superior */}
-      {[
-        [13, 24],
-        [18, 17],
-        [25, 12],
-        [33, 9],
-        [41, 9],
-        [49, 12],
-      ].map(([x, y], i) => (
-        <path key={i} d={`M${x - 3} ${y + 4} L${x} ${y - 4} L${x + 4} ${y + 3} Z`} fill="#6f7375" stroke="#25282b" strokeWidth=".8" strokeLinejoin="round" />
-      ))}
-      {/* casco principal, inclinado como uma ombreira vista de lado */}
-      <path d="M8 31 C 9 17, 27 8, 44 11 C 54 13, 59 21, 57 31 C 49 28, 38 28, 28 31 C 20 33, 13 34, 8 31 Z" fill={`url(#${uid}-m)`} stroke="#25282b" strokeWidth="1.2" strokeLinejoin="round" />
-      {/* lamelas (placas sobrepostas) */}
-      <path d="M10 33 C 21 37, 40 32, 57 33 L 55 41 C 40 40, 24 44, 13 41 Z" fill="#9a9d9e" stroke="#25282b" strokeWidth="1" strokeLinejoin="round" />
-      <path d="M14 42 C 26 45, 40 41, 54 42 L 51 49 C 40 48, 27 52, 17 49 Z" fill="#7f8384" stroke="#25282b" strokeWidth="1" strokeLinejoin="round" />
-      <path d="M18 50 C 28 53, 39 50, 50 50 L 47 56 C 38 56, 29 58, 21 56 Z" fill="#666a6c" stroke="#25282b" strokeWidth="1" strokeLinejoin="round" />
-      {/* friso e rebites */}
-      <path d="M12 28 C 24 24, 42 23, 54 26" fill="none" stroke="#3a3e41" strokeWidth="1.4" />
-      {[16, 26, 36, 46].map((x, i) => (
-        <circle key={x} cx={x} cy={[26.5, 24.6, 24, 24.6][i]} r="1.3" fill="#e0e1de" stroke="#2b2e31" strokeWidth=".6" />
-      ))}
-      {[22, 34, 46].map((x) => (
-        <circle key={x} cx={x} cy={x === 34 ? 37.3 : 37.8} r="1" fill="#d0d1ce" stroke="#2b2e31" strokeWidth=".5" />
-      ))}
-      {/* brilho */}
-      <path d="M15 21 C 22 15, 31 13, 39 13" fill="none" stroke="#ffffff" strokeOpacity=".75" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M16 35 C 26 37, 38 34, 50 34" fill="none" stroke="#ffffff" strokeOpacity=".35" strokeWidth="1" strokeLinecap="round" />
-      </g>
-    </g>
-  );
-}
-
 /** Pedra de refino: esfera de vidro com redemoinho prateado. */
 function RefiningStoneArt({ uid }: { uid: string }) {
   return (
@@ -149,27 +99,16 @@ export function ItemIcon({ item, size = 48, title }: { item: Pick<CraftItem, "ra
   );
 }
 
-/** Ícone de receita: imagem do usuário, desenho do app, ou "?" se o ícone foi excluído. */
+/** Ícone de receita: imagem do usuário, ou moldura vazia quando a receita ainda não tem ícone. */
 export function RecipeIcon({ icon, size = 48 }: { icon: RecipeIconDef | undefined; size?: number }) {
-  const uid = useId().replace(/:/g, "");
-  if (icon?.image) {
+  if (icon) {
     return (
       <span className="craft-icon" style={{ width: size, height: size, borderColor: "rgba(224,180,82,.6)", boxShadow: `inset 0 0 ${size / 4}px rgba(224,180,82,.18)` }} title={icon.name}>
         <img src={icon.image} alt="" width={size} height={size} />
       </span>
     );
   }
-  return (
-    <Frame size={size} border="rgba(224,180,82,.6)" glow="rgba(224,180,82,.18)" title={icon?.name}>
-      {icon?.art === "pauldron" ? (
-        <PauldronArt uid={uid} />
-      ) : (
-        <text x="32" y="41" textAnchor="middle" fontSize="24" fill="#5a6b85" fontFamily="Noto Sans, sans-serif">
-          ?
-        </text>
-      )}
-    </Frame>
-  );
+  return <span className="craft-icon craft-icon--empty" style={{ width: size, height: size, borderColor: "rgba(160,180,210,.35)" }} />;
 }
 
 /** Ícone para um item que não existe mais no catálogo. */

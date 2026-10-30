@@ -1,14 +1,11 @@
 // Calculadora de craft: lista de itens (catálogo fixo) e receitas salvas pelo usuário.
 
 export type ItemIconId = "common-material" | "refining-stone";
-export type RecipeArtId = "pauldron";
-
-/** Ícone de receita: imagem escolhida pelo usuário ou desenho do app. */
+/** Ícone de receita cadastrado pelo usuário (nome + imagem). */
 export interface RecipeIconDef {
   id: string;
   name: string;
-  image: string | null;
-  art?: RecipeArtId;
+  image: string;
 }
 
 /** Item da lista, criado pelo usuário (os dois primeiros vêm de exemplo e podem ser editados ou excluídos). */
@@ -80,7 +77,7 @@ export function parseRecipes(raw: unknown): Recipe[] {
     out.push({
       id: o.id,
       name: o.name.slice(0, RECIPE_NAME_MAX) || "Receita",
-      icon: typeof o.icon === "string" && o.icon ? o.icon : "pauldron",
+      icon: typeof o.icon === "string" ? o.icon : "",
       grade: RECIPE_GRADES.some((g) => g.id === o.grade) ? (o.grade as RecipeGrade) : "common",
       lines,
       updatedAt: typeof o.updatedAt === "string" ? o.updatedAt : new Date().toISOString(),
@@ -120,8 +117,6 @@ export function mergeBuiltinItems<T extends { id: string }>(userItems: T[], hidd
   return [...userItems, ...builtin.filter((b) => !have.has(b.id) && !skip.has(b.id)).map((b) => ({ ...b }))];
 }
 
-const ART_IDS: RecipeArtId[] = ["pauldron"];
-
 /** Lê a lista de ícones de receita. */
 export function parseRecipeIcons(raw: unknown): RecipeIconDef[] {
   if (!Array.isArray(raw)) return [];
@@ -131,9 +126,9 @@ export function parseRecipeIcons(raw: unknown): RecipeIconDef[] {
     const o = r as Record<string, unknown>;
     if (typeof o.id !== "string" || typeof o.name !== "string" || !o.name.trim()) continue;
     const image = typeof o.image === "string" && o.image.startsWith("data:image/") && o.image.length < ITEM_IMAGE_MAX ? o.image : null;
-    const art = ART_IDS.includes(o.art as RecipeArtId) ? (o.art as RecipeArtId) : undefined;
-    if (!image && !art) continue;
-    out.push({ id: o.id, name: o.name.slice(0, ITEM_NAME_MAX), image, art });
+    // Ícones sem imagem (como a antiga Ombreira desenhada no app) são descartados
+    if (!image) continue;
+    out.push({ id: o.id, name: o.name.slice(0, ITEM_NAME_MAX), image });
   }
   return out;
 }

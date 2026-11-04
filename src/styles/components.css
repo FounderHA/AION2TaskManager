@@ -3353,3 +3353,74 @@
   margin: 12px 0 0;
   color: var(--text-soft);
 }
+
+/* ---------- Guia: essenciais de dano PvE (Soul Binding) ---------- */
+.pve-intro {
+  margin: 0 0 14px;
+  color: var(--text-soft);
+}
+.pve-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 10px;
+}
+.pve-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(160, 180, 210, 0.16);
+  background: rgba(8, 14, 24, 0.45);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.pve-card:hover {
+  border-color: rgba(var(--accent-rgb), 0.4);
+}
+.pve-card--on {
+  border-color: rgba(var(--accent-rgb), 0.7);
+  background: rgba(var(--accent-rgb), 0.08);
+}
+.pve-card__piece {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+.pve-card__stats,
+.pve-essentials__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.pve-chip {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ffd98a;
+  background: rgba(224, 180, 82, 0.12);
+  border: 1px solid rgba(224, 180, 82, 0.4);
+}
+.pve-chip--hl {
+  background: rgba(224, 180, 82, 0.32);
+  color: #fff3d6;
+}
+.pve-essentials {
+  margin-top: 14px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(224, 180, 82, 0.28);
+  background: rgba(224, 180, 82, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pve-essentials__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #f0c86a;
+}

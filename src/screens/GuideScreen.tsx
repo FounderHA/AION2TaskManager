@@ -1,6 +1,7 @@
 // Aba Guia: informações de referência. Primeira seção: prioridade de status por equipamento.
 import { useState, type ReactNode } from "react";
 import { GenusInsightGuide } from "./GenusInsightGuide";
+import { SOULBIND_PVE, soulbindPveFor } from "../data/guide/soulbindPve";
 import { Panel, SectionTitle } from "../components/ui";
 import { GEAR_SLOTS, GUIDE_SOURCE, SLOT_GROUPS, STONE_STATS, targetStats, type StatRow } from "../data/guide/statPriorities";
 
@@ -34,6 +35,7 @@ function StatPrioritiesGuide({ nav }: { nav: ReactNode }) {
   const slot = GEAR_SLOTS.find((s) => s.id === slotId) ?? GEAR_SLOTS[0];
   const same = GEAR_SLOTS.filter((s) => s.id !== slot.id && s.stats.length && s.stats === slot.stats);
   const stats = targetStats();
+  const pve = soulbindPveFor(slot.id);
   const hasStat = (id: string) => !!stat && !!GEAR_SLOTS.find((s) => s.id === id)?.stats.some((r) => r.target && r.stat === stat);
 
   return (
@@ -104,6 +106,18 @@ function StatPrioritiesGuide({ nav }: { nav: ReactNode }) {
           {slot.stats.length ? (
             <>
               <PriorityList rows={slot.stats} highlight={stat} />
+              {pve && (
+                <div className="pve-essentials">
+                  <span className="pve-essentials__label">✦ Essenciais para dano PvE</span>
+                  <div className="pve-essentials__chips">
+                    {pve.stats.map((st) => (
+                      <span key={st} className="pve-chip">
+                        {st}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
               {same.length > 0 && <p className="slot-detail__note">Mesma prioridade de: {same.map((s) => s.name).join(", ")}.</p>}
               {(slot.id === "weapon" || slot.id === "guard") && (
                 <div className="guide-callout">
@@ -116,6 +130,28 @@ function StatPrioritiesGuide({ nav }: { nav: ReactNode }) {
           )}
         </Panel>
       </div>
+
+      <Panel label="Dano PvE">
+        <SectionTitle aside="Soul Binding · status essenciais por peça">Essenciais para dano PvE</SectionTitle>
+        <p className="pve-intro">Resumo rápido do que não pode faltar em cada peça quando o foco é dano em PvE. Clique numa peça para ver a prioridade completa acima.</p>
+        <div className="pve-grid">
+          {SOULBIND_PVE.map((e) => {
+            const on = e.slots.includes(slot.id);
+            return (
+              <button key={e.piece} type="button" className={`pve-card ${on ? "pve-card--on" : ""}`} onClick={() => setSlotId(e.slots[0])} aria-pressed={on}>
+                <span className="pve-card__piece">{e.piece}</span>
+                <span className="pve-card__stats">
+                  {e.stats.map((st) => (
+                    <span key={st} className={`pve-chip ${stat === st ? "pve-chip--hl" : ""}`}>
+                      {st}
+                    </span>
+                  ))}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </Panel>
 
       <Panel label="Manastone e Soulstone">
         <SectionTitle aside="Valem para todos os itens">Manastone / Soulstone</SectionTitle>

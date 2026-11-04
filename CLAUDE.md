@@ -20,7 +20,8 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- **Aba Guia com sub-abas** (`GuideScreen`: "Stat Priorities" = conteúdo antigo, "Genus Insight" = novo; escolha lembrada no localStorage `aion2tm-guia-aba`).
+- **Genus Insight** (`screens/GenusInsightGuide.tsx`, dados em `data/guide/genusInsight.ts`), transcrito das páginas 2–6 do PDF "Soulbind and Genus Important PvE Damage stats" (Google Drive do usuário, 04/11/2026). Layout como no jogo: medalhões pequenos das 5 categorias (Cogni, Fera, Natura, Varian, Special) em arco à esquerda, medalhão grande no centro com arco prateado e os 9 slots em volta (slot 1 no topo, descendo pela esquerda, de 30° em 30°, igual ao jogo), orbes na cor da prioridade de lock (First vermelho, Second amarelo, Third azul), painel "Insight" à direita com status, faixa e valor máximo; passar o mouse liga orbe ↔ linha. Tabela comparando os slots 4 e 7 (os únicos que mudam entre categorias). **Arte dos medalhões recortada dos prints do jogo enviados pelo usuário** (`src/assets/genus/*.webp`; decisão dele, uso pessoal, ciente de que o repo é público). A página 1 do PDF (Soulbind por peça) ainda não entrou.
 
 ## Decisões de produto (já tomadas)
 

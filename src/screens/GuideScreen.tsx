@@ -1,5 +1,6 @@
 // Aba Guia: informações de referência. Primeira seção: prioridade de status por equipamento.
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { GenusInsightGuide } from "./GenusInsightGuide";
 import { Panel, SectionTitle } from "../components/ui";
 import { GEAR_SLOTS, GUIDE_SOURCE, SLOT_GROUPS, STONE_STATS, targetStats, type StatRow } from "../data/guide/statPriorities";
 
@@ -27,7 +28,7 @@ function PriorityList({ rows, highlight }: { rows: StatRow[]; highlight: string 
   );
 }
 
-export function GuideScreen() {
+function StatPrioritiesGuide({ nav }: { nav: ReactNode }) {
   const [slotId, setSlotId] = useState("weapon");
   const [stat, setStat] = useState<string | null>(null);
   const slot = GEAR_SLOTS.find((s) => s.id === slotId) ?? GEAR_SLOTS[0];
@@ -37,6 +38,7 @@ export function GuideScreen() {
 
   return (
     <div className="page">
+      {nav}
       <Panel label="Guia">
         <SectionTitle aside={<span className="guide-source">Fonte: {GUIDE_SOURCE.title} · transcrito em {GUIDE_SOURCE.date}</span>}>Guia · Prioridade de status</SectionTitle>
         <div className="guide-intro">
@@ -130,4 +132,45 @@ export function GuideScreen() {
       </p>
     </div>
   );
+}
+
+type GuideTab = "status" | "genus";
+const GUIDE_TABS: { id: GuideTab; label: string }[] = [
+  { id: "status", label: "Stat Priorities" },
+  { id: "genus", label: "Genus Insight" },
+];
+const GUIDE_TAB_KEY = "aion2tm-guia-aba";
+
+function readGuideTab(): GuideTab {
+  try {
+    const v = localStorage.getItem(GUIDE_TAB_KEY);
+    if (v === "status" || v === "genus") return v;
+  } catch {
+    /* sem localStorage */
+  }
+  return "status";
+}
+
+/** Aba Guia, dividida em sub-abas. */
+export function GuideScreen() {
+  const [tab, setTab] = useState(readGuideTab);
+  const choose = (t: GuideTab) => {
+    setTab(t);
+    try {
+      localStorage.setItem(GUIDE_TAB_KEY, t);
+    } catch {
+      /* ok */
+    }
+  };
+  const nav = (
+    <div className="subtabs" role="tablist" aria-label="Seções do guia">
+      {GUIDE_TABS.map((t) => (
+        <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} className={`subtab ${tab === t.id ? "subtab--on" : ""}`} onClick={() => choose(t.id)}>
+          <span className="subtab__gem" aria-hidden="true" />
+          {t.label}
+        </button>
+      ))}
+    </div>
+  );
+  return tab === "genus" ? <GenusInsightGuide nav={nav} /> : <StatPrioritiesGuide nav={nav} />;
 }

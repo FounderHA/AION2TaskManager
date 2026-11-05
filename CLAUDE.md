@@ -20,7 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- **Aba Simuladores** (nova, depois do Calc Craft; id `simuladores`): a página **"Forja de Raridades"** do usuário (artifact https://claude.ai/artifact/TijmdkYLer9wsUu6EhD2pV, versão de 05/11/2026) embutida **igual ao original** num iframe (`screens/SimulatorsScreen.tsx` → `public/forja/index.html`). Tem as 4 abas dela: Forja de Raridades (roleta de evolução Cinza → Verde → Azul → Dourado com quebra), Festival Shugo (cartas + minigames Toca dos Pipos, Memória dos Itens, Corrida nas Nuvens), Roleta de Seleção (Conquest/Transcendence) e Sorteio do Grupo. Visual, som e dados próprios (localStorage dela: `forja-tab`, `grupo-nomes`); não usa o dados.json nem o backup do app. Fontes (Cinzel, Cormorant SC, IBM Plex Mono, Noto Sans) copiadas do @fontsource para `public/forja/fonts` (o app funciona offline). O iframe ocupa a janela até embaixo e fica montado depois da primeira visita (trocar de aba não perde a simulação). **Para atualizar** quando o usuário mudar a página: baixar o HTML (Artifact read) e rodar `python3 scripts/import-forja.py <arquivo.html>`. 9 abas cabem numa linha de 1024 a 1920 px.
+- (nenhuma)
 
 ## Decisões de produto (já tomadas)
 
@@ -178,6 +178,9 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Primeiro build leva ~10–15 min (compila Rust do zero); depois há cache.
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
+
+## Ajustes da v2.4.0
+- **Aba Simuladores** (nova, depois do Calc Craft; id `simuladores`): a página **"Forja de Raridades"** do usuário (artifact https://claude.ai/artifact/TijmdkYLer9wsUu6EhD2pV, versão de 05/11/2026) embutida **igual ao original** num iframe (`screens/SimulatorsScreen.tsx` → `public/forja/index.html`). Tem as 4 abas dela: Forja de Raridades (roleta de evolução Cinza → Verde → Azul → Dourado com quebra), Festival Shugo (cartas + minigames Toca dos Pipos, Memória dos Itens, Corrida nas Nuvens), Roleta de Seleção (Conquest/Transcendence) e Sorteio do Grupo. Visual, som e dados próprios (localStorage dela: `forja-tab`, `grupo-nomes`); não usa o dados.json nem o backup do app. Fontes (Cinzel, Cormorant SC, IBM Plex Mono, Noto Sans) copiadas do @fontsource para `public/forja/fonts` (o app funciona offline). O iframe ocupa a janela até embaixo e fica montado depois da primeira visita (trocar de aba não perde a simulação). **Para atualizar** quando o usuário mudar a página: baixar o HTML (Artifact read) e rodar `python3 scripts/import-forja.py <arquivo.html>`. 9 abas cabem numa linha de 1024 a 1920 px.
 
 ## Ajustes da v2.3.0
 - **Aba Guia com sub-abas** (`GuideScreen`: "Stat Priorities" = conteúdo antigo, "Genus Insight" = novo; escolha lembrada no localStorage `aion2tm-guia-aba`).

@@ -3424,3 +3424,17 @@
   font-weight: 700;
   color: #f0c86a;
 }
+
+/* ---------- Aba Simuladores (Forja de Raridades em iframe) ---------- */
+.sim-screen {
+  padding: 0 0 8px;
+}
+.sim-frame {
+  display: block;
+  width: 100%;
+  height: calc(100vh - 180px);
+  border: 1px solid rgba(201, 163, 90, 0.35);
+  border-radius: 6px;
+  background: #060914;
+  box-shadow: 0 10px 40px -18px rgba(0, 0, 0, 0.9);
+}

@@ -20,7 +20,12 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- **Aba Horários** (nova, depois da Odyle; id `horarios`; `screens/TimersScreen.tsx`, lista em `components/TimerList.tsx`, lógica em `data/timers.ts` + `timers.test.ts`). Lista de eventos e chefes **ordenada pelo próximo** (acontecendo agora → chefes de respawn já nascidos → próximo a começar), com contagem (min:seg abaixo de 1h), horário no relógio do PC ("hoje 09:30", "amanhã", "sex") e **barra** que enche até a hora do evento (janela máx. 24h; listrada enquanto acontece). Selos AGORA / JÁ JÁ (≤10 min) / NASCEU. Filtro Todos/Chefes/Eventos; "Escolher eventos" liga/desliga cada um.
+  - **Relógio dos servidores Global = GMT+9** (reset 16:00 lá = 07:00 UTC = 04:00 Brasília). `TIMER_CATALOG` com horários do servidor (fontes allthings.how e aion2hub.com, 06/11/2026): Watcher Kaira a cada 3h desde 01:00; Executors Argo/Kaira/Tamasa seg/qui/sáb 21:30; Guardian Lord Nahma (Abyss Siege Boss) sex/dom 21:00; Dramos/Marakha/Ducal (Middle Reshanta, desligado: incerto no Global); Artifact Siege seg/qui/sáb 21:00; Spacetime Rift a cada 3h desde 00:00 (10 min); Arena of Tactics 11–14h e 19–21h; Shugo Festival (toda hora) e Dimensional Invasion (:30) desligados por padrão. Durações de chefes/cerco = 30 min (estimativa).
+  - **Chefes de campo por respawn** (Melted Danar 1h, Silent Dartan 6h, Soul Ruler Kashapa 6h, High Commander Lagta 12h, Immortal Gartua 12h): painel com "Matei agora / há X min" e "Limpar"; a contagem entra na lista; quando renasce aparece NASCEU com botão "Matei" na própria linha.
+  - Guardado em `settings.timers = { enabled: {id: bool}, kills: {id: ISO} }` (`parseTimerSettings`, vai no backup). Ids estáveis.
+  - **Modo compacto com duas visões**: "Tarefas" (como era) e "Horários" (só a lista, versão enxuta); escolha lembrada em `aion2tm-compacto-aba`.
+  - Ideias para depois: editar horários pelo app, aviso/notificação do Windows X min antes.
 
 ## Decisões de produto (já tomadas)
 

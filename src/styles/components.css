@@ -3438,3 +3438,379 @@
   background: #060914;
   box-shadow: 0 10px 40px -18px rgba(0, 0, 0, 0.9);
 }
+
+/* ---------- Aba Horários (timers de eventos e chefes) ---------- */
+.tm-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.tm-filters {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 8px;
+  background: rgba(8, 14, 24, 0.55);
+  border: 1px solid rgba(160, 180, 210, 0.16);
+}
+.tm-filter {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tm-filter--on {
+  color: var(--text-strong);
+  background: rgba(var(--accent-rgb), 0.16);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.45);
+}
+.tm-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.tm-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tm-legend i {
+  width: 9px;
+  height: 9px;
+  transform: rotate(45deg);
+  background: var(--c);
+  box-shadow: 0 0 6px var(--c);
+}
+.tm-legend__note {
+  margin-left: auto;
+}
+.tm-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tm-empty,
+.tm-hint {
+  color: var(--text-muted);
+  margin: 4px 0 10px;
+  font-size: 13.5px;
+}
+.tm-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 12px 1fr auto auto;
+  align-items: center;
+  gap: 4px 14px;
+  padding: 12px 16px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(160, 180, 210, 0.14);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 10%, rgba(8, 14, 24, 0.6)), rgba(8, 14, 24, 0.55) 45%);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.tm-row:first-child:not(.tm-row--compact) {
+  padding-block: 16px 18px;
+  border-color: color-mix(in srgb, var(--c) 55%, transparent);
+  box-shadow: 0 0 24px -12px var(--c);
+}
+.tm-row:first-child:not(.tm-row--compact) .tm-row__count {
+  font-size: 30px;
+}
+.tm-row__dot {
+  width: 10px;
+  height: 10px;
+  transform: rotate(45deg);
+  background: var(--c);
+  box-shadow: 0 0 8px var(--c);
+}
+.tm-row__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.tm-row__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--text-strong);
+  font-size: 15.5px;
+}
+.tm-row__tag {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding: 1px 7px;
+  border-radius: 4px;
+  color: #10141a;
+  background: var(--c);
+}
+.tm-row__sub {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.tm-row__when {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.15;
+}
+.tm-row__count {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-strong);
+  font-variant-numeric: tabular-nums;
+}
+.tm-row__time {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.tm-row__kill {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--c) 60%, transparent);
+  background: color-mix(in srgb, var(--c) 14%, transparent);
+  color: var(--text-strong);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.tm-row:not(.tm-row--spawned) .tm-row__kill {
+  display: none;
+}
+.tm-row__bar {
+  grid-column: 2 / -1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+  margin-top: 4px;
+}
+.tm-row__bar span {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 40%, transparent), var(--c));
+  box-shadow: 0 0 8px var(--c);
+  transition: width 1s linear;
+}
+.tm-row--soon {
+  border-color: rgba(255, 170, 60, 0.6);
+  box-shadow: 0 0 22px -8px rgba(255, 170, 60, 0.8);
+}
+.tm-row--soon .tm-row__count {
+  color: #ffc46b;
+}
+.tm-row--live {
+  border-color: var(--c);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--c) 26%, rgba(8, 14, 24, 0.6)), rgba(8, 14, 24, 0.55) 70%);
+  animation: tm-live 1.8s ease-in-out infinite;
+}
+.tm-row--live .tm-row__bar span {
+  background: repeating-linear-gradient(-45deg, var(--c) 0 8px, color-mix(in srgb, var(--c) 60%, #fff) 8px 16px);
+}
+.tm-row--spawned {
+  border-style: dashed;
+  border-color: color-mix(in srgb, var(--c) 70%, transparent);
+}
+@keyframes tm-live {
+  50% {
+    box-shadow: 0 0 26px -6px var(--c);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tm-row--live {
+    animation: none;
+  }
+}
+
+/* Lista no modo compacto: só nome, contagem e horário */
+.tm-list--compact {
+  gap: 5px;
+}
+.tm-row--compact {
+  grid-template-columns: 8px 1fr auto auto;
+  gap: 2px 8px;
+  padding: 7px 10px 8px;
+  border-radius: 7px;
+}
+.tm-row--compact .tm-row__dot {
+  width: 7px;
+  height: 7px;
+}
+.tm-row--compact .tm-row__name {
+  font-size: 13px;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.tm-row--compact .tm-row__tag {
+  font-size: 9px;
+  padding: 0 5px;
+  margin-left: 6px;
+  vertical-align: 1px;
+}
+.tm-row--compact .tm-row__count {
+  font-size: 15px;
+}
+.tm-row--compact .tm-row__time {
+  font-size: 11px;
+}
+.tm-row--compact .tm-row__bar {
+  height: 4px;
+  margin-top: 2px;
+}
+.tm-row--compact:first-child {
+  border-color: color-mix(in srgb, var(--c) 55%, transparent);
+}
+.tm-row--compact:first-child .tm-row__count {
+  font-size: 19px;
+}
+.compact__views {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 8px;
+  background: rgba(8, 14, 24, 0.55);
+  border: 1px solid rgba(160, 180, 210, 0.16);
+}
+.compact__view {
+  flex: 1;
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.compact__view--on {
+  color: var(--text-strong);
+  background: rgba(var(--accent-rgb), 0.16);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.45);
+}
+.compact__timers {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* Chefes de campo (respawn) */
+.tm-respawn {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 10px;
+}
+.tm-boss {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(160, 180, 210, 0.16);
+  background: rgba(8, 14, 24, 0.5);
+}
+.tm-boss--spawned {
+  border-color: color-mix(in srgb, var(--c) 70%, transparent);
+  box-shadow: 0 0 18px -8px var(--c);
+}
+.tm-boss__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.tm-boss__name {
+  font-weight: 700;
+  color: var(--text-strong);
+}
+.tm-boss__hours {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c);
+}
+.tm-boss__place,
+.tm-boss__state {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+.tm-boss__state b {
+  color: var(--text-strong);
+}
+.tm-boss--spawned .tm-boss__state b {
+  color: var(--c);
+}
+.tm-boss__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+.tm-boss__ago {
+  width: auto;
+  padding: 4px 8px;
+  font-size: 12.5px;
+}
+
+/* Configuração: quais horários mostrar */
+.tm-cfg {
+  margin-bottom: 14px;
+}
+.tm-cfg__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--c);
+  margin-bottom: 6px;
+}
+.tm-cfg__row {
+  display: grid;
+  grid-template-columns: 20px minmax(200px, 1fr) minmax(220px, auto);
+  gap: 2px 12px;
+  align-items: baseline;
+  padding: 7px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.tm-cfg__row:hover {
+  background: rgba(var(--accent-rgb), 0.06);
+}
+.tm-cfg__row--off {
+  opacity: 0.55;
+}
+.tm-cfg__name {
+  font-weight: 600;
+  color: var(--text-strong);
+}
+.tm-cfg__place {
+  font-weight: 400;
+  color: var(--text-muted);
+}
+.tm-cfg__sched {
+  font-size: 13px;
+  color: var(--text);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.tm-cfg__note {
+  grid-column: 2 / -1;
+  font-size: 12px;
+  color: var(--text-muted);
+}

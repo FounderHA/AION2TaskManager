@@ -1,6 +1,7 @@
 // Modo compacto: janela pequena (sempre por cima do jogo) com o que falta hoje e na semana.
 import { useMemo, useState } from "react";
 import { CharPortrait } from "../components/ui";
+import { TimerList } from "../components/TimerList";
 import { CheckIcon } from "../components/ui/icons";
 import { progressFor } from "../components/WeekView";
 import { currentOdyle, rulesFor } from "../data/odyle";
@@ -42,6 +43,22 @@ function Row({ item, onToggle, note }: { item: DayItem; onToggle: () => void; no
 export function CompactView({ clock, onExpand, onTop, onToggleTop }: { clock: GameClock; onExpand: () => void; onTop: boolean; onToggleTop: () => void }) {
   const { characters, data, catalog, toggleCheck } = useStore();
   const [showDone, setShowDone] = useState(false);
+  // Duas visões no compacto: tarefas (como era) ou só os horários
+  const [view, setViewState] = useState<"tarefas" | "horarios">(() => {
+    try {
+      return localStorage.getItem("aion2tm-compacto-aba") === "horarios" ? "horarios" : "tarefas";
+    } catch {
+      return "tarefas";
+    }
+  });
+  const setView = (v: "tarefas" | "horarios") => {
+    setViewState(v);
+    try {
+      localStorage.setItem("aion2tm-compacto-aba", v);
+    } catch {
+      /* ok */
+    }
+  };
   const [openWeek, setOpenWeek] = useState<Record<string, boolean>>({});
   const rows = useMemo(() => charDays(catalog, characters, data.checks, clock.todayKey, clock.weekKey), [catalog, characters, data.checks, clock.todayKey, clock.weekKey]);
   const week = useMemo(() => progressFor(catalog, characters, data.checks, clock.days, clock.todayIndex, clock.weekKey), [catalog, characters, data.checks, clock.days, clock.todayIndex, clock.weekKey]);
@@ -73,69 +90,86 @@ export function CompactView({ clock, onExpand, onTop, onToggleTop }: { clock: Ga
         </button>
       </div>
 
-      <div className="compact__summary">
-        <Ring value={dayTotal ? (dayDone / dayTotal) * 100 : 100} label="Hoje" sub={`${dayDone}/${dayTotal} · vira em ${formatCountdown(toDaily)}`} />
-        <Ring value={weekAvg} label="Semana" sub={`${weekLeft} pendentes · ${localResetLabel(clock.nextWeekly)}`} />
+      <div className="compact__views" role="tablist" aria-label="Visão do modo compacto">
+        <button type="button" role="tab" aria-selected={view === "tarefas"} className={`compact__view ${view === "tarefas" ? "compact__view--on" : ""}`} onClick={() => setView("tarefas")}>
+          Tarefas
+        </button>
+        <button type="button" role="tab" aria-selected={view === "horarios"} className={`compact__view ${view === "horarios" ? "compact__view--on" : ""}`} onClick={() => setView("horarios")}>
+          Horários
+        </button>
       </div>
-      {toWeekly < 86_400_000 && weekLeft > 0 && <div className="compact__alert">Semana acaba em {formatCountdown(toWeekly)}: {weekLeft} pendentes.</div>}
 
-      <div className="compact__list">
-        {rows.map(({ char, daily, weekly, purchases }) => {
-          const d = doneCount(daily);
-          const complete = daily.length > 0 && d === daily.length;
-          const shown = showDone ? daily : daily.filter((i) => !i.done);
-          const weekItems = [...weekly, ...purchases];
-          const wLeft = weekItems.filter((i) => !i.done);
-          const odyle = char.odyle ? currentOdyle(char.odyle, rules, clock.now) : null;
-          const open = !!openWeek[char.id];
-          return (
-            <section key={char.id} className={`compact-char ${complete ? "compact-char--complete" : ""}`}>
-              <div className="compact-char__head">
-                <CharPortrait photo={char.photo} name={char.name} size={34} />
-                <span className="compact-char__name">{char.name}</span>
-                {odyle && odyle.level !== "ok" && (
-                  <span className={`compact-char__odyle compact-char__odyle--${odyle.level}`} title="Odyle Energy (Basic)">
-                    Odyle {odyle.basic}
-                  </span>
-                )}
-                <span className="compact-char__pct">{daily.length ? `${d}/${daily.length}` : "—"}</span>
-              </div>
-              <div className="compact-char__bar">
-                <span style={{ width: `${daily.length ? (d / daily.length) * 100 : 0}%` }} />
-              </div>
-              {complete && !showDone ? (
-                <div className="compact-char__done">✦ Dia completo</div>
-              ) : (
-                <div className="compact-char__rows">
-                  {shown.map((item) => (
-                    <Row key={item.key} item={item} onToggle={() => toggleCheck(item.key)} />
-                  ))}
-                </div>
-              )}
-              {weekItems.length > 0 && (
-                <>
-                  <button type="button" className="compact-char__week" onClick={() => setOpenWeek((o) => ({ ...o, [char.id]: !open }))} aria-expanded={open}>
-                    <span>{open ? "▾" : "▸"} Semana</span>
-                    <span>{wLeft.length ? `${wLeft.length} pendentes` : "✦ tudo feito"}</span>
-                  </button>
-                  {open && (
-                    <div className="compact-char__rows">
-                      {(showDone ? weekItems : wLeft).map((item) => (
-                        <Row key={item.key} item={item} onToggle={() => toggleCheck(item.key)} note={item.task.shop} />
-                      ))}
-                    </div>
+      {view === "horarios" ? (
+        <div className="compact__timers">
+          <TimerList compact empty="Nenhum horário ligado. Escolha os eventos na aba Horários." />
+        </div>
+      ) : (
+        <>
+        <div className="compact__summary">
+          <Ring value={dayTotal ? (dayDone / dayTotal) * 100 : 100} label="Hoje" sub={`${dayDone}/${dayTotal} · vira em ${formatCountdown(toDaily)}`} />
+          <Ring value={weekAvg} label="Semana" sub={`${weekLeft} pendentes · ${localResetLabel(clock.nextWeekly)}`} />
+        </div>
+        {toWeekly < 86_400_000 && weekLeft > 0 && <div className="compact__alert">Semana acaba em {formatCountdown(toWeekly)}: {weekLeft} pendentes.</div>}
+
+        <div className="compact__list">
+          {rows.map(({ char, daily, weekly, purchases }) => {
+            const d = doneCount(daily);
+            const complete = daily.length > 0 && d === daily.length;
+            const shown = showDone ? daily : daily.filter((i) => !i.done);
+            const weekItems = [...weekly, ...purchases];
+            const wLeft = weekItems.filter((i) => !i.done);
+            const odyle = char.odyle ? currentOdyle(char.odyle, rules, clock.now) : null;
+            const open = !!openWeek[char.id];
+            return (
+              <section key={char.id} className={`compact-char ${complete ? "compact-char--complete" : ""}`}>
+                <div className="compact-char__head">
+                  <CharPortrait photo={char.photo} name={char.name} size={34} />
+                  <span className="compact-char__name">{char.name}</span>
+                  {odyle && odyle.level !== "ok" && (
+                    <span className={`compact-char__odyle compact-char__odyle--${odyle.level}`} title="Odyle Energy (Basic)">
+                      Odyle {odyle.basic}
+                    </span>
                   )}
-                </>
-              )}
-            </section>
-          );
-        })}
-      </div>
+                  <span className="compact-char__pct">{daily.length ? `${d}/${daily.length}` : "—"}</span>
+                </div>
+                <div className="compact-char__bar">
+                  <span style={{ width: `${daily.length ? (d / daily.length) * 100 : 0}%` }} />
+                </div>
+                {complete && !showDone ? (
+                  <div className="compact-char__done">✦ Dia completo</div>
+                ) : (
+                  <div className="compact-char__rows">
+                    {shown.map((item) => (
+                      <Row key={item.key} item={item} onToggle={() => toggleCheck(item.key)} />
+                    ))}
+                  </div>
+                )}
+                {weekItems.length > 0 && (
+                  <>
+                    <button type="button" className="compact-char__week" onClick={() => setOpenWeek((o) => ({ ...o, [char.id]: !open }))} aria-expanded={open}>
+                      <span>{open ? "▾" : "▸"} Semana</span>
+                      <span>{wLeft.length ? `${wLeft.length} pendentes` : "✦ tudo feito"}</span>
+                    </button>
+                    {open && (
+                      <div className="compact-char__rows">
+                        {(showDone ? weekItems : wLeft).map((item) => (
+                          <Row key={item.key} item={item} onToggle={() => toggleCheck(item.key)} note={item.task.shop} />
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </section>
+            );
+          })}
+        </div>
 
-      <label className="compact__footer">
-        <input type="checkbox" checked={showDone} onChange={(e) => setShowDone(e.target.checked)} />
-        Mostrar concluídas
-      </label>
+        <label className="compact__footer">
+          <input type="checkbox" checked={showDone} onChange={(e) => setShowDone(e.target.checked)} />
+          Mostrar concluídas
+        </label>
+        </>
+      )}
     </div>
   );
 }

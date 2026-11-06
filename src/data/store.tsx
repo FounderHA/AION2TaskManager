@@ -39,6 +39,10 @@ interface StoreValue {
   /** Membership da conta (vale para todos os personagens). */
   setMembership: (on: boolean) => void;
   setTheme: (theme: ThemeChoice) => void;
+  /** Liga/desliga um evento da aba Horários. */
+  setTimerEnabled: (id: string, on: boolean) => void;
+  /** Marca (ou limpa, com null) quando um chefe de respawn foi morto. */
+  setTimerKill: (id: string, at: Date | null) => void;
   /** Cria ou atualiza uma receita (pelo id). */
   saveRecipe: (recipe: Recipe) => void;
   deleteRecipe: (id: string) => void;
@@ -254,6 +258,19 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setData((d) => ({ ...d, settings: { ...d.settings, theme } }));
   }, []);
 
+  const setTimerEnabled = useCallback((id: string, on: boolean) => {
+    setData((d) => ({ ...d, settings: { ...d.settings, timers: { ...d.settings.timers, enabled: { ...d.settings.timers.enabled, [id]: on } } } }));
+  }, []);
+
+  const setTimerKill = useCallback((id: string, at: Date | null) => {
+    setData((d) => {
+      const kills = { ...d.settings.timers.kills };
+      if (at) kills[id] = at.toISOString();
+      else delete kills[id];
+      return { ...d, settings: { ...d.settings, timers: { ...d.settings.timers, kills } } };
+    });
+  }, []);
+
   const setOdyleConfig = useCallback((cfg: OdyleConfig) => {
     setData((d) => ({ ...d, characters: reanchorAll(d, new Date()), settings: { ...d.settings, odyle: { ...cfg } } }));
   }, []);
@@ -305,6 +322,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setStatIcon,
       setMembership,
       setTheme,
+      setTimerEnabled,
+      setTimerKill,
       saveRecipe,
       deleteRecipe,
       saveCraftItem,
@@ -316,7 +335,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       spendOdyle,
       addChargedOdyle,
     };
-  }, [saveRecipeIcon, deleteRecipeIcon, saveCraftItem, deleteCraftItem, saveRecipe, deleteRecipe, setMembership, setTheme, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
+  }, [saveRecipeIcon, deleteRecipeIcon, saveCraftItem, deleteCraftItem, saveRecipe, deleteRecipe, setMembership, setTheme, setTimerEnabled, setTimerKill, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

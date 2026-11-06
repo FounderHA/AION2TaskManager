@@ -3,6 +3,7 @@
 import { DEFAULT_CATALOG } from "./catalog";
 import type { TaskCadence, TaskCategory, TaskDef, TaskScope, Weekday } from "./types";
 import { DEFAULT_RESET, type ResetConfig } from "../time/gameTime";
+import { defaultTimerSettings, parseTimerSettings, type TimerSettings } from "./timers";
 
 /** Ajuste do usuário numa tarefa (do catálogo ou própria). */
 export interface TaskOverride {
@@ -35,6 +36,8 @@ export interface Settings {
   membership: boolean;
   /** Tema visual: automático (facção do main), Elyos ou Asmodian. */
   theme: ThemeChoice;
+  /** Aba Horários: eventos ligados/desligados e mortes dos chefes de respawn. */
+  timers: TimerSettings;
   odyle: OdyleConfig;
   icons: StatIcons;
   tasks: Record<string, TaskOverride>;
@@ -49,7 +52,7 @@ export const TASK_NAME_MAX = 40;
 export const TASK_DESC_MAX = 120;
 
 export function defaultSettings(): Settings {
-  return { reset: { ...DEFAULT_RESET }, membership: false, theme: "auto", odyle: { ...DEFAULT_ODYLE }, icons: {}, tasks: {}, customTasks: [] };
+  return { reset: { ...DEFAULT_RESET }, membership: false, theme: "auto", timers: defaultTimerSettings(), odyle: { ...DEFAULT_ODYLE }, icons: {}, tasks: {}, customTasks: [] };
 }
 
 const SCOPES: TaskScope[] = ["personagem", "servidor"];
@@ -65,6 +68,7 @@ export function parseSettings(raw: unknown, legacy: { membership?: boolean } = {
 
   if (typeof o.membership === "boolean") s.membership = o.membership;
   if (o.theme === "elyos" || o.theme === "asmodian" || o.theme === "auto") s.theme = o.theme;
+  s.timers = parseTimerSettings(o.timers);
   const od = o.odyle as Record<string, unknown> | undefined;
   for (const k of ["capMember", "rateMember", "capFree", "rateFree"] as const) {
     const v = od?.[k];

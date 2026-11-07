@@ -179,6 +179,9 @@ src-tauri/                      Núcleo Tauri 2 (Rust), ícones, config do insta
 - Validar o frontend localmente com `npm run build` (faz o type-check).
 - O Windows mostra "O Windows protegeu o computador" (sem assinatura digital): **Mais informações → Executar assim mesmo**.
 
+## Ajustes da v2.6.2
+- Som do usuário para o **Watcher Kaira** (`public/sons/watcher-kaira.mp3`, convertido do .m4a enviado em 07/11/2026). Com som próprio: Shugo Festival, Spacetime Rift e Watcher Kaira.
+
 ## Ajustes da v2.6.1
 - **Sons do usuário**: Shugo Festival e Spacetime Rift (arquivos .m4a enviados em 07/11/2026, convertidos para MP3 com ffmpeg: `public/sons/shugo-festival.mp3`, `public/sons/spacetime-rift.mp3`, registrados em `CUSTOM_SOUNDS`). Os outros eventos continuam com o sininho provisório.
 - **Aviso duplo**: X min antes **e de novo na hora** (`alerts.atStart`, padrão ligado; caixa "Avisar de novo na hora"). `dueAlerts` devolve `kind` "antes" | "hora" e a chave do aviso agora é `id|início|tipo`. O "antes" só dispara faltando mais de 30 s (não cola no da hora).

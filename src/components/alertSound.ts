@@ -7,6 +7,7 @@
 export const CUSTOM_SOUNDS: Record<string, string> = {
   "shugo-festival": "sons/shugo-festival.mp3",
   "spacetime-rift": "sons/spacetime-rift.mp3",
+  "watcher-kaira": "sons/watcher-kaira.mp3",
 };
 
 /** Melodias provisórias (notas em semitons a partir de Lá 440 Hz). */

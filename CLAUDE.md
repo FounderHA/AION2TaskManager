@@ -20,7 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- **Modo compacto como overlay** (pedido do usuário: ficar sempre por cima de tudo, com opção direta e transparência). No compacto a janela fica **sem a moldura do Windows** (`setDecorations(false)`; volta ao sair) e a barra do topo vira área de arrastar (`data-tauri-drag-region`) com botões Voltar ao completo / Minimizar / Fechar. Linha nova logo abaixo: interruptor **"Por cima"** (era o alfinete; mesmo `aion2tm-no-topo`) e **controle de transparência** 30–100% (`aion2tm-compacto-opacidade`; CSS `--overlay`: o fundo segue o valor e o conteúdo fica em `0.55 + 0.45 × valor` para continuar legível). Com "Por cima" ligado, o app reafirma o `setAlwaysOnTop(true)` a cada 4 s (jogos às vezes tomam o topo). **A janela agora é `transparent: true` no `tauri.conf.json`** (saiu o `backgroundColor`); fora do compacto o fundo da página continua opaco; no compacto `html.is-compact` deixa html/body transparentes e o `.app-bg--compact` tem cantos arredondados. Permissões novas: `core:window:allow-set-decorations`, `allow-start-dragging`, `allow-minimize`, `allow-close`. Limite do Windows: nenhuma janela fica por cima de jogo em **tela cheia exclusiva** (usar modo janela ou tela cheia sem bordas). Não deu para testar o lado Tauri aqui (só no app instalado).
 
 ## Decisões de produto (já tomadas)
 

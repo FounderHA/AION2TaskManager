@@ -78,6 +78,33 @@ function App() {
     setCompact(false);
     void exitCompact();
   };
+  // Transparência do modo compacto (30% a 100%)
+  const [overlay, setOverlayState] = useState(() => {
+    try {
+      const v = Number(localStorage.getItem("aion2tm-compacto-opacidade"));
+      return v >= 30 && v <= 100 ? v : 100;
+    } catch {
+      return 100;
+    }
+  });
+  const setOverlay = (v: number) => {
+    setOverlayState(v);
+    try {
+      localStorage.setItem("aion2tm-compacto-opacidade", String(v));
+    } catch {
+      /* ok */
+    }
+  };
+  // Fundo da página transparente só no compacto (a janela do app é transparente)
+  useEffect(() => {
+    document.documentElement.classList.toggle("is-compact", compact);
+  }, [compact]);
+  // Alguns jogos "roubam" o topo ao ganhar foco: reafirma o "sempre por cima" de tempos em tempos
+  useEffect(() => {
+    if (!compact || !onTop) return;
+    const id = window.setInterval(() => void setOnTop(true), 4000);
+    return () => window.clearInterval(id);
+  }, [compact, onTop]);
   const toggleTop = () => {
     const next = !onTop;
     writeFlag("aion2tm-no-topo", next);
@@ -116,9 +143,9 @@ function App() {
 
   if (compact) {
     return (
-      <div className="app-bg app-bg--compact">
+      <div className="app-bg app-bg--compact" style={{ ["--overlay" as string]: overlay / 100 }}>
         <RuneBackdrop />
-        <CompactView clock={clock} onExpand={goFull} onTop={onTop} onToggleTop={toggleTop} />
+        <CompactView clock={clock} onExpand={goFull} onTop={onTop} onToggleTop={toggleTop} overlay={overlay} onOverlay={setOverlay} />
         <DayCompleteFx todayKey={clock.todayKey} weekKey={clock.weekKey} />
       </div>
     );

@@ -7,6 +7,7 @@ import { progressFor } from "../components/WeekView";
 import { currentOdyle, rulesFor } from "../data/odyle";
 import { useStore } from "../data/store";
 import { charDays, doneCount, type DayItem } from "../data/today";
+import { closeWindow, minimizeWindow } from "../components/windowMode";
 import { formatCountdown, localResetLabel } from "../time/gameTime";
 import type { GameClock } from "../time/useGameClock";
 
@@ -40,7 +41,7 @@ function Row({ item, onToggle, note }: { item: DayItem; onToggle: () => void; no
   );
 }
 
-export function CompactView({ clock, onExpand, onTop, onToggleTop }: { clock: GameClock; onExpand: () => void; onTop: boolean; onToggleTop: () => void }) {
+export function CompactView({ clock, onExpand, onTop, onToggleTop, overlay, onOverlay }: { clock: GameClock; onExpand: () => void; onTop: boolean; onToggleTop: () => void; overlay: number; onOverlay: (v: number) => void }) {
   const { characters, data, catalog, toggleCheck } = useStore();
   const [showDone, setShowDone] = useState(false);
   // Duas visões no compacto: tarefas (como era) ou só os horários
@@ -73,21 +74,48 @@ export function CompactView({ clock, onExpand, onTop, onToggleTop }: { clock: Ga
 
   return (
     <div className="compact">
-      <div className="compact__bar">
-        <span className="compact__title">
+      {/* Barra arrastável (no app a janela fica sem a moldura do Windows no modo compacto) */}
+      <div className="compact__bar" data-tauri-drag-region>
+        <span className="compact__title" data-tauri-drag-region>
           Aion 2 <span>Manager</span>
         </span>
-        <span className="form__spacer" />
-        <button type="button" className={`compact__icon ${onTop ? "compact__icon--on" : ""}`} onClick={onToggleTop} title={onTop ? "Sempre no topo: ligado" : "Sempre no topo: desligado"} aria-pressed={onTop}>
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-            <path d="M5 1h6l-1 5 3 3H3l3-3zM8 9v6" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
-          </svg>
-        </button>
-        <button type="button" className="compact__icon" onClick={onExpand} title="Voltar ao modo completo">
+        <span className="form__spacer" data-tauri-drag-region />
+        <button type="button" className="compact__icon" onClick={onExpand} title="Voltar ao modo completo" aria-label="Voltar ao modo completo">
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
             <path d="M2 6V2h4M14 6V2h-4M2 10v4h4M14 10v4h-4" fill="none" stroke="currentColor" strokeWidth="1.4" />
           </svg>
         </button>
+        <button type="button" className="compact__icon" onClick={() => void minimizeWindow()} title="Minimizar" aria-label="Minimizar">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M3 11h10" fill="none" stroke="currentColor" strokeWidth="1.6" />
+          </svg>
+        </button>
+        <button type="button" className="compact__icon compact__icon--close" onClick={() => void closeWindow()} title="Fechar o app" aria-label="Fechar o app">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" strokeWidth="1.6" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Overlay: sempre por cima + transparência */}
+      <div className="compact__overlay">
+        <button type="button" role="switch" aria-checked={onTop} className={`compact__ontop ${onTop ? "compact__ontop--on" : ""}`} onClick={onToggleTop} title="Deixa esta janela por cima de todas as outras, inclusive do jogo em modo janela ou tela cheia sem bordas">
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M5 1h6l-1 5 3 3H3l3-3zM8 9v6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+          </svg>
+          Por cima
+          <span className="compact__switch" aria-hidden="true">
+            <span />
+          </span>
+        </button>
+        <label className="compact__opacity" title="Transparência da janela">
+          <svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true">
+            <circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" strokeWidth="1.4" />
+            <path d="M8 2a6 6 0 0 1 0 12z" fill="currentColor" />
+          </svg>
+          <input type="range" min={30} max={100} step={5} value={overlay} onChange={(e) => onOverlay(Number(e.target.value))} aria-label="Opacidade da janela" />
+          <span className="compact__opacity-val">{overlay}%</span>
+        </label>
       </div>
 
       <div className="compact__views" role="tablist" aria-label="Visão do modo compacto">

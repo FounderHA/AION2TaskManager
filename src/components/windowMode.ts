@@ -1,4 +1,7 @@
-// Modo compacto: diminui a janela e deixa sempre por cima do jogo. No navegador só troca a tela.
+// Modo compacto: diminui a janela, tira a moldura do Windows (vira um painel "overlay" que dá para
+// deixar transparente) e deixa sempre por cima do jogo. No navegador só troca a tela.
+// Obs.: "sempre por cima" funciona sobre janelas e jogos em modo janela/tela cheia sem bordas;
+// jogo em tela cheia EXCLUSIVA cobre qualquer janela.
 import { getCurrentWindow, LogicalSize } from "@tauri-apps/api/window";
 
 const isTauri = () => typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -23,6 +26,7 @@ export async function enterCompact(onTop: boolean): Promise<void> {
     if (await w.isMaximized()) await w.unmaximize();
     await w.setMinSize(new LogicalSize(320, 420));
     await w.setSize(new LogicalSize(COMPACT_SIZE.width, COMPACT_SIZE.height));
+    await w.setDecorations(false);
     await w.setAlwaysOnTop(onTop);
   } catch (e) {
     console.error("Modo compacto:", e);
@@ -44,6 +48,7 @@ export async function exitCompact(): Promise<void> {
   }
   try {
     await w.setAlwaysOnTop(false);
+    await w.setDecorations(true);
     await w.setSize(new LogicalSize(saved.width, saved.height));
     await w.setMinSize(new LogicalSize(FULL_MIN.width, FULL_MIN.height));
   } catch (e) {
@@ -57,5 +62,23 @@ export async function setOnTop(onTop: boolean): Promise<void> {
     await getCurrentWindow().setAlwaysOnTop(onTop);
   } catch (e) {
     console.error("Sempre no topo:", e);
+  }
+}
+
+export async function minimizeWindow(): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    await getCurrentWindow().minimize();
+  } catch (e) {
+    console.error("Minimizar:", e);
+  }
+}
+
+export async function closeWindow(): Promise<void> {
+  if (!isTauri()) return;
+  try {
+    await getCurrentWindow().close();
+  } catch (e) {
+    console.error("Fechar:", e);
   }
 }

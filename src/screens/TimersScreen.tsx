@@ -3,7 +3,8 @@ import { useState } from "react";
 import { Panel, SectionTitle } from "../components/ui";
 import { TimerList, useNow, type TimerFilter } from "../components/TimerList";
 import { useStore } from "../data/store";
-import { SERVER_REGIONS, TIMER_CATALOG, TIMER_CATEGORIES, categoryInfo, describeSchedule, formatTimerCountdown, isTimerEnabled, localWhen, regionInfo, timerState, type ServerRegion } from "../data/timers";
+import { playAlertSound } from "../components/alertSound";
+import { ALERT_LEADS, isAlertOn, SERVER_REGIONS, TIMER_CATALOG, TIMER_CATEGORIES, categoryInfo, describeSchedule, formatTimerCountdown, isTimerEnabled, localWhen, regionInfo, timerState, type ServerRegion } from "../data/timers";
 
 const FILTERS: { id: TimerFilter; label: string }[] = [
   { id: "todos", label: "Todos" },
@@ -73,8 +74,47 @@ function RespawnBosses() {
   );
 }
 
+function AlertsPanel() {
+  const { data, setTimerAlerts } = useStore();
+  const a = data.settings.timers.alerts;
+  return (
+    <Panel label="Avisos">
+      <SectionTitle aside="Pop-up dentro do app + som + notificação do Windows">Avisos antes dos eventos</SectionTitle>
+      <div className="tm-alerts">
+        <label className="tm-alerts__toggle">
+          <input type="checkbox" checked={a.on} onChange={(e) => setTimerAlerts({ on: e.target.checked })} />
+          Avisar antes dos eventos ligados
+        </label>
+        <div className="field">
+          <label className="field__label" htmlFor="tm-lead">
+            Quando
+          </label>
+          <select id="tm-lead" className="input" value={a.lead} disabled={!a.on} onChange={(e) => setTimerAlerts({ lead: Number(e.target.value) })}>
+            {ALERT_LEADS.map((m) => (
+              <option key={m} value={m}>
+                {m === 0 ? "Na hora" : `${m} min antes`}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="field tm-alerts__vol">
+          <label className="field__label" htmlFor="tm-vol">
+            Volume do som · {a.volume}%
+          </label>
+          <input id="tm-vol" type="range" min={0} max={100} step={5} value={a.volume} disabled={!a.on} onChange={(e) => setTimerAlerts({ volume: Number(e.target.value) })} />
+        </div>
+        <label className="tm-alerts__toggle">
+          <input type="checkbox" checked={a.system} disabled={!a.on} onChange={(e) => setTimerAlerts({ system: e.target.checked })} />
+          Também mostrar a notificação do Windows
+        </label>
+      </div>
+      <p className="tm-hint">Cada evento tem um som próprio (provisório até chegarem os sons definitivos). Ligue ou desligue o aviso de cada um e teste o som no sininho e no ▶ em “Escolher eventos”.</p>
+    </Panel>
+  );
+}
+
 function TimerSettingsPanel() {
-  const { data, setTimerEnabled, setTimerRegion } = useStore();
+  const { data, setTimerEnabled, setTimerRegion, setTimerAlerts } = useStore();
   const s = data.settings.timers;
   return (
     <Panel label="Escolher eventos">
@@ -107,6 +147,25 @@ function TimerSettingsPanel() {
                   {d.place && <span className="tm-cfg__place"> · {d.place}</span>}
                 </span>
                 <span className="tm-cfg__sched">{describeSchedule(d.schedule)}</span>
+                <span className="tm-cfg__alert" onClick={(e) => e.preventDefault()}>
+                  <button
+                    type="button"
+                    className={`tm-bell ${isAlertOn(d, s) ? "tm-bell--on" : ""}`}
+                    disabled={!on}
+                    onClick={() => setTimerAlerts({ events: { ...s.alerts.events, [d.id]: !isAlertOn(d, s) } })}
+                    title={isAlertOn(d, s) ? "Aviso ligado (clique para desligar)" : "Aviso desligado (clique para ligar)"}
+                    aria-pressed={isAlertOn(d, s)}
+                    aria-label={`Aviso de ${d.name}`}
+                  >
+                    <svg width="15" height="15" viewBox="0 0 16 16" aria-hidden="true">
+                      <path d="M8 2a4 4 0 0 0-4 4v3L2.5 11h11L12 9V6a4 4 0 0 0-4-4zM6.5 13a1.5 1.5 0 0 0 3 0" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinejoin="round" />
+                      {!isAlertOn(d, s) && <path d="M2 2l12 12" stroke="currentColor" strokeWidth="1.4" />}
+                    </svg>
+                  </button>
+                  <button type="button" className="tm-bell" onClick={() => playAlertSound(d.id, s.alerts.volume)} title="Testar o som deste evento" aria-label={`Testar som de ${d.name}`}>
+                    ▶
+                  </button>
+                </span>
                 {d.note && <span className="tm-cfg__note">{d.note}</span>}
               </label>
             );
@@ -154,6 +213,7 @@ export function TimersScreen() {
         </div>
         <TimerList filter={filter} empty="Nada ligado neste filtro. Use “Escolher eventos” para ligar." />
       </Panel>
+      <AlertsPanel />
       {config && <TimerSettingsPanel />}
       <RespawnBosses />
     </div>

@@ -7,6 +7,7 @@ import { GuideScreen } from "./screens/GuideScreen";
 import { CraftScreen } from "./screens/CraftScreen";
 import { SimulatorsScreen } from "./screens/SimulatorsScreen";
 import { TimersScreen } from "./screens/TimersScreen";
+import { TimerAlerts } from "./components/TimerAlerts";
 import { RuneBackdrop } from "./components/RuneBackdrop";
 import { CompactView } from "./screens/CompactView";
 import { DayCompleteFx } from "./components/DayCompleteFx";
@@ -147,6 +148,7 @@ function App() {
         <RuneBackdrop />
         <CompactView clock={clock} onExpand={goFull} onTop={onTop} onToggleTop={toggleTop} overlay={overlay} onOverlay={setOverlay} />
         <DayCompleteFx todayKey={clock.todayKey} weekKey={clock.weekKey} />
+        <TimerAlerts compact />
       </div>
     );
   }
@@ -201,6 +203,7 @@ function App() {
       )}
       {(simOpened || tab === "simuladores") && <SimulatorsScreen hidden={tab !== "simuladores"} />}
       <DayCompleteFx todayKey={clock.todayKey} weekKey={clock.weekKey} />
+      <TimerAlerts />
       <VersionFooter version={updater.currentVersion} state={updater.state} onCheck={updater.checkNow} />
     </div>
   );

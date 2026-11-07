@@ -153,22 +153,50 @@ export const TIMER_CATALOG: TimerDef[] = [
   { id: "immortal-gartua", name: "Immortal Gartua", place: "Altgard", category: "boss-campo", schedule: { type: "respawn", hours: 12 }, enabledByDefault: true },
 ];
 
+export interface TimerAlerts {
+  /** Avisos ligados (chave geral). */
+  on: boolean;
+  /** Quantos minutos antes avisar (0 = na hora). */
+  lead: number;
+  /** Volume do som (0 a 100). */
+  volume: number;
+  /** Também mostrar a notificação do Windows. */
+  system: boolean;
+  /** Aviso por evento (sem entrada = ligado). */
+  events: Record<string, boolean>;
+}
+
+export const ALERT_LEADS = [0, 1, 3, 5, 10, 15, 30];
+
 export interface TimerSettings {
   /** Região do servidor (define o relógio dos horários). */
   region: ServerRegion;
+  /** Avisos (pop-up + som) antes de cada evento. */
+  alerts: TimerAlerts;
   /** Ligado/desligado escolhido pelo usuário (sem entrada = padrão do catálogo). */
   enabled: Record<string, boolean>;
   /** Quando o usuário matou cada chefe de respawn (ISO). */
   kills: Record<string, string>;
 }
 
-export const defaultTimerSettings = (): TimerSettings => ({ region: "sa", enabled: {}, kills: {} });
+export const defaultAlerts = (): TimerAlerts => ({ on: true, lead: 5, volume: 70, system: true, events: {} });
+export const defaultTimerSettings = (): TimerSettings => ({ region: "sa", alerts: defaultAlerts(), enabled: {}, kills: {} });
 
 export function parseTimerSettings(raw: unknown): TimerSettings {
   const s = defaultTimerSettings();
   if (!raw || typeof raw !== "object") return s;
   const o = raw as Record<string, unknown>;
   if (SERVER_REGIONS.some((r) => r.id === o.region)) s.region = o.region as ServerRegion;
+  const al = o.alerts as Record<string, unknown> | undefined;
+  if (al && typeof al === "object") {
+    if (typeof al.on === "boolean") s.alerts.on = al.on;
+    if (typeof al.system === "boolean") s.alerts.system = al.system;
+    if (typeof al.lead === "number" && ALERT_LEADS.includes(al.lead)) s.alerts.lead = al.lead;
+    if (typeof al.volume === "number" && al.volume >= 0 && al.volume <= 100) s.alerts.volume = Math.round(al.volume);
+    if (al.events && typeof al.events === "object") {
+      for (const [k, v] of Object.entries(al.events as Record<string, unknown>)) if (typeof v === "boolean") s.alerts.events[k] = v;
+    }
+  }
   if (o.enabled && typeof o.enabled === "object") {
     for (const [k, v] of Object.entries(o.enabled as Record<string, unknown>)) if (typeof v === "boolean") s.enabled[k] = v;
   }
@@ -320,4 +348,35 @@ export function describeSchedule(s: TimerSchedule): string {
   }
   const days = s.days.length === 7 ? "todo dia" : [...s.days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((x) => WEEKDAYS[x]).join(", ");
   return `${days} ${s.times.map((t) => hm(t.h, t.m)).join(" e ")}`;
+}
+
+export const isAlertOn = (def: TimerDef, s: TimerSettings) => s.alerts.events[def.id] ?? true;
+
+export interface DueAlert {
+  def: TimerDef;
+  /** Chave única (evento + horário) para não avisar duas vezes. */
+  key: string;
+  start: number;
+}
+
+/**
+ * Avisos que devem disparar agora: eventos ligados, com aviso ligado, que começam
+ * dentro de `lead` minutos (ou que acabaram de começar, se lead = 0) e que ainda não foram avisados.
+ */
+export function dueAlerts(s: TimerSettings, now: number, fired: Set<string>): DueAlert[] {
+  if (!s.alerts.on) return [];
+  const lead = s.alerts.lead * MIN;
+  const out: DueAlert[] = [];
+  for (const def of TIMER_CATALOG) {
+    if (!isTimerEnabled(def, s) || !isAlertOn(def, s)) continue;
+    const st = timerState(def, now, s.kills, s.region);
+    let start: number | null = null;
+    if (st.kind === "next" && st.start - now <= lead && (lead > 0 || st.start - now <= 1000)) start = st.start;
+    // Na hora (ou se o app abriu logo depois): até 1 min depois do início
+    if ((st.kind === "live" || st.kind === "spawned") && lead === 0 && now - st.start < MIN) start = st.start;
+    if (start === null) continue;
+    const key = `${def.id}|${start}`;
+    if (!fired.has(key)) out.push({ def, key, start });
+  }
+  return out;
 }

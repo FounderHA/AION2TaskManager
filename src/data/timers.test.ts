@@ -70,7 +70,35 @@ describe("ordem, barra e textos", () => {
     expect(formatTimerCountdown(28 * 3600_000)).toBe("1d 4h");
   });
   it("parse tolerante (região padrão = América do Sul)", () => {
-    expect(parseTimerSettings({ region: "xx", enabled: { a: true, b: "x" }, kills: { c: "lixo", d: "2026-11-06T10:00:00Z" } })).toEqual({ region: "sa", enabled: { a: true }, kills: { d: "2026-11-06T10:00:00Z" } });
+    expect(parseTimerSettings({ region: "xx", enabled: { a: true, b: "x" }, kills: { c: "lixo", d: "2026-11-06T10:00:00Z" } })).toEqual({ region: "sa", alerts: { on: true, lead: 5, volume: 70, system: true, events: {} }, enabled: { a: true }, kills: { d: "2026-11-06T10:00:00Z" } });
     expect(parseTimerSettings({ region: "eu" }).region).toBe("eu");
+  });
+});
+
+import { defaultTimerSettings, dueAlerts } from "./timers";
+
+describe("avisos", () => {
+  it("avisa 5 min antes, uma vez só", () => {
+    const s = defaultTimerSettings();
+    // Rift às 02:00 BRT (05:00 UTC); 4 min antes
+    const now = at("2026-11-07T04:56:00Z");
+    const due = dueAlerts(s, now, new Set());
+    const rift = due.find((d) => d.def.id === "spacetime-rift");
+    expect(rift?.start).toBe(at("2026-11-07T05:00:00Z"));
+    expect(dueAlerts(s, now, new Set([rift!.key])).some((d) => d.def.id === "spacetime-rift")).toBe(false);
+  });
+  it("não avisa cedo demais, nem desligado", () => {
+    const s = defaultTimerSettings();
+    expect(dueAlerts(s, at("2026-11-07T04:50:00Z"), new Set()).some((d) => d.def.id === "spacetime-rift")).toBe(false);
+    s.alerts.events["spacetime-rift"] = false;
+    expect(dueAlerts(s, at("2026-11-07T04:56:00Z"), new Set()).some((d) => d.def.id === "spacetime-rift")).toBe(false);
+    s.alerts.on = false;
+    expect(dueAlerts(s, at("2026-11-07T04:56:00Z"), new Set())).toEqual([]);
+  });
+  it("na hora (lead 0): só no primeiro minuto", () => {
+    const s = defaultTimerSettings();
+    s.alerts.lead = 0;
+    expect(dueAlerts(s, at("2026-11-07T05:00:30Z"), new Set()).some((d) => d.def.id === "spacetime-rift")).toBe(true);
+    expect(dueAlerts(s, at("2026-11-07T05:02:00Z"), new Set()).some((d) => d.def.id === "spacetime-rift")).toBe(false);
   });
 });

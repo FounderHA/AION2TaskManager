@@ -5,7 +5,8 @@
 
 /** Arquivos de som por evento (id → caminho dentro de public/). */
 export const CUSTOM_SOUNDS: Record<string, string> = {
-  // "watcher-kaira": "sons/watcher-kaira.mp3",
+  "shugo-festival": "sons/shugo-festival.mp3",
+  "spacetime-rift": "sons/spacetime-rift.mp3",
 };
 
 /** Melodias provisórias (notas em semitons a partir de Lá 440 Hz). */

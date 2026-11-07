@@ -70,7 +70,7 @@ describe("ordem, barra e textos", () => {
     expect(formatTimerCountdown(28 * 3600_000)).toBe("1d 4h");
   });
   it("parse tolerante (região padrão = América do Sul)", () => {
-    expect(parseTimerSettings({ region: "xx", enabled: { a: true, b: "x" }, kills: { c: "lixo", d: "2026-11-06T10:00:00Z" } })).toEqual({ region: "sa", alerts: { on: true, lead: 5, volume: 70, system: true, events: {} }, enabled: { a: true }, kills: { d: "2026-11-06T10:00:00Z" } });
+    expect(parseTimerSettings({ region: "xx", enabled: { a: true, b: "x" }, kills: { c: "lixo", d: "2026-11-06T10:00:00Z" } })).toEqual({ region: "sa", alerts: { on: true, lead: 5, atStart: true, volume: 70, system: true, events: {} }, enabled: { a: true }, kills: { d: "2026-11-06T10:00:00Z" } });
     expect(parseTimerSettings({ region: "eu" }).region).toBe("eu");
   });
 });
@@ -94,6 +94,15 @@ describe("avisos", () => {
     expect(dueAlerts(s, at("2026-11-07T04:56:00Z"), new Set()).some((d) => d.def.id === "spacetime-rift")).toBe(false);
     s.alerts.on = false;
     expect(dueAlerts(s, at("2026-11-07T04:56:00Z"), new Set())).toEqual([]);
+  });
+  it("5 min antes e de novo na hora", () => {
+    const s = defaultTimerSettings();
+    const before = dueAlerts(s, at("2026-11-07T04:56:00Z"), new Set()).find((d) => d.def.id === "spacetime-rift");
+    expect(before?.kind).toBe("antes");
+    const atStartAlert = dueAlerts(s, at("2026-11-07T05:00:20Z"), new Set([before!.key])).find((d) => d.def.id === "spacetime-rift");
+    expect(atStartAlert?.kind).toBe("hora");
+    s.alerts.atStart = false;
+    expect(dueAlerts(s, at("2026-11-07T05:00:20Z"), new Set([before!.key])).some((d) => d.def.id === "spacetime-rift")).toBe(false);
   });
   it("na hora (lead 0): só no primeiro minuto", () => {
     const s = defaultTimerSettings();

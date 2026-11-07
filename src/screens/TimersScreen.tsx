@@ -104,6 +104,10 @@ function AlertsPanel() {
           <input id="tm-vol" type="range" min={0} max={100} step={5} value={a.volume} disabled={!a.on} onChange={(e) => setTimerAlerts({ volume: Number(e.target.value) })} />
         </div>
         <label className="tm-alerts__toggle">
+          <input type="checkbox" checked={a.atStart} disabled={!a.on || a.lead === 0} onChange={(e) => setTimerAlerts({ atStart: e.target.checked })} />
+          Avisar de novo na hora
+        </label>
+        <label className="tm-alerts__toggle">
           <input type="checkbox" checked={a.system} disabled={!a.on} onChange={(e) => setTimerAlerts({ system: e.target.checked })} />
           Também mostrar a notificação do Windows
         </label>

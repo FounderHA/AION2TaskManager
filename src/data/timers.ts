@@ -135,7 +135,7 @@ export const TIMER_CATALOG: TimerDef[] = [
     name: "Shugo Festival",
     category: "evento",
     schedule: { type: "every", everyMin: 60, offsetMin: 0, dur: 10 },
-    enabledByDefault: false,
+    enabledByDefault: true,
     note: "Toda hora cheia (10 min). Gasta uma chave.",
   },
   {
@@ -158,6 +158,8 @@ export interface TimerAlerts {
   on: boolean;
   /** Quantos minutos antes avisar (0 = na hora). */
   lead: number;
+  /** Avisar de novo na hora em que o evento começa. */
+  atStart: boolean;
   /** Volume do som (0 a 100). */
   volume: number;
   /** Também mostrar a notificação do Windows. */
@@ -179,7 +181,7 @@ export interface TimerSettings {
   kills: Record<string, string>;
 }
 
-export const defaultAlerts = (): TimerAlerts => ({ on: true, lead: 5, volume: 70, system: true, events: {} });
+export const defaultAlerts = (): TimerAlerts => ({ on: true, lead: 5, atStart: true, volume: 70, system: true, events: {} });
 export const defaultTimerSettings = (): TimerSettings => ({ region: "sa", alerts: defaultAlerts(), enabled: {}, kills: {} });
 
 export function parseTimerSettings(raw: unknown): TimerSettings {
@@ -191,6 +193,7 @@ export function parseTimerSettings(raw: unknown): TimerSettings {
   if (al && typeof al === "object") {
     if (typeof al.on === "boolean") s.alerts.on = al.on;
     if (typeof al.system === "boolean") s.alerts.system = al.system;
+    if (typeof al.atStart === "boolean") s.alerts.atStart = al.atStart;
     if (typeof al.lead === "number" && ALERT_LEADS.includes(al.lead)) s.alerts.lead = al.lead;
     if (typeof al.volume === "number" && al.volume >= 0 && al.volume <= 100) s.alerts.volume = Math.round(al.volume);
     if (al.events && typeof al.events === "object") {
@@ -354,29 +357,35 @@ export const isAlertOn = (def: TimerDef, s: TimerSettings) => s.alerts.events[de
 
 export interface DueAlert {
   def: TimerDef;
-  /** Chave única (evento + horário) para não avisar duas vezes. */
+  /** Chave única (evento + horário + tipo) para não avisar duas vezes. */
   key: string;
   start: number;
+  /** "antes" (X min antes) ou "hora" (quando começa). */
+  kind: "antes" | "hora";
 }
 
 /**
- * Avisos que devem disparar agora: eventos ligados, com aviso ligado, que começam
- * dentro de `lead` minutos (ou que acabaram de começar, se lead = 0) e que ainda não foram avisados.
+ * Avisos que devem disparar agora: eventos ligados, com aviso ligado, que ainda não foram avisados.
+ * - "antes": faltando até `lead` minutos (e mais de 1 min, para não colar no aviso da hora).
+ * - "hora": no primeiro minuto depois de começar (se `atStart`, ou se lead = 0).
  */
 export function dueAlerts(s: TimerSettings, now: number, fired: Set<string>): DueAlert[] {
   if (!s.alerts.on) return [];
   const lead = s.alerts.lead * MIN;
+  const atStart = s.alerts.atStart || lead === 0;
   const out: DueAlert[] = [];
   for (const def of TIMER_CATALOG) {
     if (!isTimerEnabled(def, s) || !isAlertOn(def, s)) continue;
     const st = timerState(def, now, s.kills, s.region);
-    let start: number | null = null;
-    if (st.kind === "next" && st.start - now <= lead && (lead > 0 || st.start - now <= 1000)) start = st.start;
-    // Na hora (ou se o app abriu logo depois): até 1 min depois do início
-    if ((st.kind === "live" || st.kind === "spawned") && lead === 0 && now - st.start < MIN) start = st.start;
-    if (start === null) continue;
-    const key = `${def.id}|${start}`;
-    if (!fired.has(key)) out.push({ def, key, start });
+    const push = (start: number, kind: DueAlert["kind"]) => {
+      const key = `${def.id}|${start}|${kind}`;
+      if (!fired.has(key)) out.push({ def, key, start, kind });
+    };
+    if (lead > 0 && st.kind === "next" && st.start - now <= lead && st.start - now > MIN / 2) push(st.start, "antes");
+    if (atStart) {
+      if (st.kind === "next" && st.start - now <= 1000) push(st.start, "hora");
+      if ((st.kind === "live" || st.kind === "spawned") && now - st.start < MIN) push(st.start, "hora");
+    }
   }
   return out;
 }

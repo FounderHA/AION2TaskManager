@@ -49,7 +49,7 @@ interface Toast extends DueAlert {
 
 function alertText(a: DueAlert, now: number) {
   const left = a.start - now;
-  if (left <= 30_000) return `Começando agora · ${localWhen(a.start, now)}`;
+  if (a.kind === "hora" || left <= 30_000) return `Começando agora · ${localWhen(a.start, now)}`;
   const min = Math.round(left / 60_000);
   return `Em ${min} min · ${localWhen(a.start, now)}`;
 }

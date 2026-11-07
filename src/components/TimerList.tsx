@@ -28,7 +28,7 @@ export function useTimerEntries(now: number, filter: TimerFilter = "todos"): Tim
   return useMemo(() => {
     const keep = (c: TimerCategory) => filter === "todos" || (filter === "chefes" ? c !== "evento" : c === "evento");
     return TIMER_CATALOG.filter((d) => isTimerEnabled(d, s) && keep(d.category))
-      .map((def) => ({ def, state: timerState(def, now, s.kills) }))
+      .map((def) => ({ def, state: timerState(def, now, s.kills, s.region) }))
       .filter((e) => e.state.kind !== "unknown")
       .sort((a, b) => {
         const ka = sortKey(a.state);

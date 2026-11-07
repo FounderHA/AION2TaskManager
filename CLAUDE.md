@@ -20,7 +20,7 @@ App de desktop para **Windows** que organiza as tarefas diárias e semanais do j
 - **Desde a v1.4.0: juntar várias mudanças antes de lançar.** Cada mudança é feita, testada e mostrada (prints) e vai para o GitHub (commit/push na `main`, que não dispara build). Só gerar instalador (subir versão + `gh workflow run`) quando o usuário pedir para publicar. Manter uma lista "Mudanças ainda não lançadas" abaixo.
 
 ### Mudanças ainda não lançadas
-- (nenhuma)
+- **Horários revisados (o usuário disse que estavam todos errados).** Erro da v2.5.0: assumi relógio único GMT+9 para o Global. Na verdade **cada região Global segue o relógio local dela** (América do Sul = São Paulo, sem horário de verão; NA East = Nova York; NA West = Los Angeles; Europa = Berlim; Ásia = Seul); só os resets são o mesmo instante (07:00 UTC). Nova configuração **"Região do servidor"** em "Escolher eventos" (`settings.timers.region`, padrão `sa`; `SERVER_REGIONS`, cálculo com fuso IANA via `Intl`, `zonedToUtc` trata horário de verão). Horários novos (relógio da região; fonte principal shugo.gg/timers, conferidos com daevaguides.com, aion2rifttimer.com e metabot.gg em 07/11/2026): Spacetime Rift 02:00, 05:00 … 23:00 (10 min); Watcher Kaira 01:00, 04:00 … 22:00 (30 min); **Argo, the Spirit King** (novo) todo dia 10:30 e 22:30; Artifact Siege **qui e sáb** 21:00 (segunda saiu em 04/11; grupos 21:00/21:05/21:10); Executors qui/sáb 21:30; Nahma sex/dom 21:00; Dramos/Marakha/Ducal qui/sáb 21:30 (desligado); Arena of Tactics 11:00 e 19:00 (2h); Shugo Festival :00 (10 min) e Dimensional Invasion :30 (15 min), desligados. Chefes de campo: o Global tem respawn de 30 min a 12h (o mapa do jogo mostra); intervalos por chefe mantidos como estimativa.
 
 ## Decisões de produto (já tomadas)
 

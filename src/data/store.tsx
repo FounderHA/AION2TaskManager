@@ -8,6 +8,7 @@ import type { CraftItem, Recipe, RecipeIconDef } from "./craft";
 import { BUILTIN_CRAFT_ITEMS, BUILTIN_RECIPE_ICONS } from "./craftCatalog";
 import type { TaskDef } from "./types";
 import type { ResetConfig } from "../time/gameTime";
+import type { ServerRegion } from "./timers";
 
 export type SaveStatus = "carregando" | "salvo" | "salvando" | "erro";
 export type CharacterInput = Omit<Character, "id" | "createdAt" | "role" | "odyle"> & { makeMain?: boolean; odyle?: OdyleSnapshot | null };
@@ -43,6 +44,8 @@ interface StoreValue {
   setTimerEnabled: (id: string, on: boolean) => void;
   /** Marca (ou limpa, com null) quando um chefe de respawn foi morto. */
   setTimerKill: (id: string, at: Date | null) => void;
+  /** Região do servidor (relógio dos horários). */
+  setTimerRegion: (region: ServerRegion) => void;
   /** Cria ou atualiza uma receita (pelo id). */
   saveRecipe: (recipe: Recipe) => void;
   deleteRecipe: (id: string) => void;
@@ -271,6 +274,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const setTimerRegion = useCallback((region: ServerRegion) => {
+    setData((d) => ({ ...d, settings: { ...d.settings, timers: { ...d.settings.timers, region } } }));
+  }, []);
+
   const setOdyleConfig = useCallback((cfg: OdyleConfig) => {
     setData((d) => ({ ...d, characters: reanchorAll(d, new Date()), settings: { ...d.settings, odyle: { ...cfg } } }));
   }, []);
@@ -324,6 +331,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       setTheme,
       setTimerEnabled,
       setTimerKill,
+      setTimerRegion,
       saveRecipe,
       deleteRecipe,
       saveCraftItem,
@@ -335,7 +343,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       spendOdyle,
       addChargedOdyle,
     };
-  }, [saveRecipeIcon, deleteRecipeIcon, saveCraftItem, deleteCraftItem, saveRecipe, deleteRecipe, setMembership, setTheme, setTimerEnabled, setTimerKill, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
+  }, [saveRecipeIcon, deleteRecipeIcon, saveCraftItem, deleteCraftItem, saveRecipe, deleteRecipe, setMembership, setTheme, setTimerEnabled, setTimerKill, setTimerRegion, setOdyleConfig, setOdyle, spendOdyle, addChargedOdyle, setStatIcon, data, saveStatus, addCharacter, updateCharacter, setMain, deleteCharacter, toggleCheck, replaceAll, catalog, setTaskEnabled, setTaskDescription, addCustomTask, deleteCustomTask, setReset]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
 }

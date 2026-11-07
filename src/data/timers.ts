@@ -1,10 +1,20 @@
 // Horários de eventos e chefes do Aion 2 (servidores Global).
-// Os servidores Global (NA, EU, América do Sul, JP) usam um relógio único em GMT+9:
-// o reset diário de 16:00 do servidor é 07:00 UTC = 04:00 em Brasília.
-// Fontes (06/11/2026): allthings.how (event schedule, world boss timers) e aion2hub.com (world bosses).
-// Os horários mudam com patches; o usuário pode ligar/desligar cada um.
+// Cada região Global segue o RELÓGIO LOCAL dela (América do Sul = horário de São Paulo, sem horário de verão;
+// NA East = Nova York; NA West = Los Angeles; Europa = Berlim; Ásia = Seul). Ex.: o Artifact Siege é 21:00
+// no relógio de cada região. Só os resets são o mesmo instante em todas (07:00 UTC = 04:00 em Brasília).
+// Fontes (07/11/2026): shugo.gg/timers (tabela da América do Sul), daevaguides.com, aion2rifttimer.com, metabot.gg.
+// A NCSOFT não publica os horários do Global: são da comunidade e mudam com patches.
 
-export const SERVER_UTC_OFFSET = 9;
+export type ServerRegion = "sa" | "na-east" | "na-west" | "eu" | "asia";
+
+export const SERVER_REGIONS: { id: ServerRegion; label: string; tz: string }[] = [
+  { id: "sa", label: "América do Sul (horário de São Paulo)", tz: "America/Sao_Paulo" },
+  { id: "na-east", label: "NA East (horário de Nova York)", tz: "America/New_York" },
+  { id: "na-west", label: "NA West (horário de Los Angeles)", tz: "America/Los_Angeles" },
+  { id: "eu", label: "Europa (horário de Berlim)", tz: "Europe/Berlin" },
+  { id: "asia", label: "Ásia (horário de Seul)", tz: "Asia/Seoul" },
+];
+export const regionInfo = (r: ServerRegion) => SERVER_REGIONS.find((x) => x.id === r) ?? SERVER_REGIONS[0];
 
 export type TimerCategory = "boss-abismo" | "boss-campo" | "evento";
 
@@ -15,7 +25,7 @@ export const TIMER_CATEGORIES: { id: TimerCategory; label: string; color: string
 ];
 export const categoryInfo = (c: TimerCategory) => TIMER_CATEGORIES.find((x) => x.id === c) ?? TIMER_CATEGORIES[0];
 
-/** Horário no relógio do servidor (GMT+9) com duração em minutos. */
+/** Horário no relógio da região do servidor, com duração em minutos. */
 export interface ServerTime {
   h: number;
   m: number;
@@ -23,9 +33,9 @@ export interface ServerTime {
 }
 
 export type TimerSchedule =
-  /** Dias da semana do servidor (0 = domingo) em horários fixos. */
+  /** Dias da semana (relógio da região; 0 = domingo) em horários fixos. */
   | { type: "weekly"; days: number[]; times: ServerTime[] }
-  /** A cada N minutos, a partir de um minuto do dia do servidor. */
+  /** A cada N minutos, a partir de um minuto do dia (relógio da região). */
   | { type: "every"; everyMin: number; offsetMin: number; dur: number }
   /** Renasce N horas depois de morto (o usuário marca quando matou). */
   | { type: "respawn"; hours: number };
@@ -50,103 +60,115 @@ export const TIMER_CATALOG: TimerDef[] = [
     category: "boss-abismo",
     schedule: { type: "every", everyMin: 180, offsetMin: 60, dur: 30 },
     enabledByDefault: true,
-    note: "A cada 3h. Anda pelo mapa: Siel's Wings, Black Fragments, Devastated Remnants, Sulfur Tree Island.",
+    note: "A cada 3h (01:00, 04:00 … 22:00). Aparece num ponto aleatório e vai embora em 30 min.",
+  },
+  {
+    id: "argo-spirit-king",
+    name: "Argo, the Spirit King",
+    place: "Chaotic Lower Reshanta",
+    category: "boss-abismo",
+    schedule: { type: "weekly", days: ALL_DAYS, times: [{ h: 10, m: 30, dur: 30 }, { h: 22, m: 30, dur: 30 }] },
+    enabledByDefault: true,
+    note: "Todo dia, 10:30 e 22:30.",
   },
   {
     id: "executors",
     name: "Executors Argo, Kaira e Tamasa",
     place: "Chaotic Lower Reshanta",
     category: "boss-abismo",
-    schedule: { type: "weekly", days: [1, 4, 6], times: [{ h: 21, m: 30, dur: 30 }] },
+    schedule: { type: "weekly", days: [4, 6], times: [{ h: 21, m: 30, dur: 30 }] },
     enabledByDefault: true,
-    note: "Segunda, quinta e sábado. Chefes do cerco (nível 65).",
+    note: "Quinta e sábado, 30 min depois do cerco (grupos 21:30, 21:35 e 21:40).",
   },
   {
     id: "nahma",
     name: "Guardian Lord Nahma",
-    place: "Reshanta (Abyss Siege Boss)",
+    place: "Lower e Middle Reshanta",
     category: "boss-abismo",
     schedule: { type: "weekly", days: [0, 5], times: [{ h: 21, m: 0, dur: 30 }] },
     enabledByDefault: true,
-    note: "Sexta e domingo.",
+    note: "Sexta e domingo (grupos 21:00, 21:05 e 21:10).",
   },
   {
     id: "middle-reshanta-bosses",
     name: "Dramos, Marakha e Ducal",
     place: "Chaotic Middle Reshanta",
     category: "boss-abismo",
-    schedule: { type: "weekly", days: [1, 4, 6], times: [{ h: 21, m: 30, dur: 30 }] },
+    schedule: { type: "weekly", days: [4, 6], times: [{ h: 21, m: 30, dur: 30 }] },
     enabledByDefault: false,
-    note: "Nível 80. As fontes divergem se já existem no Global.",
+    note: "Junto com os Executors. Nível 80.",
   },
   {
     id: "artifact-siege",
     name: "Artifact Siege",
-    place: "Reshanta",
+    place: "Chaotic Lower Reshanta",
     category: "evento",
-    schedule: { type: "weekly", days: [1, 4, 6], times: [{ h: 21, m: 0, dur: 30 }] },
+    schedule: { type: "weekly", days: [4, 6], times: [{ h: 21, m: 0, dur: 30 }] },
     enabledByDefault: true,
-    note: "Segunda, quinta e sábado. A disputa no chão começa antes da contagem.",
+    note: "Quinta e sábado desde 04/11 (antes era também segunda). Grupos 21:00, 21:05 e 21:10.",
   },
   {
     id: "spacetime-rift",
     name: "Spacetime Rift",
     category: "evento",
-    schedule: { type: "every", everyMin: 180, offsetMin: 0, dur: 10 },
+    schedule: { type: "every", everyMin: 180, offsetMin: 120, dur: 10 },
     enabledByDefault: true,
-    note: "A cada 3h. O portal fica aberto 10 min.",
+    note: "A cada 3h (02:00, 05:00 … 23:00). O portal fica aberto nos primeiros 10 min.",
   },
   {
     id: "arena-tactics",
-    name: "Arena of Tactics (10v10)",
+    name: "Arena of Tactics (Battlefield)",
     category: "evento",
     schedule: {
       type: "weekly",
       days: ALL_DAYS,
       times: [
-        { h: 11, m: 0, dur: 180 },
+        { h: 11, m: 0, dur: 120 },
         { h: 19, m: 0, dur: 120 },
       ],
     },
     enabledByDefault: true,
-    note: "Todo dia, duas janelas.",
+    note: "Todo dia, 11:00 e 19:00 (2h cada).",
   },
   {
     id: "shugo-festival",
     name: "Shugo Festival",
     category: "evento",
-    schedule: { type: "every", everyMin: 60, offsetMin: 0, dur: 3 },
+    schedule: { type: "every", everyMin: 60, offsetMin: 0, dur: 10 },
     enabledByDefault: false,
-    note: "Toda hora cheia (3 min para entrar).",
+    note: "Toda hora cheia (10 min). Gasta uma chave.",
   },
   {
     id: "dimensional-invasion",
     name: "Dimensional Invasion",
     category: "evento",
-    schedule: { type: "every", everyMin: 60, offsetMin: 30, dur: 3 },
+    schedule: { type: "every", everyMin: 60, offsetMin: 30, dur: 15 },
     enabledByDefault: false,
-    note: "Toda hora e meia (3 min para entrar).",
+    note: "Toda hora e meia (entre pelo aviso em até 3 min).",
   },
-  { id: "melted-danar", name: "Melted Danar", place: "Verteron / Altgard", category: "boss-campo", schedule: { type: "respawn", hours: 1 }, enabledByDefault: true },
-  { id: "silent-dartan", name: "Silent Dartan", place: "Verteron / Altgard", category: "boss-campo", schedule: { type: "respawn", hours: 6 }, enabledByDefault: true },
-  { id: "soul-ruler-kashapa", name: "Soul Ruler Kashapa", place: "Verteron / Altgard", category: "boss-campo", schedule: { type: "respawn", hours: 6 }, enabledByDefault: true },
-  { id: "high-commander-lagta", name: "High Commander Lagta", place: "Verteron / Altgard", category: "boss-campo", schedule: { type: "respawn", hours: 12 }, enabledByDefault: true },
-  { id: "immortal-gartua", name: "Immortal Gartua", category: "boss-campo", schedule: { type: "respawn", hours: 12 }, enabledByDefault: true },
+  { id: "melted-danar", name: "Melted Danar", place: "Altgard", category: "boss-campo", schedule: { type: "respawn", hours: 1 }, enabledByDefault: true },
+  { id: "silent-dartan", name: "Silent Dartan", place: "Verteron", category: "boss-campo", schedule: { type: "respawn", hours: 6 }, enabledByDefault: true },
+  { id: "soul-ruler-kashapa", name: "Soul Ruler Kashapa", place: "Verteron", category: "boss-campo", schedule: { type: "respawn", hours: 6 }, enabledByDefault: true },
+  { id: "high-commander-lagta", name: "High Commander Lagta", place: "Verteron", category: "boss-campo", schedule: { type: "respawn", hours: 12 }, enabledByDefault: true },
+  { id: "immortal-gartua", name: "Immortal Gartua", place: "Altgard", category: "boss-campo", schedule: { type: "respawn", hours: 12 }, enabledByDefault: true },
 ];
 
 export interface TimerSettings {
+  /** Região do servidor (define o relógio dos horários). */
+  region: ServerRegion;
   /** Ligado/desligado escolhido pelo usuário (sem entrada = padrão do catálogo). */
   enabled: Record<string, boolean>;
   /** Quando o usuário matou cada chefe de respawn (ISO). */
   kills: Record<string, string>;
 }
 
-export const defaultTimerSettings = (): TimerSettings => ({ enabled: {}, kills: {} });
+export const defaultTimerSettings = (): TimerSettings => ({ region: "sa", enabled: {}, kills: {} });
 
 export function parseTimerSettings(raw: unknown): TimerSettings {
   const s = defaultTimerSettings();
   if (!raw || typeof raw !== "object") return s;
   const o = raw as Record<string, unknown>;
+  if (SERVER_REGIONS.some((r) => r.id === o.region)) s.region = o.region as ServerRegion;
   if (o.enabled && typeof o.enabled === "object") {
     for (const [k, v] of Object.entries(o.enabled as Record<string, unknown>)) if (typeof v === "boolean") s.enabled[k] = v;
   }
@@ -173,40 +195,56 @@ const MIN = 60_000;
 const HOUR = 60 * MIN;
 const DAY = 24 * HOUR;
 
-/** Instante (UTC ms) de um horário do servidor num dia do servidor. */
-function serverInstant(serverDayStartUtc: number, t: { h: number; m: number }) {
-  return serverDayStartUtc + (t.h * 60 + t.m) * MIN;
+/** Partes da data/hora num fuso (IANA). */
+function zonedParts(ms: number, tz: string) {
+  const f = new Intl.DateTimeFormat("en-US", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric" });
+  const p: Record<string, number> = {};
+  for (const x of f.formatToParts(new Date(ms))) if (x.type !== "literal") p[x.type] = Number(x.value);
+  return { y: p.year, mo: p.month, d: p.day, h: p.hour % 24, mi: p.minute, s: p.second };
 }
 
-/** Inícios (com fim) em volta de agora, em ordem. */
-function occurrences(s: Exclude<TimerSchedule, { type: "respawn" }>, now: number): { start: number; end: number }[] {
+/** Diferença (ms) entre o relógio do fuso e o UTC naquele instante. */
+function tzOffset(ms: number, tz: string) {
+  const p = zonedParts(ms, tz);
+  return Date.UTC(p.y, p.mo - 1, p.d, p.h, p.mi, p.s) - Math.floor(ms / 1000) * 1000;
+}
+
+/** Instante (UTC ms) de uma data/hora no relógio do fuso (ajusta horário de verão). */
+export function zonedToUtc(y: number, mo: number, d: number, h: number, mi: number, tz: string) {
+  const guess = Date.UTC(y, mo - 1, d, h, mi);
+  let t = guess - tzOffset(guess, tz);
+  t = guess - tzOffset(t, tz);
+  return t;
+}
+
+/** Inícios (com fim) em volta de agora, em ordem, no relógio da região. */
+function occurrences(s: Exclude<TimerSchedule, { type: "respawn" }>, now: number, tz: string): { start: number; end: number }[] {
   const out: { start: number; end: number }[] = [];
-  const offset = SERVER_UTC_OFFSET * HOUR;
-  // Início do dia do servidor (00:00 GMT+9) que contém agora, em UTC
-  const today = Math.floor((now + offset) / DAY) * DAY - offset;
-  if (s.type === "weekly") {
-    for (let d = -2; d <= 8; d++) {
-      const dayStart = today + d * DAY;
-      const weekday = new Date(dayStart + offset).getUTCDay();
-      if (!s.days.includes(weekday)) continue;
+  const today = zonedParts(now, tz);
+  const span = s.type === "weekly" ? [-2, 8] : [-1, 1];
+  for (let k = span[0]; k <= span[1]; k++) {
+    // Data do calendário (dia k a partir de hoje no relógio da região)
+    const cal = new Date(Date.UTC(today.y, today.mo - 1, today.d + k));
+    const y = cal.getUTCFullYear();
+    const mo = cal.getUTCMonth() + 1;
+    const d = cal.getUTCDate();
+    if (s.type === "weekly") {
+      if (!s.days.includes(cal.getUTCDay())) continue;
       for (const t of s.times) {
-        const start = serverInstant(dayStart, t);
+        const start = zonedToUtc(y, mo, d, t.h, t.m, tz);
         out.push({ start, end: start + t.dur * MIN });
       }
-    }
-  } else {
-    const period = s.everyMin * MIN;
-    const base = today + s.offsetMin * MIN;
-    const k = Math.floor((now - base) / period);
-    for (let i = k - 1; i <= k + 2; i++) {
-      const start = base + i * period;
-      out.push({ start, end: start + s.dur * MIN });
+    } else {
+      for (let m = s.offsetMin; m < 24 * 60; m += s.everyMin) {
+        const start = zonedToUtc(y, mo, d, Math.floor(m / 60), m % 60, tz);
+        out.push({ start, end: start + s.dur * MIN });
+      }
     }
   }
   return out.sort((a, b) => a.start - b.start);
 }
 
-export function timerState(def: TimerDef, now: number, kills: Record<string, string>): TimerState {
+export function timerState(def: TimerDef, now: number, kills: Record<string, string>, region: ServerRegion = "sa"): TimerState {
   const s = def.schedule;
   if (s.type === "respawn") {
     const k = kills[def.id];
@@ -214,7 +252,7 @@ export function timerState(def: TimerDef, now: number, kills: Record<string, str
     const start = Date.parse(k) + s.hours * HOUR;
     return start <= now ? { kind: "spawned", start } : { kind: "next", start, prev: Date.parse(k) };
   }
-  const occ = occurrences(s, now);
+  const occ = occurrences(s, now, regionInfo(region).tz);
   const live = occ.find((o) => o.start <= now && now < o.end);
   if (live) return { kind: "live", start: live.start, end: live.end };
   const i = occ.findIndex((o) => o.start > now);
@@ -271,26 +309,15 @@ export function localWhen(ms: number, now: number): string {
   return `${WEEKDAYS[d.getDay()]} ${hm}`;
 }
 
-/** Texto do horário fixo no relógio do PC (para a lista de configuração). */
+const hm = (h: number, m: number) => `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+
+/** Texto do horário no relógio da região do servidor (para a lista de configuração). */
 export function describeSchedule(s: TimerSchedule): string {
-  const toLocal = (h: number, m: number) => {
-    const d = new Date(Date.UTC(2026, 0, 4, h - SERVER_UTC_OFFSET, m));
-    return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
-  };
   if (s.type === "respawn") return `Renasce ${s.hours}h depois de morto`;
   if (s.type === "every") {
-    const first = toLocal(Math.floor(s.offsetMin / 60), s.offsetMin % 60);
-    return s.everyMin === 60 ? (s.offsetMin % 60 ? `Toda hora, aos ${s.offsetMin % 60} min` : "Toda hora cheia") : `A cada ${s.everyMin / 60}h (${first}, …)`;
+    if (s.everyMin === 60) return s.offsetMin % 60 ? `Toda hora, aos ${s.offsetMin % 60} min` : "Toda hora cheia";
+    return `A cada ${s.everyMin / 60}h (${hm(Math.floor(s.offsetMin / 60), s.offsetMin % 60)}, …)`;
   }
-  // Dias no fuso do PC (o dia pode mudar ao converter)
-  const parts = s.times.map((t) => {
-    const days = s.days.map((wd) => {
-      // 4/1/2026 foi domingo: wd dias depois, no horário do servidor
-      const d = new Date(Date.UTC(2026, 0, 4 + wd, t.h - SERVER_UTC_OFFSET, t.m));
-      return d.getDay();
-    });
-    const dayTxt = days.length === 7 ? "todo dia" : [...days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((x) => WEEKDAYS[x]).join(", ");
-    return `${dayTxt} ${toLocal(t.h, t.m)}`;
-  });
-  return parts.join(" · ");
+  const days = s.days.length === 7 ? "todo dia" : [...s.days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((x) => WEEKDAYS[x]).join(", ");
+  return `${days} ${s.times.map((t) => hm(t.h, t.m)).join(" e ")}`;
 }

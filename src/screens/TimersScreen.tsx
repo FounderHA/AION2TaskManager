@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Panel, SectionTitle } from "../components/ui";
 import { TimerList, useNow, type TimerFilter } from "../components/TimerList";
 import { useStore } from "../data/store";
-import { TIMER_CATALOG, TIMER_CATEGORIES, categoryInfo, describeSchedule, formatTimerCountdown, isTimerEnabled, localWhen, timerState } from "../data/timers";
+import { SERVER_REGIONS, TIMER_CATALOG, TIMER_CATEGORIES, categoryInfo, describeSchedule, formatTimerCountdown, isTimerEnabled, localWhen, regionInfo, timerState, type ServerRegion } from "../data/timers";
 
 const FILTERS: { id: TimerFilter; label: string }[] = [
   { id: "todos", label: "Todos" },
@@ -74,11 +74,24 @@ function RespawnBosses() {
 }
 
 function TimerSettingsPanel() {
-  const { data, setTimerEnabled } = useStore();
+  const { data, setTimerEnabled, setTimerRegion } = useStore();
   const s = data.settings.timers;
   return (
     <Panel label="Escolher eventos">
-      <SectionTitle aside="Horários convertidos para o relógio do seu PC">Quais horários mostrar</SectionTitle>
+      <SectionTitle aside={`Horários no relógio de: ${regionInfo(s.region).label}`}>Quais horários mostrar</SectionTitle>
+      <div className="field tm-region">
+        <label className="field__label" htmlFor="tm-region">
+          Região do servidor
+        </label>
+        <select id="tm-region" className="input" value={s.region} onChange={(e) => setTimerRegion(e.target.value as ServerRegion)}>
+          {SERVER_REGIONS.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.label}
+            </option>
+          ))}
+        </select>
+        <span className="tm-hint">Cada região segue o próprio relógio (ex.: Artifact Siege às 21:00 locais). Na lista, os horários aparecem no relógio do seu PC.</span>
+      </div>
       {TIMER_CATEGORIES.map((c) => (
         <div key={c.id} className="tm-cfg">
           <div className="tm-cfg__title" style={{ ["--c" as string]: c.color }}>
@@ -101,7 +114,7 @@ function TimerSettingsPanel() {
         </div>
       ))}
       <p className="tm-hint">
-        Os servidores Global usam o relógio GMT+9 (o reset diário é 16:00 lá = 04:00 em Brasília); aqui tudo aparece no horário do seu PC. Fontes: allthings.how e aion2hub.com (06/11/2026). Os horários podem mudar com patches.
+        A NCSOFT não publica os horários do Global: estes são da comunidade (shugo.gg, daevaguides.com, aion2rifttimer.com, metabot.gg; revisados em 07/11/2026) e podem mudar com patches. Os chefes de campo renascem de 30 min a 12h depois de mortos; o mapa do jogo (aba Exploration) mostra o tempo exato.
       </p>
     </Panel>
   );
